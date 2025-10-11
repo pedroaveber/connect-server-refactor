@@ -15,6 +15,7 @@ import { checkAuth } from "./http/routes/auth/check-auth"
 import { signIn } from "./http/routes/auth/sign-in"
 import { signOut } from "./http/routes/auth/sign-out"
 import { createCompanyGroup } from "./http/routes/company-group/create-company-group"
+import { updateCompanyGroup } from "./http/routes/company-group/update-company-group"
 import { healthCheck } from "./http/routes/health-check"
 
 export const app = fastify({
@@ -85,3 +86,4 @@ app.register(signIn)
 app.register(signOut)
 app.register(checkAuth)
 app.register(createCompanyGroup)
+app.register(updateCompanyGroup)

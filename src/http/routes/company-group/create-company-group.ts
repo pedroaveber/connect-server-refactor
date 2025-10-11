@@ -38,7 +38,7 @@ export const createCompanyGroup: FastifyPluginCallbackZod = (app) => {
       },
     },
     async (request, reply) => {
-      const { document, name, phones } = request.body
+      const { document, name, phones, totalVehiclesHired } = request.body
 
       const companyGroupWithSameDocument = await prisma.companyGroup.findUnique(
         {
@@ -58,6 +58,7 @@ export const createCompanyGroup: FastifyPluginCallbackZod = (app) => {
         data: {
           document,
           name,
+          totalVehiclesHired,
           phones: {
             createMany: {
               data: phones,
