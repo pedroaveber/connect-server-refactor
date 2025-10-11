@@ -14,6 +14,7 @@ import { env } from "./env"
 import { checkAuth } from "./http/routes/auth/check-auth"
 import { signIn } from "./http/routes/auth/sign-in"
 import { signOut } from "./http/routes/auth/sign-out"
+import { createCompanyGroup } from "./http/routes/company-group/create-company-group"
 import { healthCheck } from "./http/routes/health-check"
 
 export const app = fastify({
@@ -54,12 +55,21 @@ app.register(fastifySwagger, {
       title: "Connect | Server",
       version: "2.0.0",
     },
+    components: {
+      securitySchemes: {
+        BearerAuth: {
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT",
+        },
+      },
+    },
   },
 
   transform: jsonSchemaTransform,
 })
 
-if (env.NODE_ENV === "development") {
+if (env.ENV === "development") {
   app.register(scalarApiReference, {
     routePrefix: "/docs",
     configuration: {
@@ -74,3 +84,4 @@ app.register(healthCheck)
 app.register(signIn)
 app.register(signOut)
 app.register(checkAuth)
+app.register(createCompanyGroup)

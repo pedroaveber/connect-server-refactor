@@ -1,9 +1,25 @@
-import type { FastifyPluginCallbackZod } from "fastify-type-provider-zod";
+import type { FastifyPluginCallbackZod } from "fastify-type-provider-zod"
+import { z } from "zod"
 
 export const healthCheck: FastifyPluginCallbackZod = (app) => {
-	app.get("/health", (_request, reply) => {
-		return reply.status(200).send({
-			status: "ok",
-		});
-	});
-};
+  app.get(
+    "/health",
+    {
+      schema: {
+        tags: ["Health Check"],
+        summary: "Health Check",
+        description: "Health Check to the application",
+        response: {
+          200: z.object({
+            status: z.string(),
+          }),
+        },
+      },
+    },
+    async (_request, reply) => {
+      await reply.status(200).send({
+        status: "ok",
+      })
+    }
+  )
+}
