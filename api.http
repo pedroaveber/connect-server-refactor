@@ -81,3 +81,68 @@ Authorization: Bearer {{accessToken}}
 # @name DeleteCompanyGroupPhoneNumber
 Delete {{baseUrl}}/company-groups/cmgmci5ec0000roys4pmw7gtp/phones/cmgmci5ee0001royspndareir
 Authorization: Bearer {{accessToken}}
+
+###
+# @name GetCompanies
+Get {{baseUrl}}/companies
+Authorization: Bearer {{accessToken}}
+
+###
+# @name GetCompaniesByCompanyGroupId
+Get {{baseUrl}}/companies?companyGroupId=cmgmci5ec0000roys4pmw7gtp
+Authorization: Bearer {{accessToken}}
+
+###
+# @name GetCompany
+Get {{baseUrl}}/companies/cm5abc123def4ghij5klm6nop
+Authorization: Bearer {{accessToken}}
+
+###
+# @name CreateCompany
+Post {{baseUrl}}/companies
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "name": "Empresa 1",
+  "document": "12345678000199",
+  "totalVehiclesHired": 5,
+  "companyGroupId": "cmgmci5ec0000roys4pmw7gtp",
+  "phones": [
+    {
+      "number": "+5511988887777"
+    }
+  ]
+}
+
+###
+# @name UpdateCompany
+Put {{baseUrl}}/companies/cm5abc123def4ghij5klm6nop
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "name": "Empresa Atualizada",
+  "document": "12345678000199",
+  "totalVehiclesHired": 8
+}
+
+###
+# @name DeleteCompany
+Delete {{baseUrl}}/companies/cm5abc123def4ghij5klm6nop
+Authorization: Bearer {{accessToken}}
+
+###
+# @name CreateCompanyPhoneNumber
+Post {{baseUrl}}/companies/cm5abc123def4ghij5klm6nop/phones
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "number": "+5521987654321"
+}
+
+###
+# @name DeleteCompanyPhoneNumber
+Delete {{baseUrl}}/companies/cm5abc123def4ghij5klm6nop/phones/cm5xyz789abc0defg1hij2klm
+Authorization: Bearer {{accessToken}}

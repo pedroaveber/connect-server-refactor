@@ -17,6 +17,9 @@ model Phone {
   companyGroup   CompanyGroup? @relation(fields: [companyGroupId], references: [id])
   companyGroupId String?       @map("company_group_id")
 
+  company   Company? @relation(fields: [companyId], references: [id])
+  companyId String?  @map("company_id")
+
   @@map("phones")
 }
 
@@ -29,9 +32,27 @@ model CompanyGroup {
   updatedAt          DateTime  @updatedAt @map("updated_at")
   deletedAt          DateTime? @map("deleted_at")
 
-  phones Phone[]
+  phones    Phone[]
+  companies Company[]
 
   @@map("company_groups")
+}
+
+model Company {
+  id                 String    @id @default(cuid())
+  name               String
+  document           String    @unique
+  totalVehiclesHired Int       @default(0) @map("total_vehicles_hired")
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @updatedAt @map("updated_at")
+  deletedAt          DateTime? @map("deleted_at")
+
+  companyGroup   CompanyGroup @relation(fields: [companyGroupId], references: [id])
+  companyGroupId String       @map("company_group_id")
+
+  phones Phone[]
+
+  @@map("companies")
 }
 
 model User {

@@ -14,6 +14,13 @@ import { env } from "./env"
 import { checkAuth } from "./http/routes/auth/check-auth"
 import { signIn } from "./http/routes/auth/sign-in"
 import { signOut } from "./http/routes/auth/sign-out"
+import { createCompany } from "./http/routes/companies/create-company"
+import { createCompanyPhoneNumber } from "./http/routes/companies/create-company-phone-number"
+import { deleteCompany } from "./http/routes/companies/delete-company"
+import { deleteCompanyPhoneNumber } from "./http/routes/companies/delete-company-phone-number"
+import { getCompanies } from "./http/routes/companies/get-companies"
+import { getCompany } from "./http/routes/companies/get-company"
+import { updateCompany } from "./http/routes/companies/update-company"
 import { createCompanyGroup } from "./http/routes/company-group/create-company-group"
 import { createCompanyGroupPhoneNumber } from "./http/routes/company-group/create-company-group-phone-number"
 import { deleteCompanyGroup } from "./http/routes/company-group/delete-company-group"
@@ -98,3 +105,11 @@ app.register(getCompanyGroups)
 app.register(getCompanyGroup)
 app.register(createCompanyGroupPhoneNumber)
 app.register(deleteCompanyGroupPhoneNumber)
+
+app.register(createCompany)
+app.register(updateCompany)
+app.register(deleteCompany)
+app.register(getCompanies)
+app.register(getCompany)
+app.register(createCompanyPhoneNumber)
+app.register(deleteCompanyPhoneNumber)
