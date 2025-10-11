@@ -29,6 +29,13 @@ import { getCompanyGroup } from "./http/routes/company-group/get-company-group"
 import { getCompanyGroups } from "./http/routes/company-group/get-company-groups"
 import { updateCompanyGroup } from "./http/routes/company-group/update-company-group"
 import { healthCheck } from "./http/routes/health-check"
+import { createUnit } from "./http/routes/units/create-unit"
+import { createUnitPhoneNumber } from "./http/routes/units/create-unit-phone-number"
+import { deleteUnit } from "./http/routes/units/delete-unit"
+import { deleteUnitPhoneNumber } from "./http/routes/units/delete-unit-phone-number"
+import { getUnit } from "./http/routes/units/get-unit"
+import { getUnits } from "./http/routes/units/get-units"
+import { updateUnit } from "./http/routes/units/update-unit"
 
 export const app = fastify({
   logger: {
@@ -113,3 +120,11 @@ app.register(getCompanies)
 app.register(getCompany)
 app.register(createCompanyPhoneNumber)
 app.register(deleteCompanyPhoneNumber)
+
+app.register(createUnit)
+app.register(updateUnit)
+app.register(deleteUnit)
+app.register(getUnits)
+app.register(getUnit)
+app.register(createUnitPhoneNumber)
+app.register(deleteUnitPhoneNumber)

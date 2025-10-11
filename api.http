@@ -146,3 +146,68 @@ Authorization: Bearer {{accessToken}}
 # @name DeleteCompanyPhoneNumber
 Delete {{baseUrl}}/companies/cm5abc123def4ghij5klm6nop/phones/cm5xyz789abc0defg1hij2klm
 Authorization: Bearer {{accessToken}}
+
+###
+# @name GetUnits
+Get {{baseUrl}}/units
+Authorization: Bearer {{accessToken}}
+
+###
+# @name GetUnitsByCompanyId
+Get {{baseUrl}}/units?companyId=cm5abc123def4ghij5klm6nop
+Authorization: Bearer {{accessToken}}
+
+###
+# @name GetUnit
+Get {{baseUrl}}/units/cm5unit123def4ghij5klm6xyz
+Authorization: Bearer {{accessToken}}
+
+###
+# @name CreateUnit
+Post {{baseUrl}}/units
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "name": "Unidade Centro",
+  "document": "98765432000177",
+  "totalVehiclesHired": 3,
+  "companyId": "cm5abc123def4ghij5klm6nop",
+  "phones": [
+    {
+      "number": "+5511977776666"
+    }
+  ]
+}
+
+###
+# @name UpdateUnit
+Put {{baseUrl}}/units/cm5unit123def4ghij5klm6xyz
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "name": "Unidade Centro Atualizada",
+  "document": "98765432000177",
+  "totalVehiclesHired": 5
+}
+
+###
+# @name DeleteUnit
+Delete {{baseUrl}}/units/cm5unit123def4ghij5klm6xyz
+Authorization: Bearer {{accessToken}}
+
+###
+# @name CreateUnitPhoneNumber
+Post {{baseUrl}}/units/cm5unit123def4ghij5klm6xyz/phones
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "number": "+5511966665555"
+}
+
+###
+# @name DeleteUnitPhoneNumber
+Delete {{baseUrl}}/units/cm5unit123def4ghij5klm6xyz/phones/cm5phone789abc0defg1hij2abc
+Authorization: Bearer {{accessToken}}
