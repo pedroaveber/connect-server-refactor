@@ -42,7 +42,6 @@ Authorization: Bearer {{accessToken}}
 {
   "name": "Grupo empresarial 1",
   "document": "92872357000188",
-  "totalVehiclesHired": 10,
   "phones": [
     {
       "number": "+5511999999999"
@@ -58,8 +57,7 @@ Authorization: Bearer {{accessToken}}
 
 {
   "name": "Super grupo empresarial 2",
-  "document": "92872357000188",
-  "totalVehiclesHired": 10
+  "document": "92872357000188"
 }
 
 ###
@@ -106,7 +104,6 @@ Authorization: Bearer {{accessToken}}
 {
   "name": "Empresa 1",
   "document": "12345678000199",
-  "totalVehiclesHired": 5,
   "companyGroupId": "cmgmci5ec0000roys4pmw7gtp",
   "phones": [
     {
@@ -123,8 +120,7 @@ Authorization: Bearer {{accessToken}}
 
 {
   "name": "Empresa Atualizada",
-  "document": "12345678000199",
-  "totalVehiclesHired": 8
+  "document": "12345678000199"
 }
 
 ###
@@ -171,7 +167,6 @@ Authorization: Bearer {{accessToken}}
 {
   "name": "Unidade Centro",
   "document": "98765432000177",
-  "totalVehiclesHired": 3,
   "companyId": "cm5abc123def4ghij5klm6nop",
   "phones": [
     {
@@ -188,8 +183,7 @@ Authorization: Bearer {{accessToken}}
 
 {
   "name": "Unidade Centro Atualizada",
-  "document": "98765432000177",
-  "totalVehiclesHired": 5
+  "document": "98765432000177"
 }
 
 ###

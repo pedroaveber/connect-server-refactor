@@ -29,7 +29,6 @@ export const getCompanies: FastifyPluginCallbackZod = (app) => {
                 id: z.cuid(),
                 name: z.string(),
                 document: z.string(),
-                totalVehiclesHired: z.number(),
                 companyGroupId: z.cuid(),
                 createdAt: z.date(),
                 updatedAt: z.date(),

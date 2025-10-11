@@ -23,9 +23,6 @@ export const updateCompany: FastifyPluginCallbackZod = (app) => {
           document: z.string().length(14).meta({
             description: "Brazilian CNPJ",
           }),
-          totalVehiclesHired: z.number().int().min(0).meta({
-            description: "Total of vehicles hired",
-          }),
         }),
         response: {
           204: z.null(),
@@ -34,7 +31,7 @@ export const updateCompany: FastifyPluginCallbackZod = (app) => {
     },
     async (request, reply) => {
       const { companyId } = request.params
-      const { document, name, totalVehiclesHired } = request.body
+      const { document, name } = request.body
 
       const company = await prisma.company.findUnique({
         where: {
@@ -72,7 +69,6 @@ export const updateCompany: FastifyPluginCallbackZod = (app) => {
         data: {
           name,
           document,
-          totalVehiclesHired,
         },
       })
 

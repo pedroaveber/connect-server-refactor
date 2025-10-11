@@ -20,9 +20,6 @@ export const createUnit: FastifyPluginCallbackZod = (app) => {
           document: z.string().length(14).meta({
             description: "Brazilian CNPJ",
           }),
-          totalVehiclesHired: z.number().int().min(0).meta({
-            description: "Total of vehicles hired",
-          }),
           companyId: z.cuid().meta({
             description: "Company ID",
           }),
@@ -42,8 +39,7 @@ export const createUnit: FastifyPluginCallbackZod = (app) => {
       },
     },
     async (request, reply) => {
-      const { document, name, phones, totalVehiclesHired, companyId } =
-        request.body
+      const { document, name, phones, companyId } = request.body
 
       const company = await prisma.company.findUnique({
         where: {
@@ -69,7 +65,6 @@ export const createUnit: FastifyPluginCallbackZod = (app) => {
         data: {
           document,
           name,
-          totalVehiclesHired,
           companyId,
           phones: {
             createMany: {
