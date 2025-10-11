@@ -1,5 +1,5 @@
 @baseUrl=http://localhost:3333
-@accessToken=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbWdnaWp3d3QwMDAwcm9nc2s4MHRxa3BtIiwiaWF0IjoxNzU5OTM5NDQxLCJleHAiOjE3NTk5NDEyNDF9.jBgKeNQHgtlt6b3PHdAnDnGQlpGrlH1A2Ou7aBP3i6Nc5U4CcvWY0gdrj5EwtoHWrwsHzEXAC0VOhsR_ehcUY92Omj5Xppb5-bxmXgKTd7SEY_BLwiQxk4ZrsCmsNRC5L_8iuo5DC1xa_cWDoPfTqN8llR1JEKViapQ1_gCi_oCLHUJhtZ-gypvEh_dTLNYw14lRR8UnHg-fwrByVfV42XiTroZymrLRywVwp67KbAAvO4CH99uq5HWWFl0KrJJmCpa42vftkYTJAF1SF1jq5HK0hXj3HX1E-rAdQKK1-WaWCEndGNOFfb0Uh3kvpt_IhcZUJDVIpuBRjpWmliN2RQ
+@accessToken={{SignIn.response.body.accessToken}}
 
 ###
 # @name GetHealthCheck
@@ -22,3 +22,62 @@ Post {{baseUrl}}/auth/sign-out
 ###
 # @name CheckAuth
 Get {{baseUrl}}/auth/status
+
+###
+# @name GetCompanyGroups
+Get {{baseUrl}}/company-groups
+Authorization: Bearer {{accessToken}}
+
+###
+# @name GetCompanyGroup
+Get {{baseUrl}}/company-groups/cmgmci5ec0000roys4pmw7gtp
+Authorization: Bearer {{accessToken}}
+
+###
+# @name CreateCompanyGroup
+Post {{baseUrl}}/company-groups
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "name": "Grupo empresarial 1",
+  "document": "92872357000188",
+  "totalVehiclesHired": 10,
+  "phones": [
+    {
+      "number": "+5511999999999"
+    }
+  ]
+}
+
+###
+# @name UpdateCompanyGroup
+Put {{baseUrl}}/company-groups/cmgmci5ec0000roys4pmw7gtp
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "name": "Super grupo empresarial 2",
+  "document": "92872357000188",
+  "totalVehiclesHired": 10
+}
+
+###
+# @name DeleteCompanyGroup
+Delete {{baseUrl}}/company-groups/cmgmci5ec0000roys4pmw7gtp
+Authorization: Bearer {{accessToken}}
+
+###
+# @name CreateCompanyGroupPhoneNumber
+Post {{baseUrl}}/company-groups/cmgmci5ec0000roys4pmw7gtp/phones
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "number": "+5554999859934"
+}
+
+###
+# @name DeleteCompanyGroupPhoneNumber
+Delete {{baseUrl}}/company-groups/cmgmci5ec0000roys4pmw7gtp/phones/cmgmci5ee0001royspndareir
+Authorization: Bearer {{accessToken}}

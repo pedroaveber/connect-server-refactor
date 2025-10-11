@@ -16,7 +16,7 @@ export const createCompanyGroup: FastifyPluginCallbackZod = (app) => {
         description: "Create company group",
         body: z.object({
           name: z.string(),
-          document: z.string().length(11).meta({
+          document: z.string().length(14).meta({
             description: "Brazilian CNPJ",
           }),
           totalVehiclesHired: z.number().int().min(0).meta({
@@ -24,7 +24,7 @@ export const createCompanyGroup: FastifyPluginCallbackZod = (app) => {
           }),
           phones: z.array(
             z.object({
-              number: z.string().length(11).meta({
+              number: z.string().meta({
                 description: "Brazilian phone number (example: +5511999999999)",
               }),
             })

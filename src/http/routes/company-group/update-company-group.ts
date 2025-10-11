@@ -20,7 +20,7 @@ export const updateCompanyGroup: FastifyPluginCallbackZod = (app) => {
         }),
         body: z.object({
           name: z.string(),
-          document: z.string().length(11).meta({
+          document: z.string().length(14).meta({
             description: "Brazilian CNPJ",
           }),
           totalVehiclesHired: z.number().int().min(0).meta({
