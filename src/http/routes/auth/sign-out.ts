@@ -19,14 +19,14 @@ export const signOut: FastifyPluginCallbackZod = (app) => {
     async (_request, reply) => {
       reply.clearCookie("accessToken", {
         httpOnly: true,
-        secure: env.NODE_ENV === "production",
-        sameSite: env.NODE_ENV === "production" ? "none" : "lax",
+        secure: env.ENV === "production",
+        sameSite: env.ENV === "production" ? "none" : "lax",
       })
 
       reply.clearCookie("refreshToken", {
         httpOnly: true,
-        secure: env.NODE_ENV === "production",
-        sameSite: env.NODE_ENV === "production" ? "none" : "lax",
+        secure: env.ENV === "production",
+        sameSite: env.ENV === "production" ? "none" : "lax",
       })
 
       return reply.status(204).send(null)

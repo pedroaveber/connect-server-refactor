@@ -69,16 +69,16 @@ export const signIn: FastifyPluginCallbackZod = (app) => {
       reply.setCookie("accessToken", accessToken, {
         path: "/",
         httpOnly: true,
-        secure: env.NODE_ENV === "production",
-        sameSite: env.NODE_ENV === "production" ? "none" : "lax",
+        secure: env.ENV === "production",
+        sameSite: env.ENV === "production" ? "none" : "lax",
         maxAge: 30 * 60 * 1000, // 30 minutes
       })
 
       reply.setCookie("refreshToken", refreshToken, {
         path: "/",
         httpOnly: true,
-        secure: env.NODE_ENV === "production",
-        sameSite: env.NODE_ENV === "production" ? "none" : "lax",
+        secure: env.ENV === "production",
+        sameSite: env.ENV === "production" ? "none" : "lax",
         maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
       })
 
