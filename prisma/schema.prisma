@@ -8,6 +8,246 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum AmbulanceStatusEnum {
+  QAP
+  OCP
+  EVT
+  J4
+  J5
+  FA
+  MN
+}
+
+model Ambulance {
+  id String @id @default(cuid())
+
+  // Base values
+  name        String
+  observation String?
+  plateNumber String    @unique @map("plate_number")
+  linkingCode String    @unique @map("linking_code")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  deletedAt   DateTime? @map("deleted_at")
+
+  // Base Relation
+  ambulanceBase   Base   @relation(fields: [ambulanceBaseId], references: [id])
+  ambulanceBaseId String @map("ambulance_base_id")
+
+  // Relations
+  ambulanceShift               AmbulanceShift[]
+  ambulanceStatus              AmbulanceStatus[]
+  ambulanceDestinationCommands AmbulanceDestinationCommands[]
+  ambulanceDocuments           AmbulanceDocuments[]
+  chat                         Chat[]
+
+  @@map("ambulances")
+}
+
+model AmbulanceStatus {
+  id String @id @default(cuid())
+
+  status AmbulanceStatusEnum @default(FA)
+
+  ambulance   Ambulance @relation(fields: [ambulanceId], references: [id])
+  ambulanceId String    @map("ambulance_id")
+
+  user   User?   @relation(fields: [userId], references: [id])
+  userId String? @map("user_id")
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  @@map("ambulance_statuses")
+}
+
+model AmbulanceShift {
+  id String @id @default(cuid())
+
+  startDate DateTime @map("start_date")
+  endDate   DateTime @map("end_date")
+
+  ambulance   Ambulance @relation(fields: [ambulanceId], references: [id])
+  ambulanceId String    @map("ambulance_id")
+
+  user   User?   @relation(fields: [userId], references: [id])
+  userId String? @map("user_id")
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  @@map("ambulance_shifts")
+}
+
+model AmbulanceDocuments {
+  id String @id @default(cuid())
+
+  // Documentos
+  documentTitle String   @map("document_title")
+  documentType  String   @map("document_type")
+  documentUrl   String   @map("document_url")
+  validUntil    DateTime @map("valid_until")
+
+  ambulance   Ambulance @relation(fields: [ambulanceId], references: [id])
+  ambulanceId String    @map("ambulance_id")
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  @@map("ambulance_documents")
+}
+
+model AmbulanceDestinationCommands {
+  id String @id @default(cuid())
+
+  // Endereço
+  latitude  Float?
+  longitude Float?
+  address   String?
+
+  // Pode ser vinculado a uma base
+  base   Base?   @relation(fields: [baseId], references: [id])
+  baseId String? @map("base_id")
+
+  // Atendido
+  attended   Boolean?  @default(false)
+  attendedAt DateTime? @default(now())
+
+  ambulance   Ambulance @relation(fields: [ambulanceId], references: [id])
+  ambulanceId String    @map("ambulance_id")
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  @@map("ambulance_destination_commands")
+}
+
+model CompanyGroup {
+  id       String  @id @default(cuid())
+  name     String
+  document String? @unique
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  phones    Phone[]
+  companies Company[]
+
+  @@map("company_groups")
+}
+
+model Company {
+  id       String  @id @default(cuid())
+  name     String
+  document String? @unique
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  companyGroup   CompanyGroup @relation(fields: [companyGroupId], references: [id])
+  companyGroupId String       @map("company_group_id")
+
+  phones Phone[]
+  units  Unit[]
+
+  @@map("companies")
+}
+
+model Unit {
+  id       String  @id @default(cuid())
+  name     String
+  document String? @unique
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  company   Company @relation(fields: [companyId], references: [id])
+  companyId String  @map("company_id")
+
+  phones Phone[]
+
+  @@map("units")
+}
+
+model Base {
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  latitude  Float
+  longitude Float
+  ambulance Ambulance[]
+
+  phones                       Phone[]
+  ambulanceDestinationCommands AmbulanceDestinationCommands[]
+
+  @@map("bases")
+}
+
+model Chat {
+  id String @id @default(cuid())
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  ambulance   Ambulance  @relation(fields: [ambulanceId], references: [id])
+  ambulanceId String     @map("ambulance_id")
+  messages    Messages[]
+
+  @@index([ambulanceId]) // busca rápida por chat de uma ambulância
+  @@map("chats")
+}
+
+model Messages {
+  id String @id @default(cuid())
+
+  messageContent String  @map("message_content")
+  messageType    String  @map("message_type")
+  messageFile    String? @map("message_file")
+
+  chat   Chat   @relation(fields: [chatId], references: [id])
+  chatId String @map("chat_id")
+
+  user   User?   @relation(fields: [userId], references: [id])
+  userId String? @map("user_id")
+
+  createdAt          DateTime             @default(now()) @map("created_at")
+  updatedAt          DateTime             @updatedAt @map("updated_at")
+  deletedAt          DateTime?            @map("deleted_at")
+  messageReadReceipt MessageReadReceipt[]
+
+  @@index([chatId]) // busca rápida por mensagens de um chat
+  @@index([userId]) // busca rápida por mensagens de um user
+  @@index([createdAt]) // busca rápida por mensagens em um período
+  @@map("messages")
+}
+
+model MessageReadReceipt {
+  id String @id @default(cuid())
+
+  message   Messages @relation(fields: [messageId], references: [id])
+  messageId String   @map("message_id")
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String @map("user_id")
+
+  readAt DateTime @default(now()) @map("read_at")
+
+  @@unique([messageId, userId]) // cada user só pode ler uma vez a mesma mensagem
+  @@index([userId]) // busca rápida por mensagens lidas por um user
+  @@index([messageId, readAt]) // busca rápida por quem leu uma mensagem e quando
+  @@map("message_read_receipts")
+}
+
 model Phone {
   id        String   @id @default(cuid())
   number    String
@@ -23,67 +263,28 @@ model Phone {
   unit   Unit?   @relation(fields: [unitId], references: [id])
   unitId String? @map("unit_id")
 
+  base   Base?   @relation(fields: [baseId], references: [id])
+  baseId String?
+
+  @@index([number]) // busca rápida por número de telefone
   @@map("phones")
 }
 
-model CompanyGroup {
-  id                 String    @id @default(cuid())
-  name               String
-  document           String    @unique
-  totalVehiclesHired Int       @default(0) @map("total_vehicles_hired")
-  createdAt          DateTime  @default(now()) @map("created_at")
-  updatedAt          DateTime  @updatedAt @map("updated_at")
-  deletedAt          DateTime? @map("deleted_at")
-
-  phones    Phone[]
-  companies Company[]
-
-  @@map("company_groups")
-}
-
-model Company {
-  id        String    @id @default(cuid())
-  name      String
-  document  String    @unique
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime  @updatedAt @map("updated_at")
-  deletedAt DateTime? @map("deleted_at")
-
-  companyGroup   CompanyGroup @relation(fields: [companyGroupId], references: [id])
-  companyGroupId String       @map("company_group_id")
-
-  phones Phone[]
-  units  Unit[]
-
-  @@map("companies")
-}
-
-model Unit {
-  id        String    @id @default(cuid())
-  name      String
-  document  String    @unique
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime  @updatedAt @map("updated_at")
-  deletedAt DateTime? @map("deleted_at")
-
-  company   Company @relation(fields: [companyId], references: [id])
-  companyId String  @map("company_id")
-
-  phones Phone[]
-
-  @@map("units")
-}
-
 model User {
-  id        String    @id @default(cuid())
-  name      String
-  document  String    @unique
-  password  String
-  birthDate DateTime  @map("birth_date")
-  avatarUrl String?   @map("avatar_url")
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime  @updatedAt @map("updated_at")
-  deletedAt DateTime? @map("deleted_at")
+  id                 String               @id @default(cuid())
+  name               String
+  document           String               @unique
+  password           String
+  birthDate          DateTime             @map("birth_date")
+  avatarUrl          String?              @map("avatar_url")
+  createdAt          DateTime             @default(now()) @map("created_at")
+  updatedAt          DateTime             @updatedAt @map("updated_at")
+  deletedAt          DateTime?            @map("deleted_at")
+  ambulanceShift     AmbulanceShift[]
+  ambulanceStatus    AmbulanceStatus[]
+  messages           Messages[]
+  messageReadReceipt MessageReadReceipt[]
 
+  @@index([document]) // busca rápida por documento
   @@map("users")
 }
