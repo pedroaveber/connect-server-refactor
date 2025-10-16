@@ -1,4 +1,22 @@
 import { app } from "./app";
+import { attendDestinationCommand } from "./http/routes/ambulance-destination-commands/attend-destination-commands";
+import { createDestinationCommand } from "./http/routes/ambulance-destination-commands/create-ambulance-destination-commands";
+import { deleteDestinationCommand } from "./http/routes/ambulance-destination-commands/delete-destination-command";
+import { getDestinationCommands } from "./http/routes/ambulance-destination-commands/find-destination-commands";
+import { replaceDestinationCommand } from "./http/routes/ambulance-destination-commands/replace-destination-commands";
+import { updateAmbulanceDocumentsInBulk } from "./http/routes/ambulance-documents/bulk-update-ambulance-documents";
+import { createAmbulanceDocuments } from "./http/routes/ambulance-documents/create-ambulance-documents";
+import { deleteAmbulanceDocument } from "./http/routes/ambulance-documents/delete-ambulance-documents";
+import { updateAmbulanceDocument } from "./http/routes/ambulance-documents/update-ambulance-documents";
+import { createAmbulanceShift } from "./http/routes/ambulance-shifts/create-ambulance-shift";
+import { getAmbulanceShifts } from "./http/routes/ambulance-shifts/find-ambulance-shifts";
+import { createAmbulanceStatus } from "./http/routes/ambulance-status/create-ambulance-status";
+import { getAmbulanceStatuses } from "./http/routes/ambulance-status/find-ambulance-status";
+import { createAmbulance } from "./http/routes/ambulances/create-ambulance";
+import { deleteAmbulance } from "./http/routes/ambulances/delete-ambulance";
+import { getAmbulance } from "./http/routes/ambulances/get-ambulance";
+import { getAmbulances } from "./http/routes/ambulances/get-ambulances";
+import { updateAmbulance } from "./http/routes/ambulances/update-ambulance";
 import { checkAuth } from "./http/routes/auth/check-auth";
 import { signIn } from "./http/routes/auth/sign-in";
 import { signOut } from "./http/routes/auth/sign-out";
@@ -62,4 +80,33 @@ export default function Routing() {
   app.register(getUnit);
   app.register(createUnitPhoneNumber);
   app.register(deleteUnitPhoneNumber);
+
+  // Ambulances
+  app.register(createAmbulance)
+  app.register(updateAmbulance)
+  app.register(getAmbulance)
+  app.register(getAmbulances)
+  app.register(deleteAmbulance)
+
+  // Ambulance Destination Commands
+  app.register(createDestinationCommand)
+  app.register(replaceDestinationCommand)
+  app.register(getDestinationCommands)
+  app.register(attendDestinationCommand)
+  app.register(getDestinationCommands)
+  app.register(deleteDestinationCommand)
+
+  // Ambulance Documents
+  app.register(createAmbulanceDocuments)
+  app.register(updateAmbulanceDocument)
+  app.register(updateAmbulanceDocumentsInBulk)
+  app.register(deleteAmbulanceDocument)
+
+  // Ambulance Shifts
+  app.register(createAmbulanceShift)
+  app.register(getAmbulanceShifts)
+
+  // Ambulance Statuses
+  app.register(createAmbulanceStatus)
+  app.register(getAmbulanceStatuses)
 }

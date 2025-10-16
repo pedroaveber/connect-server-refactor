@@ -12,6 +12,7 @@ export const getUnit: FastifyPluginCallbackZod = (app) => {
       schema: {
         tags: ["Unit"],
         summary: "Get unit",
+        operationId: "getUnit",
         security: [{ BearerAuth: [] }],
         description: "Get unit",
         params: z.object({

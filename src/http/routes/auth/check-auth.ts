@@ -9,6 +9,7 @@ export const checkAuth: FastifyPluginCallbackZod = (app) => {
         tags: ["Auth"],
         summary: "Check auth",
         description: "Check auth to the application",
+        operationId: "checkAuth",
         response: {
           200: z.object({
             isAuthenticated: z.boolean(),

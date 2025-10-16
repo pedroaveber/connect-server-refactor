@@ -1,6 +1,6 @@
+import { env } from "@/env"
 import type { FastifyPluginCallbackZod } from "fastify-type-provider-zod"
 import { z } from "zod"
-import { env } from "@/env"
 
 export const signOut: FastifyPluginCallbackZod = (app) => {
   app.post(
@@ -9,6 +9,7 @@ export const signOut: FastifyPluginCallbackZod = (app) => {
       schema: {
         tags: ["Auth"],
         summary: "Sign out",
+        operationId: "signOut",
         description: "Sign out of the application",
         response: {
           204: z.null(),

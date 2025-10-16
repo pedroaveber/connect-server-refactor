@@ -8,6 +8,7 @@ export const healthCheck: FastifyPluginCallbackZod = (app) => {
       schema: {
         tags: ["Health Check"],
         summary: "Health Check",
+        operationId: "healthCheck",
         description: "Health Check to the application",
         response: {
           200: z.object({

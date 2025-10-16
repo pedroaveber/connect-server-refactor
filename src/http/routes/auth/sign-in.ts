@@ -1,9 +1,9 @@
-import { verify } from "argon2"
-import type { FastifyPluginCallbackZod } from "fastify-type-provider-zod"
-import { z } from "zod"
 import { prisma } from "@/database/prisma"
 import { env } from "@/env"
 import { BadRequestException } from "@/http/exceptions/bad-request-exception"
+import { verify } from "argon2"
+import type { FastifyPluginCallbackZod } from "fastify-type-provider-zod"
+import { z } from "zod"
 
 export const signIn: FastifyPluginCallbackZod = (app) => {
   app.post(
@@ -12,6 +12,7 @@ export const signIn: FastifyPluginCallbackZod = (app) => {
       schema: {
         tags: ["Auth"],
         summary: "Sign in",
+        operationId: "signIn",
         description:
           "Sign in to the application informing the document and password",
         body: z.object({

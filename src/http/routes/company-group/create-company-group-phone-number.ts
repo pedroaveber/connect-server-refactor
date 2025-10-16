@@ -1,8 +1,8 @@
-import type { FastifyPluginCallbackZod } from "fastify-type-provider-zod"
-import { z } from "zod"
 import { prisma } from "@/database/prisma"
 import { ConflictException } from "@/http/exceptions/conflict-exception"
 import { auth } from "@/http/hooks/auth"
+import type { FastifyPluginCallbackZod } from "fastify-type-provider-zod"
+import { z } from "zod"
 
 export const createCompanyGroupPhoneNumber: FastifyPluginCallbackZod = (
   app
@@ -14,6 +14,7 @@ export const createCompanyGroupPhoneNumber: FastifyPluginCallbackZod = (
       schema: {
         tags: ["Company Group"],
         summary: "Create company group phone number",
+        operationId: "createCompanyGroupPhoneNumber",
         security: [{ BearerAuth: [] }],
         description: "Create company group phone number",
         params: z.object({

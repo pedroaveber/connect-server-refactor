@@ -1,8 +1,8 @@
-import type { FastifyPluginCallbackZod } from "fastify-type-provider-zod"
-import { z } from "zod"
 import { prisma } from "@/database/prisma"
 import { ResourceNotFoundException } from "@/http/exceptions/resource-not-found-exception"
 import { auth } from "@/http/hooks/auth"
+import type { FastifyPluginCallbackZod } from "fastify-type-provider-zod"
+import { z } from "zod"
 
 export const deleteCompanyGroupPhoneNumber: FastifyPluginCallbackZod = (
   app
@@ -14,6 +14,7 @@ export const deleteCompanyGroupPhoneNumber: FastifyPluginCallbackZod = (
       schema: {
         tags: ["Company Group"],
         summary: "Delete company group phone number",
+        operationId: "deleteCompanyGroupPhoneNumber",
         security: [{ BearerAuth: [] }],
         description: "Delete company group phone number",
         params: z.object({

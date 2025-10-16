@@ -1,8 +1,8 @@
-import type { FastifyPluginCallbackZod } from "fastify-type-provider-zod"
-import { z } from "zod"
 import { prisma } from "@/database/prisma"
 import { ConflictException } from "@/http/exceptions/conflict-exception"
 import { auth } from "@/http/hooks/auth"
+import type { FastifyPluginCallbackZod } from "fastify-type-provider-zod"
+import { z } from "zod"
 
 export const createUnitPhoneNumber: FastifyPluginCallbackZod = (app) => {
   app.post(
@@ -12,6 +12,7 @@ export const createUnitPhoneNumber: FastifyPluginCallbackZod = (app) => {
       schema: {
         tags: ["Unit"],
         summary: "Create unit phone number",
+        operationId: "createUnitPhoneNumber",
         security: [{ BearerAuth: [] }],
         description: "Create unit phone number",
         params: z.object({

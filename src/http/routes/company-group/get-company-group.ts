@@ -12,6 +12,7 @@ export const getCompanyGroup: FastifyPluginCallbackZod = (app) => {
       schema: {
         tags: ["Company Group"],
         summary: "Get company group",
+        operationId: "getCompanyGroup",
         security: [{ BearerAuth: [] }],
         description: "Get company group",
         params: z.object({

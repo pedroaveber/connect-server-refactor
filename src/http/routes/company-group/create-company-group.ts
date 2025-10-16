@@ -12,6 +12,7 @@ export const createCompanyGroup: FastifyPluginCallbackZod = (app) => {
       schema: {
         tags: ["Company Group"],
         summary: "Create company group",
+        operationId: "createCompanyGroup",
         security: [{ BearerAuth: [] }],
         description: "Create company group",
         body: z.object({

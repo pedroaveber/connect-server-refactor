@@ -15,7 +15,8 @@ model Ambulance {
   name        String
   observation String?
   plateNumber String    @unique @map("plate_number")
-  linkingCode String    @unique @map("linking_code")
+  linkingCode String?   @unique @map("linking_code")
+  avatarUrl   String?   @map("avatar_url")
   createdAt   DateTime  @default(now()) @map("created_at")
   updatedAt   DateTime  @updatedAt @map("updated_at")
   deletedAt   DateTime? @map("deleted_at")
@@ -53,6 +54,9 @@ model AmbulanceDestinationCommands {
   ambulance   Ambulance @relation(fields: [ambulanceId], references: [id])
   ambulanceId String    @map("ambulance_id")
 
+  user   User    @relation(fields: [userId], references: [id])
+  userId String @map("user_id")
+
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
@@ -64,10 +68,10 @@ model AmbulanceDocuments {
   id String @id @default(cuid())
 
   // Documentos
-  documentTitle String   @map("document_title")
-  documentType  String   @map("document_type")
-  documentUrl   String   @map("document_url")
-  validUntil    DateTime @map("valid_until")
+  documentTitle String    @map("document_title")
+  documentType  String    @map("document_type")
+  documentUrl   String    @map("document_url")
+  validUntil    DateTime? @map("valid_until")
 
   ambulance   Ambulance @relation(fields: [ambulanceId], references: [id])
   ambulanceId String    @map("ambulance_id")
@@ -148,7 +152,7 @@ model Chat {
 }
 
 model Company {
-  id       String  @id @default(cuid())
+  id       String @id @default(cuid())
   name     String
   document String @unique
 
@@ -168,7 +172,7 @@ model Company {
 }
 
 model CompanyGroup {
-  id       String  @id @default(cuid())
+  id       String @id @default(cuid())
   name     String
   document String @unique
 
@@ -178,7 +182,7 @@ model CompanyGroup {
 
   phones      Phone[]
   companies   Company[]
-  Integration Integration[]
+  integration Integration[]
 
   @@map("company_groups")
 }
@@ -286,7 +290,7 @@ model Messages {
 
 model Module {
   id           String            @id @default(cuid())
-  name         Modules            @unique
+  name         Modules           @unique
   description  String?
   billingType  ModuleBillingType @map("billing_type")
   defaultPrice Float             @default(0) @map("default_price")
@@ -369,7 +373,8 @@ model User {
   messages           Messages[]
   messageReadReceipt MessageReadReceipt[]
 
-  roles Role[] @relation("UserRoles")
+  roles                        Role[]                         @relation("UserRoles")
+  AmbulanceDestinationCommands AmbulanceDestinationCommands[]
 
   @@index([document]) // busca rápida por documento
   @@map("users")

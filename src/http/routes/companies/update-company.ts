@@ -13,6 +13,7 @@ export const updateCompany: FastifyPluginCallbackZod = (app) => {
       schema: {
         tags: ["Company"],
         summary: "Update company",
+        operationId: "updateCompany",
         security: [{ BearerAuth: [] }],
         description: "Update company",
         params: z.object({

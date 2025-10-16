@@ -1,9 +1,9 @@
-import type { FastifyPluginCallbackZod } from "fastify-type-provider-zod"
-import { z } from "zod"
 import { prisma } from "@/database/prisma"
 import { ConflictException } from "@/http/exceptions/conflict-exception"
 import { ResourceNotFoundException } from "@/http/exceptions/resource-not-found-exception"
 import { auth } from "@/http/hooks/auth"
+import type { FastifyPluginCallbackZod } from "fastify-type-provider-zod"
+import { z } from "zod"
 
 export const updateUnit: FastifyPluginCallbackZod = (app) => {
   app.put(
@@ -13,6 +13,7 @@ export const updateUnit: FastifyPluginCallbackZod = (app) => {
       schema: {
         tags: ["Unit"],
         summary: "Update unit",
+        operationId: "updateUnit",
         security: [{ BearerAuth: [] }],
         description: "Update unit",
         params: z.object({
