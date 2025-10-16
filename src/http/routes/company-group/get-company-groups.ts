@@ -1,7 +1,7 @@
-import type { FastifyPluginCallbackZod } from "fastify-type-provider-zod"
-import { z } from "zod"
 import { prisma } from "@/database/prisma"
 import { auth } from "@/http/hooks/auth"
+import type { FastifyPluginCallbackZod } from "fastify-type-provider-zod"
+import { z } from "zod"
 
 export const getCompanyGroups: FastifyPluginCallbackZod = (app) => {
   app.get(
@@ -26,7 +26,6 @@ export const getCompanyGroups: FastifyPluginCallbackZod = (app) => {
                 id: z.cuid(),
                 name: z.string(),
                 document: z.string(),
-                totalVehiclesHired: z.number(),
                 createdAt: z.date(),
                 updatedAt: z.date(),
                 deletedAt: z.date().nullable(),

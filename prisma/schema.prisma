@@ -150,7 +150,7 @@ model Chat {
 model Company {
   id       String  @id @default(cuid())
   name     String
-  document String? @unique
+  document String @unique
 
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")
@@ -161,8 +161,8 @@ model Company {
 
   phones        Phone[]
   units         Unit[]
-  CompanyModule CompanyModule[]
-  Integration   Integration[]
+  companyModule CompanyModule[]
+  integration   Integration[]
 
   @@map("companies")
 }
@@ -170,7 +170,7 @@ model Company {
 model CompanyGroup {
   id       String  @id @default(cuid())
   name     String
-  document String? @unique
+  document String @unique
 
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")
@@ -286,7 +286,7 @@ model Messages {
 
 model Module {
   id           String            @id @default(cuid())
-  name         String            @unique
+  name         Modules            @unique
   description  String?
   billingType  ModuleBillingType @map("billing_type")
   defaultPrice Float             @default(0) @map("default_price")
@@ -373,6 +373,17 @@ model User {
 
   @@index([document]) // busca rápida por documento
   @@map("users")
+}
+
+enum Modules {
+  BASE
+  CHAT
+  LOCATION
+  STATUS
+  RADIO
+  PA_SYSTEM
+  DRIVERS
+  IRIS
 }
 
 enum ModuleBillingType {

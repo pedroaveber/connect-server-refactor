@@ -1,9 +1,9 @@
-import type { FastifyPluginCallbackZod } from "fastify-type-provider-zod"
-import { z } from "zod"
 import { prisma } from "@/database/prisma"
 import { ConflictException } from "@/http/exceptions/conflict-exception"
 import { ResourceNotFoundException } from "@/http/exceptions/resource-not-found-exception"
 import { auth } from "@/http/hooks/auth"
+import type { FastifyPluginCallbackZod } from "fastify-type-provider-zod"
+import { z } from "zod"
 
 export const updateCompanyGroup: FastifyPluginCallbackZod = (app) => {
   app.put(
@@ -23,9 +23,6 @@ export const updateCompanyGroup: FastifyPluginCallbackZod = (app) => {
           document: z.string().length(14).meta({
             description: "Brazilian CNPJ",
           }),
-          totalVehiclesHired: z.number().int().min(0).meta({
-            description: "Total of vehicles hired",
-          }),
         }),
         response: {
           204: z.null(),
@@ -34,7 +31,7 @@ export const updateCompanyGroup: FastifyPluginCallbackZod = (app) => {
     },
     async (request, reply) => {
       const { companyGroupId } = request.params
-      const { document, name, totalVehiclesHired } = request.body
+      const { document, name } = request.body
 
       const companyGroup = await prisma.companyGroup.findUnique({
         where: {
@@ -73,7 +70,6 @@ export const updateCompanyGroup: FastifyPluginCallbackZod = (app) => {
         data: {
           name,
           document,
-          totalVehiclesHired,
         },
       })
 

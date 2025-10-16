@@ -1,9 +1,9 @@
-import type { FastifyPluginCallbackZod } from "fastify-type-provider-zod"
-import { z } from "zod"
-import { prisma } from "@/database/prisma"
-import { ConflictException } from "@/http/exceptions/conflict-exception"
-import { ResourceNotFoundException } from "@/http/exceptions/resource-not-found-exception"
-import { auth } from "@/http/hooks/auth"
+import { prisma } from "@/database/prisma";
+import { ConflictException } from "@/http/exceptions/conflict-exception";
+import { ResourceNotFoundException } from "@/http/exceptions/resource-not-found-exception";
+import { auth } from "@/http/hooks/auth";
+import type { FastifyPluginCallbackZod } from "fastify-type-provider-zod";
+import { z } from "zod";
 
 export const createCompany: FastifyPluginCallbackZod = (app) => {
   app.post(
@@ -23,6 +23,17 @@ export const createCompany: FastifyPluginCallbackZod = (app) => {
           companyGroupId: z.cuid().meta({
             description: "Company group ID",
           }),
+          companyModules: z.array(
+            z.object({
+              moduleId: z.cuid(),
+              customPrice: z.number().optional(),
+              quantity: z.number().min(1).optional(),
+              startDate: z.date().optional(),
+              endDate: z.date(),
+              billingCycle: z.enum(["monthly", "yearly"]).optional(),
+              active: z.boolean().optional(),
+            })
+          ),
           phones: z.array(
             z.object({
               number: z.string().meta({
@@ -39,26 +50,27 @@ export const createCompany: FastifyPluginCallbackZod = (app) => {
       },
     },
     async (request, reply) => {
-      const { document, name, phones, companyGroupId } = request.body
+      const { document, name, phones, companyGroupId, companyModules } =
+        request.body;
 
       const companyGroup = await prisma.companyGroup.findUnique({
         where: {
           id: companyGroupId,
         },
-      })
+      });
 
       if (!companyGroup) {
-        throw new ResourceNotFoundException("Grupo empresarial não encontrado")
+        throw new ResourceNotFoundException("Grupo empresarial não encontrado");
       }
 
       const companyWithSameDocument = await prisma.company.findUnique({
         where: {
           document,
         },
-      })
+      });
 
       if (companyWithSameDocument) {
-        throw new ConflictException("Já existe uma empresa com este documento")
+        throw new ConflictException("Já existe uma empresa com este documento");
       }
 
       const company = await prisma.company.create({
@@ -71,12 +83,17 @@ export const createCompany: FastifyPluginCallbackZod = (app) => {
               data: phones,
             },
           },
+          companyModule: {
+            createMany: {
+              data: companyModules
+            }
+          },
         },
-      })
+      });
 
       return reply.status(201).send({
         id: company.id,
-      })
+      });
     }
-  )
-}
+  );
+};

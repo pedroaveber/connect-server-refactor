@@ -1,8 +1,8 @@
-import type { FastifyPluginCallbackZod } from "fastify-type-provider-zod"
-import { z } from "zod"
 import { prisma } from "@/database/prisma"
 import { ResourceNotFoundException } from "@/http/exceptions/resource-not-found-exception"
 import { auth } from "@/http/hooks/auth"
+import type { FastifyPluginCallbackZod } from "fastify-type-provider-zod"
+import { z } from "zod"
 
 export const getCompanyGroup: FastifyPluginCallbackZod = (app) => {
   app.get(
@@ -23,7 +23,6 @@ export const getCompanyGroup: FastifyPluginCallbackZod = (app) => {
               id: z.cuid(),
               name: z.string(),
               document: z.string(),
-              totalVehiclesHired: z.number(),
               createdAt: z.date(),
               updatedAt: z.date(),
               deletedAt: z.date().nullable(),

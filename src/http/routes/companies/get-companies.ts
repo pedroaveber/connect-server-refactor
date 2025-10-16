@@ -1,7 +1,7 @@
-import type { FastifyPluginCallbackZod } from "fastify-type-provider-zod"
-import { z } from "zod"
 import { prisma } from "@/database/prisma"
 import { auth } from "@/http/hooks/auth"
+import type { FastifyPluginCallbackZod } from "fastify-type-provider-zod"
+import { z } from "zod"
 
 export const getCompanies: FastifyPluginCallbackZod = (app) => {
   app.get(
@@ -41,6 +41,23 @@ export const getCompanies: FastifyPluginCallbackZod = (app) => {
                     updatedAt: z.date(),
                   })
                 ),
+                companyModule: z.array(z.object({
+                  id: z.cuid(),
+                  customPrice: z.number().nullable(),
+                  quantity: z.number().nullable(),
+                  startDate: z.date(),
+                  endDate: z.date().nullable(),
+                  billingCycle: z.string(),
+                  active: z.boolean(),
+                  contractedAt: z.date(),
+                  module: z.object({
+                    id: z.cuid(),
+                    name: z.string(),
+                    description: z.string().nullable(),
+                    billingType: z.string(),
+                    defaultPrice: z.number(),
+                  })
+                }))
               })
             ),
             pagination: z.object({
@@ -73,6 +90,27 @@ export const getCompanies: FastifyPluginCallbackZod = (app) => {
           take: perPage,
           include: {
             phones: true,
+            companyModule: {
+              select: {
+                id: true,
+                customPrice: true,
+                quantity: true,
+                startDate: true,
+                endDate: true,
+                billingCycle: true,
+                active: true,
+                contractedAt: true,
+                module: {
+                  select: {
+                    id: true,
+                    name: true,
+                    description: true,
+                    billingType: true,
+                    defaultPrice: true,
+                  }
+                }
+              }
+            }
           },
         }),
 

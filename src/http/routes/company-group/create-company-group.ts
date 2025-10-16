@@ -1,8 +1,8 @@
-import type { FastifyPluginCallbackZod } from "fastify-type-provider-zod"
-import { z } from "zod"
 import { prisma } from "@/database/prisma"
 import { ConflictException } from "@/http/exceptions/conflict-exception"
 import { auth } from "@/http/hooks/auth"
+import type { FastifyPluginCallbackZod } from "fastify-type-provider-zod"
+import { z } from "zod"
 
 export const createCompanyGroup: FastifyPluginCallbackZod = (app) => {
   app.post(
@@ -38,7 +38,7 @@ export const createCompanyGroup: FastifyPluginCallbackZod = (app) => {
       },
     },
     async (request, reply) => {
-      const { document, name, phones, totalVehiclesHired } = request.body
+      const { document, name, phones } = request.body
 
       const companyGroupWithSameDocument = await prisma.companyGroup.findUnique(
         {
@@ -58,7 +58,6 @@ export const createCompanyGroup: FastifyPluginCallbackZod = (app) => {
         data: {
           document,
           name,
-          totalVehiclesHired,
           phones: {
             createMany: {
               data: phones,
