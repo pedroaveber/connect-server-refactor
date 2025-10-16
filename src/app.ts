@@ -11,7 +11,7 @@ import {
   type ZodTypeProvider,
 } from "fastify-type-provider-zod"
 import { env } from "./env"
-import Routing from "./routing"
+import Routing from "./http/routing"
 
 export const app = fastify({
   logger: {
