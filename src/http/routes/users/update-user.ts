@@ -29,7 +29,7 @@ export const updateUser: FastifyPluginCallbackZod = (app) => {
             name: z.string(),
             document: z.string(),
             avatarUrl: z.string().nullable(),
-            birthDate: z.string().pipe(z.coerce.date()),
+            birthDate: z.date(),
             units: z.array(
               z.object({
                 id: z.string(),
@@ -42,7 +42,7 @@ export const updateUser: FastifyPluginCallbackZod = (app) => {
                 name: z.string(),
               })
             ),
-            updatedAt: z.string().pipe(z.coerce.date()),
+            updatedAt: z.date(),
           }),
           404: z.object({ message: z.string() }),
         },

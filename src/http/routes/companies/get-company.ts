@@ -25,15 +25,18 @@ export const getCompany: FastifyPluginCallbackZod = (app) => {
               name: z.string(),
               document: z.string(),
               companyGroupId: z.cuid(),
-              createdAt: z.string().pipe(z.coerce.date()),
-              updatedAt: z.string().pipe(z.coerce.date()),
-              deletedAt: z.string().pipe(z.coerce.date()).nullable(),
+              billingStartDate: z.date(),
+              billingEndDate: z.date().nullable(),
+              billingCycle: z.string(),
+              createdAt: z.date(),
+              updatedAt: z.date(),
+              deletedAt: z.date().nullable(),
               phones: z.array(
                 z.object({
                   id: z.cuid(),
                   number: z.string(),
-                  createdAt: z.string().pipe(z.coerce.date()),
-                  updatedAt: z.string().pipe(z.coerce.date()),
+                  createdAt: z.date(),
+                  updatedAt: z.date(),
                 })
               ),
               companyModule: z.array(
@@ -41,11 +44,8 @@ export const getCompany: FastifyPluginCallbackZod = (app) => {
                   id: z.cuid(),
                   customPrice: z.number().nullable(),
                   quantity: z.number().nullable(),
-                  startDate: z.string().pipe(z.coerce.date()),
-                  endDate: z.string().pipe(z.coerce.date()).nullable(),
-                  billingCycle: z.string(),
                   active: z.boolean(),
-                  contractedAt: z.string().pipe(z.coerce.date()),
+                  contractedAt: z.date(),
                   module: z.object({
                     id: z.cuid(),
                     name: z.string(),
@@ -74,9 +74,6 @@ export const getCompany: FastifyPluginCallbackZod = (app) => {
               id: true,
               customPrice: true,
               quantity: true,
-              startDate: true,
-              endDate: true,
-              billingCycle: true,
               active: true,
               contractedAt: true,
               module: {

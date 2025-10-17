@@ -17,7 +17,7 @@ export const deleteUser: FastifyPluginCallbackZod = (app) => {
         response: {
           200: z.object({
             id: z.string(),
-            deletedAt: z.string().pipe(z.coerce.date()).nullable(),
+            deletedAt: z.date().nullable(),
           }),
           404: z.object({ message: z.string() }),
         },

@@ -59,11 +59,11 @@ export const getChats: FastifyPluginCallbackZod = (app) => {
                       id: z.string(),
                       name: z.string(),
                     }),
-                    createdAt: z.string().pipe(z.coerce.date()),
+                    createdAt: z.date(),
                   })
                   .nullable(),
-                createdAt: z.string().pipe(z.coerce.date()),
-                updatedAt: z.string().pipe(z.coerce.date()),
+                createdAt: z.date(),
+                updatedAt: z.date(),
               })
             ),
             pagination: z.object({
@@ -143,7 +143,7 @@ export const getChats: FastifyPluginCallbackZod = (app) => {
         return {
           ...chat,
           unreadCount: chat._count.messages,
-          lastMessage: lastMessage
+          lastMessage: lastMessage,
         };
       });
 

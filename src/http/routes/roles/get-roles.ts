@@ -17,8 +17,8 @@ export const getRoles: FastifyPluginCallbackZod = (app) => {
             z.object({
               id: z.string(),
               name: z.enum(rolesEnum),
-              createdAt: z.string().pipe(z.coerce.date()),
-              updatedAt: z.string().pipe(z.coerce.date()),
+              createdAt: z.date(),
+              updatedAt: z.date(),
             })
           ),
         },

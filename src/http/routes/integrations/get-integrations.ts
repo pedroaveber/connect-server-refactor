@@ -40,8 +40,8 @@ export const getIntegrations: FastifyPluginCallbackZod = (app) => {
               password: z.string().nullable(),
               apiKey: z.string().nullable(),
               config: z.any().nullable(),
-              createdAt: z.string().pipe(z.coerce.date()),
-              updatedAt: z.string().pipe(z.coerce.date()),
+              createdAt: z.date(),
+              updatedAt: z.date(),
               companyGroup: z.object({ id: z.string(), name: z.string() }),
               companies: z.array(
                 z.object({ id: z.string(), name: z.string() })

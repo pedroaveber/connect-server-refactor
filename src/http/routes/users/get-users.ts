@@ -46,7 +46,7 @@ export const getUsers: FastifyPluginCallbackZod = (app) => {
                 name: z.string(),
                 document: z.string(),
                 avatarUrl: z.string().nullable(),
-                birthDate: z.string().pipe(z.coerce.date()),
+                birthDate: z.date(),
                 units: z.array(
                   z.object({
                     id: z.string(),
@@ -59,8 +59,8 @@ export const getUsers: FastifyPluginCallbackZod = (app) => {
                     name: z.string(),
                   })
                 ),
-                createdAt: z.string().pipe(z.coerce.date()),
-                updatedAt: z.string().pipe(z.coerce.date()),
+                createdAt: z.date(),
+                updatedAt: z.date(),
               })
             ),
             pagination: z.object({

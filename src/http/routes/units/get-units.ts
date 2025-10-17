@@ -31,15 +31,15 @@ export const getUnits: FastifyPluginCallbackZod = (app) => {
                 name: z.string(),
                 document: z.string().nullable(),
                 companyId: z.cuid(),
-                createdAt: z.string().pipe(z.coerce.date()),
-                updatedAt: z.string().pipe(z.coerce.date()),
-                deletedAt: z.string().pipe(z.coerce.date()).nullable(),
+                createdAt: z.date(),
+                updatedAt: z.date(),
+                deletedAt: z.date().nullable(),
                 phones: z.array(
                   z.object({
                     id: z.cuid(),
                     number: z.string(),
-                    createdAt: z.string().pipe(z.coerce.date()),
-                    updatedAt: z.string().pipe(z.coerce.date()),
+                    createdAt: z.date(),
+                    updatedAt: z.date(),
                   })
                 ),
               })

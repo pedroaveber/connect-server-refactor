@@ -29,8 +29,8 @@ export const getModules: FastifyPluginCallbackZod = (app) => {
                 billingType: z.enum(moduleBillingTypeEnum),
                 defaultPrice: z.number(),
                 internal: z.boolean(),
-                createdAt: z.string().pipe(z.coerce.date()),
-                updatedAt: z.string().pipe(z.coerce.date()),
+                createdAt: z.date(),
+updatedAt: z.date(),
               })
             ),
             pagination: z.object({

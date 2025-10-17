@@ -1,7 +1,7 @@
-import { prisma } from "@/database/prisma"
-import { auth } from "@/http/hooks/auth"
-import type { FastifyPluginCallbackZod } from "fastify-type-provider-zod"
-import { z } from "zod"
+import { prisma } from "@/database/prisma";
+import { auth } from "@/http/hooks/auth";
+import type { FastifyPluginCallbackZod } from "fastify-type-provider-zod";
+import { z } from "zod";
 
 export const getCompanies: FastifyPluginCallbackZod = (app) => {
   app.get(
@@ -31,34 +31,36 @@ export const getCompanies: FastifyPluginCallbackZod = (app) => {
                 name: z.string(),
                 document: z.string(),
                 companyGroupId: z.cuid(),
-                createdAt: z.string().pipe(z.coerce.date()),
-                updatedAt: z.string().pipe(z.coerce.date()),
-                deletedAt: z.string().pipe(z.coerce.date()).nullable(),
+                billingStartDate: z.date(),
+                billingEndDate: z.date().nullable(),
+                billingCycle: z.string(),
+                createdAt: z.date(),
+                updatedAt: z.date(),
+                deletedAt: z.date().nullable(),
                 phones: z.array(
                   z.object({
                     id: z.cuid(),
                     number: z.string(),
-                    createdAt: z.string().pipe(z.coerce.date()),
-                    updatedAt: z.string().pipe(z.coerce.date()),
+                    createdAt: z.date(),
+                    updatedAt: z.date(),
                   })
                 ),
-                companyModule: z.array(z.object({
-                  id: z.cuid(),
-                  customPrice: z.number().nullable(),
-                  quantity: z.number().nullable(),
-                  startDate: z.string().pipe(z.coerce.date()),
-                  endDate: z.string().pipe(z.coerce.date()).nullable(),
-                  billingCycle: z.string(),
-                  active: z.boolean(),
-                  contractedAt: z.string().pipe(z.coerce.date()),
-                  module: z.object({
+                companyModule: z.array(
+                  z.object({
                     id: z.cuid(),
-                    name: z.string(),
-                    description: z.string().nullable(),
-                    billingType: z.string(),
-                    defaultPrice: z.number(),
+                    customPrice: z.number().nullable(),
+                    quantity: z.number().nullable(),
+                    active: z.boolean(),
+                    contractedAt: z.date(),
+                    module: z.object({
+                      id: z.cuid(),
+                      name: z.string(),
+                      description: z.string().nullable(),
+                      billingType: z.string(),
+                      defaultPrice: z.number(),
+                    }),
                   })
-                }))
+                ),
               })
             ),
             pagination: z.object({
@@ -73,7 +75,7 @@ export const getCompanies: FastifyPluginCallbackZod = (app) => {
       },
     },
     async (request, reply) => {
-      const { page, perPage, name, document, companyGroupId } = request.query
+      const { page, perPage, name, document, companyGroupId } = request.query;
 
       const [companies, total] = await Promise.all([
         prisma.company.findMany({
@@ -96,9 +98,6 @@ export const getCompanies: FastifyPluginCallbackZod = (app) => {
                 id: true,
                 customPrice: true,
                 quantity: true,
-                startDate: true,
-                endDate: true,
-                billingCycle: true,
                 active: true,
                 contractedAt: true,
                 module: {
@@ -108,10 +107,10 @@ export const getCompanies: FastifyPluginCallbackZod = (app) => {
                     description: true,
                     billingType: true,
                     defaultPrice: true,
-                  }
-                }
-              }
-            }
+                  },
+                },
+              },
+            },
           },
         }),
 
@@ -127,11 +126,11 @@ export const getCompanies: FastifyPluginCallbackZod = (app) => {
             deletedAt: null,
           },
         }),
-      ])
+      ]);
 
-      const totalPages = Math.ceil(total / perPage)
-      const hasNextPage = page < totalPages
-      const hasPreviousPage = page > 1
+      const totalPages = Math.ceil(total / perPage);
+      const hasNextPage = page < totalPages;
+      const hasPreviousPage = page > 1;
 
       return reply.status(200).send({
         data: companies,
@@ -142,7 +141,7 @@ export const getCompanies: FastifyPluginCallbackZod = (app) => {
           hasPreviousPage,
           currentPage: page,
         },
-      })
+      });
     }
-  )
-}
+  );
+};

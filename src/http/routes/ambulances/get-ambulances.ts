@@ -41,13 +41,13 @@ export const getAmbulances: FastifyPluginCallbackZod = (app) => {
                     documentTitle: z.string(),
                     documentType: z.string(),
                     documentUrl: z.string(),
-                    validUntil: z.string().pipe(z.coerce.date()).nullable(),
+                    validUntil: z.date().nullable(),
                   })
                 ),
                 ambulanceShift: z.array(
                   z.object({
-                    startDate: z.string().pipe(z.coerce.date()),
-                    endDate: z.string().pipe(z.coerce.date()),
+                    startDate: z.date(),
+                    endDate: z.date(),
                     user: z.object({ name: z.string().nullable() }).nullable(),
                   })
                 ),
