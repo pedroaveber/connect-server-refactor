@@ -10,7 +10,7 @@ const replaceDestinationCommandSchema = z.object({
   address: z.string().optional(),
   baseId: z.string().optional(),
   attended: z.boolean().optional(),
-  attendedAt: z.date().optional(),
+  attendedAt: z.string().pipe(z.coerce.date()).optional(),
 });
 
 export const replaceDestinationCommand: FastifyPluginCallbackZod = (app) => {

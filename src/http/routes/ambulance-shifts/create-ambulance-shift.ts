@@ -5,8 +5,8 @@ import type { FastifyPluginCallbackZod } from "fastify-type-provider-zod";
 import { z } from "zod";
 
 const createShiftSchema = z.object({
-  startDate: z.date(),
-  endDate: z.date(),
+  startDate: z.string().pipe(z.coerce.date()),
+  endDate: z.string().pipe(z.coerce.date()),
 });
 
 export const createAmbulanceShift: FastifyPluginCallbackZod = (app) => {

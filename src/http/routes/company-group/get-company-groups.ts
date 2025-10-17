@@ -27,15 +27,15 @@ export const getCompanyGroups: FastifyPluginCallbackZod = (app) => {
                 id: z.cuid(),
                 name: z.string(),
                 document: z.string(),
-                createdAt: z.date(),
-                updatedAt: z.date(),
-                deletedAt: z.date().nullable(),
+                createdAt: z.string().pipe(z.coerce.date()),
+                updatedAt: z.string().pipe(z.coerce.date()),
+                deletedAt: z.string().pipe(z.coerce.date()).nullable(),
                 phones: z.array(
                   z.object({
                     id: z.cuid(),
                     number: z.string(),
-                    createdAt: z.date(),
-                    updatedAt: z.date(),
+                    createdAt: z.string().pipe(z.coerce.date()),
+                    updatedAt: z.string().pipe(z.coerce.date()),
                   })
                 ),
               })

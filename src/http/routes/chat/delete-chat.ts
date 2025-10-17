@@ -15,7 +15,11 @@ export const deleteChat: FastifyPluginCallbackZod = (app) => {
         operationId: "deleteChat",
         security: [{ BearerAuth: [] }],
         params: z.object({ id: z.cuid() }),
-        response: { 204: z.null() },
+        response: {
+          204: z.object({
+            id: z.string(),
+          }),
+        },
       },
     },
     async (request, reply) => {
@@ -26,7 +30,7 @@ export const deleteChat: FastifyPluginCallbackZod = (app) => {
 
       await prisma.chat.delete({ where: { id } });
 
-      return reply.status(204).send(null);
+      return reply.status(204).send({ id });
     }
   );
 };

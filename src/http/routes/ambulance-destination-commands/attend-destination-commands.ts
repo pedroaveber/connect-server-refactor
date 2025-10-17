@@ -6,7 +6,7 @@ import { z } from "zod";
 
 const attendDestinationCommandSchema = z.object({
   attended: z.boolean().optional(),
-  attendedAt: z.date().optional(),
+  attendedAt: z.string().pipe(z.coerce.date()).optional(),
 });
 
 export const attendDestinationCommand: FastifyPluginCallbackZod = (app) => {

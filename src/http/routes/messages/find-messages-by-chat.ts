@@ -21,7 +21,8 @@ export const findMessagesByChat: FastifyPluginCallbackZod = (app) => {
           page: z.coerce.number().int().min(1).default(1),
           perPage: z.coerce.number().int().min(1).max(100).default(20),
         }),
-        response: z.object({
+        response: {
+          200: z.object({
           data: z.array(
             z.object({
               id: z.string(),
@@ -37,11 +38,11 @@ export const findMessagesByChat: FastifyPluginCallbackZod = (app) => {
               messageReadReceipt: z.array(
                 z.object({
                   userId: z.string(),
-                  readAt: z.date(),
+                  readAt: z.string().pipe(z.coerce.date()),
                 })
               ),
-              createdAt: z.date(),
-              updatedAt: z.date(),
+              createdAt: z.string().pipe(z.coerce.date()),
+              updatedAt: z.string().pipe(z.coerce.date()),
             })
           ),
           pagination: z.object({
@@ -51,7 +52,8 @@ export const findMessagesByChat: FastifyPluginCallbackZod = (app) => {
             hasPreviousPage: z.boolean(),
             currentPage: z.number(),
           }),
-        }),
+        })
+        },
       },
     },
     async (request, reply) => {

@@ -20,7 +20,7 @@ export const createUnit: FastifyPluginCallbackZod = (app) => {
           name: z.string(),
           document: z.string().length(14).meta({
             description: "Brazilian CNPJ",
-          }),
+          }).optional(),
           companyId: z.cuid().meta({
             description: "Company ID",
           }),
@@ -30,7 +30,7 @@ export const createUnit: FastifyPluginCallbackZod = (app) => {
                 description: "Brazilian phone number (example: +5511999999999)",
               }),
             })
-          ),
+          ).optional(),
         }),
         response: {
           201: z.object({
@@ -52,7 +52,8 @@ export const createUnit: FastifyPluginCallbackZod = (app) => {
         throw new ResourceNotFoundException("Empresa não encontrada")
       }
 
-      const unitWithSameDocument = await prisma.unit.findUnique({
+      if(document) {
+        const unitWithSameDocument = await prisma.unit.findUnique({
         where: {
           document,
         },
@@ -61,17 +62,20 @@ export const createUnit: FastifyPluginCallbackZod = (app) => {
       if (unitWithSameDocument) {
         throw new ConflictException("Já existe uma unidade com este documento")
       }
+      }
 
       const unit = await prisma.unit.create({
         data: {
           document,
           name,
           companyId,
-          phones: {
-            createMany: {
-              data: phones,
-            },
-          },
+          ...(phones && phones.length > 0
+            ? {
+                phones: {
+                  createMany: { data: phones },
+                },
+              }
+            : {}),
         },
       })
 

@@ -26,9 +26,9 @@ export const getBases: FastifyPluginCallbackZod = (app) => {
                 name: z.string(),
                 latitude: z.number(),
                 longitude: z.number(),
-                createdAt: z.date(),
-                updatedAt: z.date(),
-                deletedAt: z.date().nullable(),
+                createdAt: z.string().pipe(z.coerce.date()),
+                updatedAt: z.string().pipe(z.coerce.date()),
+                deletedAt: z.string().pipe(z.coerce.date()).nullable(),
               })
             ),
             pagination: z.object({

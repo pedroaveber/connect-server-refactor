@@ -21,6 +21,9 @@ export const createCompany: FastifyPluginCallbackZod = (app) => {
           document: z.string().length(14).meta({
             description: "Brazilian CNPJ",
           }),
+          billingStartDate: z.string().pipe(z.coerce.date()).optional(),
+          billingEndDate: z.string().pipe(z.coerce.date()).optional(),
+          billingCycle: z.enum(["monthly", "yearly"]).optional(),
           companyGroupId: z.cuid().meta({
             description: "Company group ID",
           }),
@@ -29,9 +32,6 @@ export const createCompany: FastifyPluginCallbackZod = (app) => {
               moduleId: z.cuid(),
               customPrice: z.number().optional(),
               quantity: z.number().min(1).optional(),
-              startDate: z.date().optional(),
-              endDate: z.date(),
-              billingCycle: z.enum(["monthly", "yearly"]).optional(),
               active: z.boolean().optional(),
             })
           ),
@@ -86,8 +86,8 @@ export const createCompany: FastifyPluginCallbackZod = (app) => {
           },
           companyModule: {
             createMany: {
-              data: companyModules
-            }
+              data: companyModules,
+            },
           },
         },
       });

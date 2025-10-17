@@ -1,6 +1,6 @@
-import type { FastifyReply, FastifyRequest } from "fastify";
 import { encrypt as cryptoEncrypt } from "@/crypto";
 import { env } from "@/env";
+import type { FastifyReply, FastifyRequest } from "fastify";
 
 export async function encrypt(
 	_request: FastifyRequest,
@@ -24,8 +24,6 @@ export async function encrypt(
 	} else {
 		jsonData = payload;
 	}
-
-	console.log(jsonData);
 
 	const encryptedContent = cryptoEncrypt(
 		JSON.stringify(jsonData),

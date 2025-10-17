@@ -1,8 +1,8 @@
-import { prisma } from "@/database/prisma"
-import { ConflictException } from "@/http/exceptions/conflict-exception"
-import { auth } from "@/http/hooks/auth"
-import type { FastifyPluginCallbackZod } from "fastify-type-provider-zod"
-import { z } from "zod"
+import { prisma } from "@/database/prisma";
+import { ConflictException } from "@/http/exceptions/conflict-exception";
+import { auth } from "@/http/hooks/auth";
+import type { FastifyPluginCallbackZod } from "fastify-type-provider-zod";
+import { z } from "zod";
 
 export const createCompanyGroup: FastifyPluginCallbackZod = (app) => {
   app.post(
@@ -20,9 +20,6 @@ export const createCompanyGroup: FastifyPluginCallbackZod = (app) => {
           document: z.string().length(14).meta({
             description: "Brazilian CNPJ",
           }),
-          totalVehiclesHired: z.number().int().min(0).meta({
-            description: "Total of vehicles hired",
-          }),
           phones: z.array(
             z.object({
               number: z.string().meta({
@@ -39,7 +36,7 @@ export const createCompanyGroup: FastifyPluginCallbackZod = (app) => {
       },
     },
     async (request, reply) => {
-      const { document, name, phones } = request.body
+      const { document, name, phones } = request.body;
 
       const companyGroupWithSameDocument = await prisma.companyGroup.findUnique(
         {
@@ -47,12 +44,12 @@ export const createCompanyGroup: FastifyPluginCallbackZod = (app) => {
             document,
           },
         }
-      )
+      );
 
       if (companyGroupWithSameDocument) {
         throw new ConflictException(
           "Já existe um grupo empresarial com este documento"
-        )
+        );
       }
 
       const companyGroup = await prisma.companyGroup.create({
@@ -65,11 +62,11 @@ export const createCompanyGroup: FastifyPluginCallbackZod = (app) => {
             },
           },
         },
-      })
+      });
 
       return reply.status(201).send({
         id: companyGroup.id,
-      })
+      });
     }
-  )
-}
+  );
+};

@@ -10,7 +10,7 @@ const addDocumentsSchema = z.object({
       documentTitle: z.string(),
       documentType: z.string(),
       documentUrl: z.string(),
-      validUntil: z.date().optional(),
+      validUntil: z.string().pipe(z.coerce.date()).optional(),
     })
   ),
 });

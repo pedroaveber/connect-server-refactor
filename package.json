@@ -21,6 +21,8 @@
 		"ultracite": "5.4.7"
 	},
 	"dependencies": {
+		"@aws-sdk/client-s3": "^3.911.0",
+		"@aws-sdk/s3-request-presigner": "^3.911.0",
 		"@fastify/cookie": "^11.0.2",
 		"@fastify/cors": "^11.1.0",
 		"@fastify/jwt": "^10.0.0",

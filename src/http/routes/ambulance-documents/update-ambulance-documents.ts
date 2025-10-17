@@ -8,7 +8,7 @@ const updateDocumentSchema = z.object({
   documentTitle: z.string().optional(),
   documentType: z.string().optional(),
   documentUrl: z.string().optional(),
-  validUntil: z.date().nullable().optional(),
+  validUntil: z.string().pipe(z.coerce.date()).nullable().optional(),
 });
 
 export const updateAmbulanceDocument: FastifyPluginCallbackZod = (app) => {

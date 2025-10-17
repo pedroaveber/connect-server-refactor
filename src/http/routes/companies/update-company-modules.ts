@@ -24,8 +24,8 @@ export const updateCompanyModules: FastifyPluginCallbackZod = (app) => {
               moduleId: z.cuid(),
               customPrice: z.number().optional(),
               quantity: z.number().min(1).optional(),
-              startDate: z.date().optional(),
-              endDate: z.date(),
+              startDate: z.string().pipe(z.coerce.date()).optional(),
+              endDate: z.string().pipe(z.coerce.date()),
               billingCycle: z.enum(["monthly", "yearly"]).optional(),
               active: z.boolean().optional(),
             })

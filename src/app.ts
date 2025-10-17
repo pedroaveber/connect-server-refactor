@@ -28,6 +28,12 @@ export const app = fastify({
 app.setSerializerCompiler(serializerCompiler)
 app.setValidatorCompiler(validatorCompiler)
 
+// Decrypt incoming JSON bodies when payload is encrypted
+// app.addHook("preValidation", decrypt)
+
+// Encrypt outgoing JSON bodies when payload is encrypted
+// app.addHook("onSend", encrypt) 
+
 app.register(fastifyCors, {
   origin: ["http://localhost:5173"],
   credentials: true,

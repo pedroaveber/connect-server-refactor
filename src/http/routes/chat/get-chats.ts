@@ -42,38 +42,39 @@ export const getChats: FastifyPluginCallbackZod = (app) => {
         security: [{ BearerAuth: [] }],
         operationId: "getChats",
         querystring: chatQuerySchema,
-        response: z.object({
-          data: z.array(
-            z.object({
-              id: z.string(),
-              ambulanceId: z.string(),
-              messagesCount: z.number(),
-              unreadCount: z.number(),
-              lastMessage: z
-                .object({
-                  id: z.string(),
-                  messageContent: z.string(),
-                  messageType: z.string(),
-                  messageFile: z.string().nullable(),
-                  user: z.object({
+        response: {
+          200: z.object({
+            data: z.array(
+              z.object({
+                id: z.string(),
+                ambulanceId: z.string(),
+                unreadCount: z.number(),
+                lastMessage: z
+                  .object({
                     id: z.string(),
-                    name: z.string(),
-                  }),
-                  createdAt: z.date(),
-                })
-                .nullable(),
-              createdAt: z.date(),
-              updatedAt: z.date(),
-            })
-          ),
-          pagination: z.object({
-            total: z.number(),
-            totalPages: z.number(),
-            hasNextPage: z.boolean(),
-            hasPreviousPage: z.boolean(),
-            currentPage: z.number(),
+                    messageContent: z.string(),
+                    messageType: z.string(),
+                    messageFile: z.string().nullable(),
+                    user: z.object({
+                      id: z.string(),
+                      name: z.string(),
+                    }),
+                    createdAt: z.string().pipe(z.coerce.date()),
+                  })
+                  .nullable(),
+                createdAt: z.string().pipe(z.coerce.date()),
+                updatedAt: z.string().pipe(z.coerce.date()),
+              })
+            ),
+            pagination: z.object({
+              total: z.number(),
+              totalPages: z.number(),
+              hasNextPage: z.boolean(),
+              hasPreviousPage: z.boolean(),
+              currentPage: z.number(),
+            }),
           }),
-        }),
+        },
       },
     },
     async (request, reply) => {
@@ -117,7 +118,7 @@ export const getChats: FastifyPluginCallbackZod = (app) => {
                 },
                 messageReadReceipt: {
                   select: { userId: true, readAt: true },
-                }
+                },
               },
               orderBy: { createdAt: "desc" },
               take: 1, // pega apenas a última mensagem
@@ -140,22 +141,9 @@ export const getChats: FastifyPluginCallbackZod = (app) => {
         const lastMessage = chat.messages[0] || null;
 
         return {
-          id: chat.id,
-          ambulanceId: chat.ambulanceId,
+          ...chat,
           unreadCount: chat._count.messages,
           lastMessage: lastMessage
-            ? {
-                id: lastMessage.id,
-                content: lastMessage.messageContent,
-                createdAt: lastMessage.createdAt,
-                user: lastMessage.user,
-                readBy: lastMessage.messageReadReceipt.map((r) => ({
-                  userId: r.userId,
-                  readAt: r.readAt,
-                })),
-              }
-            : null,
-          updatedAt: chat.updatedAt,
         };
       });
 
