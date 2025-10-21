@@ -2,6 +2,7 @@ import { translateName, formatFieldName } from "@/utils/prisma-fields-translatio
 import { Prisma } from "@prisma/client";
 
 export function handlePrismaError(error: unknown): string {
+  console.log(error)
   if (error instanceof Prisma.PrismaClientKnownRequestError) {
     return handleKnownRequestError(error);
   }

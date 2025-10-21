@@ -26,7 +26,6 @@ Get {{baseUrl}}/auth/status
 ###
 # @name GetCompanyGroups
 Get {{baseUrl}}/company-groups
-Authorization: Bearer {{accessToken}}
 
 ###
 # @name GetCompanyGroup
