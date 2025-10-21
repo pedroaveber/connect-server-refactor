@@ -1,6 +1,6 @@
 import { handlePrismaError } from "@/http/exceptions/handler/prisma-error-handler";
 import { PrismaException } from "@/http/exceptions/prisma-exception";
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from "@/../prisma/generated/prisma";
 
 export const prisma = new PrismaClient().$extends({
   query: {

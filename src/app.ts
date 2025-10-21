@@ -3,6 +3,7 @@ import { fastifyCors } from "@fastify/cors"
 import { fastifyJwt } from "@fastify/jwt"
 import { fastifySwagger } from "@fastify/swagger"
 import scalarApiReference from "@scalar/fastify-api-reference"
+import fs from 'node:fs'
 import { fastify } from "fastify"
 import {
   jsonSchemaTransform,
@@ -81,3 +82,8 @@ if (env.ENV === "development") {
 }
 
 Routing()
+
+app.ready(async ()  => {
+  const json = app.swagger()
+  fs.writeFileSync('swagger.json', JSON.stringify(json, null, 2))
+})

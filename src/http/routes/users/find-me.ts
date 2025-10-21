@@ -6,7 +6,7 @@ import { z } from "zod";
 
 export const findMe: FastifyPluginCallbackZod = (app) => {
   app.get(
-    "/users",
+    "/users/me",
     {
       preHandler: [auth],
       schema: {
