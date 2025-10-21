@@ -13,6 +13,7 @@ import {
 } from "fastify-type-provider-zod"
 import { env } from "./env"
 import Routing from "./http/routing"
+import { errorHandler } from "./error-handler"
 
 export const app = fastify({
   logger: {
@@ -37,6 +38,7 @@ app.setValidatorCompiler(validatorCompiler)
 
 app.register(fastifyCors, {
   origin: ["http://localhost:5173"],
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   credentials: true,
 })
 
@@ -87,3 +89,5 @@ app.ready(async ()  => {
   const json = app.swagger()
   fs.writeFileSync('swagger.json', JSON.stringify(json, null, 2))
 })
+
+app.setErrorHandler(errorHandler)
