@@ -21,20 +21,12 @@ export const createCompany: FastifyPluginCallbackZod = (app) => {
           document: z.string().length(14).meta({
             description: "Brazilian CNPJ",
           }),
-          billingStartDate: z.string().pipe(z.coerce.date()).optional(),
-          billingEndDate: z.string().pipe(z.coerce.date()).optional(),
-          billingCycle: z.enum(["monthly", "yearly"]).optional(),
+          // billingStartDate: z.string().pipe(z.coerce.date()).optional(),
+          // billingEndDate: z.string().pipe(z.coerce.date()).optional(),
+          // billingCycle: z.enum(["monthly", "yearly"]).optional(),
           companyGroupId: z.cuid().meta({
             description: "Company group ID",
           }),
-          companyModules: z.array(
-            z.object({
-              moduleId: z.cuid(),
-              customPrice: z.number().optional(),
-              quantity: z.number().min(1).optional(),
-              active: z.boolean().optional(),
-            })
-          ),
           phones: z.array(
             z.object({
               number: z.string().meta({
@@ -51,7 +43,7 @@ export const createCompany: FastifyPluginCallbackZod = (app) => {
       },
     },
     async (request, reply) => {
-      const { document, name, phones, companyGroupId, companyModules } =
+      const { document, name, phones, companyGroupId } =
         request.body;
 
       const companyGroup = await prisma.companyGroup.findUnique({
@@ -74,6 +66,8 @@ export const createCompany: FastifyPluginCallbackZod = (app) => {
         throw new ConflictException("Já existe uma empresa com este documento");
       }
 
+      const modules = await prisma.module.findMany()
+
       const company = await prisma.company.create({
         data: {
           document,
@@ -86,9 +80,12 @@ export const createCompany: FastifyPluginCallbackZod = (app) => {
           },
           companyModule: {
             createMany: {
-              data: companyModules,
-            },
-          },
+              data: modules.map((m) => ({
+                moduleId: m.id,
+                active: false,
+              }))
+            }
+          }
         },
       });
 

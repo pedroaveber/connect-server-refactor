@@ -33,7 +33,16 @@ export const getUnits: FastifyPluginCallbackZod = (app) => {
                 companyId: z.cuid(),
                 createdAt: z.date(),
                 updatedAt: z.date(),
-                deletedAt: z.date().nullable(),
+                company: z.object({
+                  id: z.cuid(),
+                  name: z.string(),
+                  document: z.string(),
+                  companyGroup: z.object({
+                    id: z.cuid(),
+                    name: z.string(),
+                    document: z.string(),
+                  }),
+                }),
                 phones: z.array(
                   z.object({
                     id: z.cuid(),
@@ -74,6 +83,20 @@ export const getUnits: FastifyPluginCallbackZod = (app) => {
           take: perPage,
           include: {
             phones: true,
+            company: {
+              select: {
+                id: true,
+                name: true,
+                document: true,
+                companyGroup: {
+                  select: {
+                    id: true,
+                    name: true,
+                    document: true,
+                  },
+                }
+              },
+            },
           },
         }),
 

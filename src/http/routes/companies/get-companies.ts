@@ -45,6 +45,11 @@ export const getCompanies: FastifyPluginCallbackZod = (app) => {
                     updatedAt: z.date(),
                   })
                 ),
+                companyGroup: z.object({
+                  id: z.cuid(),
+                  name: z.string(),
+                  document: z.string(),
+                }),
                 companyModule: z.array(
                   z.object({
                     id: z.cuid(),
@@ -93,6 +98,13 @@ export const getCompanies: FastifyPluginCallbackZod = (app) => {
           take: perPage,
           include: {
             phones: true,
+            companyGroup: {
+              select: {
+                id: true,
+                name: true,
+                document: true,
+              }
+            },
             companyModule: {
               select: {
                 id: true,

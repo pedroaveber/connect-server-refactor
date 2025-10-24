@@ -6,15 +6,19 @@ import { deleteCompanyPhoneNumber } from "../routes/companies/delete-company-pho
 import { getCompanies } from "../routes/companies/get-companies";
 import { getCompany } from "../routes/companies/get-company";
 import { updateCompany } from "../routes/companies/update-company";
-import { updateCompanyModules } from "../routes/companies/update-company-modules";
+import { updateCompanyModule } from "../routes/companies/update-company-module";
+import { updateCompanyHierarchy } from "../routes/companies/update-company-hierarchy";
+import { getCompanyModules } from "../routes/companies/get-company-modules";
 
 export default function companiesRoutes() {
   app.register(createCompany);
   app.register(updateCompany);
-  app.register(updateCompanyModules);
+  app.register(updateCompanyModule);
   app.register(deleteCompany);
   app.register(getCompanies);
   app.register(getCompany);
+  app.register(getCompanyModules);
   app.register(createCompanyPhoneNumber);
   app.register(deleteCompanyPhoneNumber);
+  app.register(updateCompanyHierarchy);
 }

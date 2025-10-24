@@ -1732,13 +1732,28 @@
                   },
                   "unitId": {
                     "type": "string"
+                  },
+                  "phones": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "number": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "number"
+                      ]
+                    }
                   }
                 },
                 "required": [
                   "name",
                   "latitude",
                   "longitude",
-                  "unitId"
+                  "unitId",
+                  "phones"
                 ]
               }
             }
@@ -1810,7 +1825,7 @@
             },
             "in": "query",
             "name": "unitId",
-            "required": true
+            "required": false
           }
         ],
         "responses": {
@@ -2520,50 +2535,11 @@
                     "minLength": 14,
                     "maxLength": 14
                   },
-                  "billingStartDate": {
-                    "type": "string"
-                  },
-                  "billingEndDate": {
-                    "type": "string"
-                  },
-                  "billingCycle": {
-                    "type": "string",
-                    "enum": [
-                      "monthly",
-                      "yearly"
-                    ]
-                  },
                   "companyGroupId": {
                     "description": "Company group ID",
                     "type": "string",
                     "format": "cuid",
                     "pattern": "^[cC][^\\s-]{8,}$"
-                  },
-                  "companyModules": {
-                    "type": "array",
-                    "items": {
-                      "type": "object",
-                      "properties": {
-                        "moduleId": {
-                          "type": "string",
-                          "format": "cuid",
-                          "pattern": "^[cC][^\\s-]{8,}$"
-                        },
-                        "customPrice": {
-                          "type": "number"
-                        },
-                        "quantity": {
-                          "type": "number",
-                          "minimum": 1
-                        },
-                        "active": {
-                          "type": "boolean"
-                        }
-                      },
-                      "required": [
-                        "moduleId"
-                      ]
-                    }
                   },
                   "phones": {
                     "type": "array",
@@ -2585,7 +2561,6 @@
                   "name",
                   "document",
                   "companyGroupId",
-                  "companyModules",
                   "phones"
                 ]
               }
@@ -2770,6 +2745,28 @@
                               "additionalProperties": false
                             }
                           },
+                          "companyGroup": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "format": "cuid",
+                                "pattern": "^[cC][^\\s-]{8,}$"
+                              },
+                              "name": {
+                                "type": "string"
+                              },
+                              "document": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "name",
+                              "document"
+                            ],
+                            "additionalProperties": false
+                          },
                           "companyModule": {
                             "type": "array",
                             "items": {
@@ -2851,6 +2848,7 @@
                           "updatedAt",
                           "deletedAt",
                           "phones",
+                          "companyGroup",
                           "companyModule"
                         ],
                         "additionalProperties": false
@@ -3209,68 +3207,34 @@
         }
       }
     },
-    "/companies/{companyId}/modules": {
+    "/companies/{companyId}/modules/{companyModuleId}": {
       "put": {
-        "operationId": "updateCompanyModules",
-        "summary": "Update company modules",
+        "operationId": "updateCompanyModule",
+        "summary": "Update company module",
         "tags": [
           "Company"
         ],
-        "description": "Update company modules",
+        "description": "Update company module",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
                 "properties": {
-                  "companyModules": {
-                    "type": "array",
-                    "items": {
-                      "type": "object",
-                      "properties": {
-                        "moduleId": {
-                          "type": "string",
-                          "format": "cuid",
-                          "pattern": "^[cC][^\\s-]{8,}$"
-                        },
-                        "customPrice": {
-                          "type": "number"
-                        },
-                        "quantity": {
-                          "type": "number",
-                          "minimum": 1
-                        },
-                        "startDate": {
-                          "type": "string"
-                        },
-                        "endDate": {
-                          "type": "string"
-                        },
-                        "billingCycle": {
-                          "type": "string",
-                          "enum": [
-                            "monthly",
-                            "yearly"
-                          ]
-                        },
-                        "active": {
-                          "type": "boolean"
-                        }
-                      },
-                      "required": [
-                        "moduleId",
-                        "endDate"
-                      ]
-                    }
+                  "active": {
+                    "type": "boolean"
+                  },
+                  "customPrice": {
+                    "type": "number"
+                  },
+                  "quantity": {
+                    "type": "number",
+                    "minimum": 1
                   }
-                },
-                "required": [
-                  "companyModules"
-                ]
+                }
               }
             }
-          },
-          "required": true
+          }
         },
         "parameters": [
           {
@@ -3281,6 +3245,16 @@
             },
             "in": "path",
             "name": "companyId",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "cuid",
+              "pattern": "^[cC][^\\s-]{8,}$"
+            },
+            "in": "path",
+            "name": "companyModuleId",
             "required": true
           }
         ],
@@ -3300,6 +3274,119 @@
                   "enum": [
                     null
                   ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/companies/{companyId}/modules": {
+      "get": {
+        "operationId": "getCompanyModules",
+        "summary": "Get company modules",
+        "tags": [
+          "Company"
+        ],
+        "description": "Get company modules",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "cuid",
+              "pattern": "^[cC][^\\s-]{8,}$"
+            },
+            "in": "path",
+            "name": "companyId",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "cuid",
+                            "pattern": "^[cC][^\\s-]{8,}$"
+                          },
+                          "customPrice": {
+                            "nullable": true,
+                            "type": "number"
+                          },
+                          "quantity": {
+                            "nullable": true,
+                            "type": "number"
+                          },
+                          "active": {
+                            "type": "boolean"
+                          },
+                          "contractedAt": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "module": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "format": "cuid",
+                                "pattern": "^[cC][^\\s-]{8,}$"
+                              },
+                              "name": {
+                                "type": "string"
+                              },
+                              "description": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "billingType": {
+                                "type": "string"
+                              },
+                              "defaultPrice": {
+                                "type": "number"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "name",
+                              "description",
+                              "billingType",
+                              "defaultPrice"
+                            ],
+                            "additionalProperties": false
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "customPrice",
+                          "quantity",
+                          "active",
+                          "contractedAt",
+                          "module"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "additionalProperties": false
                 }
               }
             }
@@ -3403,6 +3490,69 @@
             },
             "in": "path",
             "name": "phoneId",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "nullable": true,
+                  "enum": [
+                    null
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/companies/{companyId}/hierarchy": {
+      "put": {
+        "operationId": "updateCompanyHierarchy",
+        "summary": "Update company hierarchy",
+        "tags": [
+          "Company"
+        ],
+        "description": "Update company hierarchy",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "companyGroupId": {
+                    "type": "string",
+                    "format": "cuid",
+                    "pattern": "^[cC][^\\s-]{8,}$"
+                  }
+                },
+                "required": [
+                  "companyGroupId"
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "cuid",
+              "pattern": "^[cC][^\\s-]{8,}$"
+            },
+            "in": "path",
+            "name": "companyId",
             "required": true
           }
         ],
@@ -4782,41 +4932,9 @@
       },
       "get": {
         "operationId": "getModules",
-        "summary": "List modules with pagination",
+        "summary": "List modules",
         "tags": [
           "Module"
-        ],
-        "parameters": [
-          {
-            "schema": {
-              "default": 1,
-              "type": "integer",
-              "minimum": 1,
-              "maximum": 9007199254740991
-            },
-            "in": "query",
-            "name": "page",
-            "required": false
-          },
-          {
-            "schema": {
-              "default": 10,
-              "type": "integer",
-              "minimum": 1,
-              "maximum": 9007199254740991
-            },
-            "in": "query",
-            "name": "perPage",
-            "required": false
-          },
-          {
-            "schema": {
-              "type": "string"
-            },
-            "in": "query",
-            "name": "name",
-            "required": false
-          }
         ],
         "responses": {
           "200": {
@@ -4887,39 +5005,10 @@
                         ],
                         "additionalProperties": false
                       }
-                    },
-                    "pagination": {
-                      "type": "object",
-                      "properties": {
-                        "total": {
-                          "type": "number"
-                        },
-                        "totalPages": {
-                          "type": "number"
-                        },
-                        "hasNextPage": {
-                          "type": "boolean"
-                        },
-                        "hasPreviousPage": {
-                          "type": "boolean"
-                        },
-                        "currentPage": {
-                          "type": "number"
-                        }
-                      },
-                      "required": [
-                        "total",
-                        "totalPages",
-                        "hasNextPage",
-                        "hasPreviousPage",
-                        "currentPage"
-                      ],
-                      "additionalProperties": false
                     }
                   },
                   "required": [
-                    "data",
-                    "pagination"
+                    "data"
                   ],
                   "additionalProperties": false
                 }
@@ -5439,10 +5528,50 @@
                             "type": "string",
                             "format": "date-time"
                           },
-                          "deletedAt": {
-                            "nullable": true,
-                            "type": "string",
-                            "format": "date-time"
+                          "company": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "format": "cuid",
+                                "pattern": "^[cC][^\\s-]{8,}$"
+                              },
+                              "name": {
+                                "type": "string"
+                              },
+                              "document": {
+                                "type": "string"
+                              },
+                              "companyGroup": {
+                                "type": "object",
+                                "properties": {
+                                  "id": {
+                                    "type": "string",
+                                    "format": "cuid",
+                                    "pattern": "^[cC][^\\s-]{8,}$"
+                                  },
+                                  "name": {
+                                    "type": "string"
+                                  },
+                                  "document": {
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "id",
+                                  "name",
+                                  "document"
+                                ],
+                                "additionalProperties": false
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "name",
+                              "document",
+                              "companyGroup"
+                            ],
+                            "additionalProperties": false
                           },
                           "phones": {
                             "type": "array",
@@ -5483,7 +5612,7 @@
                           "companyId",
                           "createdAt",
                           "updatedAt",
-                          "deletedAt",
+                          "company",
                           "phones"
                         ],
                         "additionalProperties": false
@@ -5855,6 +5984,69 @@
             },
             "in": "path",
             "name": "phoneId",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "nullable": true,
+                  "enum": [
+                    null
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/units/{unitId}/hierarchy": {
+      "put": {
+        "operationId": "updateUnitHierarchy",
+        "summary": "Update unit hierarchy",
+        "tags": [
+          "Unit"
+        ],
+        "description": "Update unit hierarchy",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "companyId": {
+                    "type": "string",
+                    "format": "cuid",
+                    "pattern": "^[cC][^\\s-]{8,}$"
+                  }
+                },
+                "required": [
+                  "companyId"
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "cuid",
+              "pattern": "^[cC][^\\s-]{8,}$"
+            },
+            "in": "path",
+            "name": "unitId",
             "required": true
           }
         ],

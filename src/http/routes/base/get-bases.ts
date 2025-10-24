@@ -16,7 +16,7 @@ export const getBases: FastifyPluginCallbackZod = (app) => {
           page: z.coerce.number().int().min(1).default(1),
           perPage: z.coerce.number().int().min(1).default(10),
           name: z.string().optional(),
-          unitId: z.string(),
+          unitId: z.string().optional(),
         }),
         response: {
           200: z.object({
@@ -27,7 +27,7 @@ export const getBases: FastifyPluginCallbackZod = (app) => {
                 latitude: z.number(),
                 longitude: z.number(),
                 createdAt: z.date(),
-updatedAt: z.date(),
+                updatedAt: z.date(),
                 deletedAt: z.date().nullable(),
               })
             ),
@@ -45,16 +45,21 @@ updatedAt: z.date(),
     async (request, reply) => {
       const { page, perPage, name, unitId } = request.query;
 
-      const filters: any = { deletedAt: null, unitId };
-      if (name) filters.name = { contains: name };
-
       const [bases, total] = await Promise.all([
         prisma.base.findMany({
-          where: filters,
+          where: {
+            deletedAt: null,
+            ...(unitId && { unitId }),
+            ...(name && { name: { contains: name } }),
+          },
           skip: (page - 1) * perPage,
           take: perPage,
         }),
-        prisma.base.count({ where: filters }),
+        prisma.base.count({ where: {
+          deletedAt: null,
+          ...(unitId && { unitId }),
+          ...(name && { name: { contains: name } }),
+        } }),
       ]);
 
       const totalPages = Math.ceil(total / perPage);

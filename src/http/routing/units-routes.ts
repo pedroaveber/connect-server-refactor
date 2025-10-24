@@ -6,6 +6,7 @@ import { deleteUnitPhoneNumber } from "../routes/units/delete-unit-phone-number"
 import { getUnit } from "../routes/units/get-unit";
 import { getUnits } from "../routes/units/get-units";
 import { updateUnit } from "../routes/units/update-unit";
+import { updateUnitHierarchy } from "../routes/units/update-unit-hierarchy";
 
 export default function unitsRoutes() {
   app.register(createUnit);
@@ -15,4 +16,5 @@ export default function unitsRoutes() {
   app.register(getUnit);
   app.register(createUnitPhoneNumber);
   app.register(deleteUnitPhoneNumber);
+  app.register(updateUnitHierarchy);
 }

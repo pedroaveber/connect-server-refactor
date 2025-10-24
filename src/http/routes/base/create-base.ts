@@ -9,6 +9,9 @@ const createBaseSchema = z.object({
   latitude: z.number(),
   longitude: z.number(),
   unitId: z.string(),
+  phones: z.array(z.object({
+    number: z.string(),
+  })),
 });
 
 export const createBase: FastifyPluginCallbackZod = (app) => {
@@ -25,13 +28,23 @@ export const createBase: FastifyPluginCallbackZod = (app) => {
       },
     },
     async (request, reply) => {
-      const { name, unitId } = request.body;
+      const { name, unitId, phones, latitude, longitude } = request.body;
 
       const existing = await prisma.base.findFirst({ where: { name, unitId } });
       if (existing) throw new ConflictException("A base já existe.");
 
       const base = await prisma.base.create({
-        data: request.body,
+        data: {
+          latitude,
+          longitude,
+          name,
+          unitId,
+          phones: {
+            createMany: {
+              data: phones,
+            },
+          },
+        },
       });
 
       return reply.status(201).send({ id: base.id });
