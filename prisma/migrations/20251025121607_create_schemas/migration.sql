@@ -1,4 +1,7 @@
 -- CreateEnum
+CREATE TYPE "UserRole" AS ENUM ('SYS_ADMIN', 'COMPANY_GROUP_ADMIN', 'COMPANY_ADMIN', 'UNIT_ADMIN', 'BASE_ADMIN');
+
+-- CreateEnum
 CREATE TYPE "Modules" AS ENUM ('BASE', 'CHAT', 'LOCATION', 'STATUS', 'RADIO', 'PA_SYSTEM', 'DRIVERS', 'IRIS');
 
 -- CreateEnum
@@ -9,9 +12,6 @@ CREATE TYPE "AmbulanceStatusEnum" AS ENUM ('QAP', 'OCP', 'EVT', 'J4', 'J5', 'FA'
 
 -- CreateEnum
 CREATE TYPE "IntegrationType" AS ENUM ('IRIS', 'DRIVERS');
-
--- CreateEnum
-CREATE TYPE "UserRoleEnum" AS ENUM ('DRIVER', 'NURSE', 'REGULATOR', 'REGULATOR_ADMIN', 'SYS_ADMIN');
 
 -- CreateTable
 CREATE TABLE "ambulances" (
@@ -99,6 +99,8 @@ CREATE TABLE "bases" (
     "latitude" DOUBLE PRECISION NOT NULL,
     "longitude" DOUBLE PRECISION NOT NULL,
     "unit_id" TEXT NOT NULL,
+    "company_id" TEXT NOT NULL,
+    "company_group_id" TEXT NOT NULL,
 
     CONSTRAINT "bases_pkey" PRIMARY KEY ("id")
 );
@@ -228,17 +230,6 @@ CREATE TABLE "phones" (
 );
 
 -- CreateTable
-CREATE TABLE "roles" (
-    "id" TEXT NOT NULL,
-    "name" "UserRoleEnum" NOT NULL,
-    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" TIMESTAMP(3) NOT NULL,
-    "deleted_at" TIMESTAMP(3),
-
-    CONSTRAINT "roles_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
 CREATE TABLE "units" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
@@ -247,6 +238,7 @@ CREATE TABLE "units" (
     "updated_at" TIMESTAMP(3) NOT NULL,
     "deleted_at" TIMESTAMP(3),
     "company_id" TEXT NOT NULL,
+    "company_group_id" TEXT NOT NULL,
 
     CONSTRAINT "units_pkey" PRIMARY KEY ("id")
 );
@@ -262,6 +254,11 @@ CREATE TABLE "users" (
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
     "deleted_at" TIMESTAMP(3),
+    "company_group_id" TEXT,
+    "company_id" TEXT,
+    "base_id" TEXT,
+    "unit_id" TEXT,
+    "role" "UserRole" NOT NULL,
 
     CONSTRAINT "users_pkey" PRIMARY KEY ("id")
 );
@@ -272,22 +269,6 @@ CREATE TABLE "_CompanyToIntegration" (
     "B" TEXT NOT NULL,
 
     CONSTRAINT "_CompanyToIntegration_AB_pkey" PRIMARY KEY ("A","B")
-);
-
--- CreateTable
-CREATE TABLE "_UserRoles" (
-    "A" TEXT NOT NULL,
-    "B" TEXT NOT NULL,
-
-    CONSTRAINT "_UserRoles_AB_pkey" PRIMARY KEY ("A","B")
-);
-
--- CreateTable
-CREATE TABLE "_UnitToUser" (
-    "A" TEXT NOT NULL,
-    "B" TEXT NOT NULL,
-
-    CONSTRAINT "_UnitToUser_AB_pkey" PRIMARY KEY ("A","B")
 );
 
 -- CreateIndex
@@ -336,9 +317,6 @@ CREATE UNIQUE INDEX "modules_name_key" ON "modules"("name");
 CREATE INDEX "phones_number_idx" ON "phones"("number");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "roles_name_key" ON "roles"("name");
-
--- CreateIndex
 CREATE UNIQUE INDEX "units_document_key" ON "units"("document");
 
 -- CreateIndex
@@ -349,12 +327,6 @@ CREATE INDEX "users_document_idx" ON "users"("document");
 
 -- CreateIndex
 CREATE INDEX "_CompanyToIntegration_B_index" ON "_CompanyToIntegration"("B");
-
--- CreateIndex
-CREATE INDEX "_UserRoles_B_index" ON "_UserRoles"("B");
-
--- CreateIndex
-CREATE INDEX "_UnitToUser_B_index" ON "_UnitToUser"("B");
 
 -- AddForeignKey
 ALTER TABLE "ambulances" ADD CONSTRAINT "ambulances_ambulance_base_id_fkey" FOREIGN KEY ("ambulance_base_id") REFERENCES "bases"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -385,6 +357,12 @@ ALTER TABLE "ambulance_statuses" ADD CONSTRAINT "ambulance_statuses_user_id_fkey
 
 -- AddForeignKey
 ALTER TABLE "bases" ADD CONSTRAINT "bases_unit_id_fkey" FOREIGN KEY ("unit_id") REFERENCES "units"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "bases" ADD CONSTRAINT "bases_company_id_fkey" FOREIGN KEY ("company_id") REFERENCES "companies"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "bases" ADD CONSTRAINT "bases_company_group_id_fkey" FOREIGN KEY ("company_group_id") REFERENCES "company_groups"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "chats" ADD CONSTRAINT "chats_ambulance_id_fkey" FOREIGN KEY ("ambulance_id") REFERENCES "ambulances"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -429,19 +407,22 @@ ALTER TABLE "phones" ADD CONSTRAINT "phones_baseId_fkey" FOREIGN KEY ("baseId") 
 ALTER TABLE "units" ADD CONSTRAINT "units_company_id_fkey" FOREIGN KEY ("company_id") REFERENCES "companies"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "units" ADD CONSTRAINT "units_company_group_id_fkey" FOREIGN KEY ("company_group_id") REFERENCES "company_groups"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "users" ADD CONSTRAINT "users_company_group_id_fkey" FOREIGN KEY ("company_group_id") REFERENCES "company_groups"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "users" ADD CONSTRAINT "users_company_id_fkey" FOREIGN KEY ("company_id") REFERENCES "companies"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "users" ADD CONSTRAINT "users_base_id_fkey" FOREIGN KEY ("base_id") REFERENCES "bases"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "users" ADD CONSTRAINT "users_unit_id_fkey" FOREIGN KEY ("unit_id") REFERENCES "units"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "_CompanyToIntegration" ADD CONSTRAINT "_CompanyToIntegration_A_fkey" FOREIGN KEY ("A") REFERENCES "companies"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "_CompanyToIntegration" ADD CONSTRAINT "_CompanyToIntegration_B_fkey" FOREIGN KEY ("B") REFERENCES "integrations"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "_UserRoles" ADD CONSTRAINT "_UserRoles_A_fkey" FOREIGN KEY ("A") REFERENCES "roles"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "_UserRoles" ADD CONSTRAINT "_UserRoles_B_fkey" FOREIGN KEY ("B") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "_UnitToUser" ADD CONSTRAINT "_UnitToUser_A_fkey" FOREIGN KEY ("A") REFERENCES "units"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "_UnitToUser" ADD CONSTRAINT "_UnitToUser_B_fkey" FOREIGN KEY ("B") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;

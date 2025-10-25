@@ -29,7 +29,7 @@ Get {{baseUrl}}/company-groups
 
 ###
 # @name GetCompanyGroup
-Get {{baseUrl}}/company-groups/cmgmci5ec0000roys4pmw7gtp
+Get {{baseUrl}}/company-groups/cmh68x8n80000ro3pyxnuaz5x
 Authorization: Bearer {{accessToken}}
 
 ###

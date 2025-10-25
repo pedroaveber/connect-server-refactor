@@ -52,6 +52,11 @@ export const signIn: FastifyPluginCallbackZod = (app) => {
       const accessToken = app.jwt.sign(
         {
           sub: userWithDocument.id,
+          companyGroupId: userWithDocument.companyGroupId ?? undefined,
+          companyId: userWithDocument.companyId ?? undefined,
+          unitId: userWithDocument.unitId ?? undefined,
+          baseId: userWithDocument.baseId ?? undefined,
+          role: userWithDocument.role,
         },
         {
           expiresIn: "30m",
@@ -61,6 +66,11 @@ export const signIn: FastifyPluginCallbackZod = (app) => {
       const refreshToken = app.jwt.sign(
         {
           sub: userWithDocument.id,
+          companyGroupId: userWithDocument.companyGroupId ?? undefined,
+          companyId: userWithDocument.companyId ?? undefined,
+          unitId: userWithDocument.unitId ?? undefined,
+          baseId: userWithDocument.baseId ?? undefined,
+          role: userWithDocument.role,
         },
         {
           expiresIn: "7d",

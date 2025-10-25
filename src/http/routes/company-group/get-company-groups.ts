@@ -1,4 +1,7 @@
+import { defineAbilityFor } from "@/auth"
 import { prisma } from "@/database/prisma"
+import { ForbiddenException } from "@/http/exceptions/forbidden-exception"
+import { getAuthUser } from "@/http/helpers/casl"
 import { auth } from "@/http/hooks/auth"
 import type { FastifyPluginCallbackZod } from "fastify-type-provider-zod"
 import { z } from "zod"
@@ -28,7 +31,7 @@ export const getCompanyGroups: FastifyPluginCallbackZod = (app) => {
                 name: z.string(),
                 document: z.string(),
                 createdAt: z.date(),
-updatedAt: z.date(),
+                updatedAt: z.date(),
                 deletedAt: z.date().nullable(),
                 phones: z.array(
                   z.object({
@@ -52,7 +55,14 @@ updatedAt: z.date(),
       },
     },
     async (request, reply) => {
+      const authUser = getAuthUser(request)
       const { page, perPage, name, document } = request.query
+
+      const { can } = defineAbilityFor(authUser)
+
+      if (can('list', 'CompanyGroup') === false) {
+        throw new ForbiddenException()
+      }
 
       const [companyGroups, total] = await Promise.all([
         prisma.companyGroup.findMany({

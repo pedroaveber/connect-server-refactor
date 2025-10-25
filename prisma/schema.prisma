@@ -134,8 +134,15 @@ model Base {
   unit   Unit   @relation(fields: [unitId], references: [id])
   unitId String @map("unit_id")
 
+  companyId      String @map("company_id")
+  companyGroupId String @map("company_group_id")
+
+  company      Company      @relation(fields: [companyId], references: [id])
+  companyGroup CompanyGroup @relation(fields: [companyGroupId], references: [id])
+
   phones                       Phone[]
   ambulanceDestinationCommands AmbulanceDestinationCommands[]
+  User                         User[]
 
   @@map("bases")
 }
@@ -168,14 +175,16 @@ model Company {
   companyGroupId String       @map("company_group_id")
 
   // Validade do contrato (geralmente mensal)
-  billingStartDate    DateTime  @default(now()) @map("start_date")
-  billingEndDate      DateTime? @map("end_date")
-  billingCycle String    @default("MONTHLY") // poderia ser enum se quiser
+  billingStartDate DateTime  @default(now()) @map("start_date")
+  billingEndDate   DateTime? @map("end_date")
+  billingCycle     String    @default("MONTHLY") // poderia ser enum se quiser
 
   phones        Phone[]
   units         Unit[]
   companyModule CompanyModule[]
   integration   Integration[]
+  bases         Base[]
+  User          User[]
 
   @@map("companies")
 }
@@ -192,6 +201,9 @@ model CompanyGroup {
   phones      Phone[]
   companies   Company[]
   integration Integration[]
+  units       Unit[]
+  bases       Base[]
+  User        User[]
 
   @@map("company_groups")
 }
@@ -331,18 +343,18 @@ model Phone {
   @@map("phones")
 }
 
-model Role {
-  id   String       @id @default(cuid())
-  name UserRoleEnum @unique
+// model Role {
+//   id   String       @id @default(cuid())
+//   name UserRoleEnum @unique
 
-  users User[] @relation("UserRoles")
+//   users User[] @relation("UserRoles")
 
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime  @updatedAt @map("updated_at")
-  deletedAt DateTime? @map("deleted_at")
+//   createdAt DateTime  @default(now()) @map("created_at")
+//   updatedAt DateTime  @updatedAt @map("updated_at")
+//   deletedAt DateTime? @map("deleted_at")
 
-  @@map("roles")
-}
+//   @@map("roles")
+// }
 
 model Unit {
   id       String  @id @default(cuid())
@@ -356,11 +368,22 @@ model Unit {
   company   Company @relation(fields: [companyId], references: [id])
   companyId String  @map("company_id")
 
+  companyGroup   CompanyGroup @relation(fields: [companyGroupId], references: [id])
+  companyGroupId String       @map("company_group_id")
+
   phones Phone[]
-  Base   Base[]
-  User   User[]
+  base   Base[]
+  user   User[]
 
   @@map("units")
+}
+
+enum UserRole {
+  SYS_ADMIN
+  COMPANY_GROUP_ADMIN
+  COMPANY_ADMIN
+  UNIT_ADMIN
+  BASE_ADMIN
 }
 
 model User {
@@ -374,14 +397,24 @@ model User {
   updatedAt DateTime  @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
 
-  units Unit[]
+  companyGroup   CompanyGroup? @relation(fields: [companyGroupId], references: [id])
+  companyGroupId String?       @map("company_group_id")
+
+  company   Company? @relation(fields: [companyId], references: [id])
+  companyId String?  @map("company_id")
+
+  base   Base?   @relation(fields: [baseId], references: [id])
+  baseId String? @map("base_id")
+
+  unit   Unit?   @relation(fields: [unitId], references: [id])
+  unitId String? @map("unit_id")
 
   ambulanceShift     AmbulanceShift[]
   ambulanceStatus    AmbulanceStatus[]
   messages           Messages[]
   messageReadReceipt MessageReadReceipt[]
 
-  roles                        Role[]                         @relation("UserRoles")
+  role                         UserRole
   AmbulanceDestinationCommands AmbulanceDestinationCommands[]
 
   @@index([document]) // busca rápida por documento
@@ -421,10 +454,10 @@ enum IntegrationType {
   DRIVERS
 }
 
-enum UserRoleEnum {
-  DRIVER
-  NURSE
-  REGULATOR
-  REGULATOR_ADMIN
-  SYS_ADMIN
-}
+// enum UserRoleEnum {
+//   DRIVER
+//   NURSE
+//   REGULATOR
+//   REGULATOR_ADMIN
+//   SYS_ADMIN
+// }

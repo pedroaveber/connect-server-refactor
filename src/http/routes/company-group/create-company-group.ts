@@ -1,5 +1,9 @@
+import { defineAbilityFor } from "@/auth";
+import { userSchema } from "@/auth/models/user";
 import { prisma } from "@/database/prisma";
 import { ConflictException } from "@/http/exceptions/conflict-exception";
+import { ForbiddenException } from "@/http/exceptions/forbidden-exception";
+import { getAuthUser } from "@/http/helpers/casl";
 import { auth } from "@/http/hooks/auth";
 import type { FastifyPluginCallbackZod } from "fastify-type-provider-zod";
 import { z } from "zod";
@@ -36,7 +40,14 @@ export const createCompanyGroup: FastifyPluginCallbackZod = (app) => {
       },
     },
     async (request, reply) => {
+      const authUser = getAuthUser(request)
       const { document, name, phones } = request.body;
+
+      const { can } = defineAbilityFor(authUser)
+
+      if (can('create', 'CompanyGroup') === false) {
+        throw new ForbiddenException()
+      }
 
       const companyGroupWithSameDocument = await prisma.companyGroup.findUnique(
         {
