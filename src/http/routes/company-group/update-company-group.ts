@@ -1,9 +1,12 @@
-import { prisma } from "@/database/prisma"
-import { ConflictException } from "@/http/exceptions/conflict-exception"
-import { ResourceNotFoundException } from "@/http/exceptions/resource-not-found-exception"
-import { auth } from "@/http/hooks/auth"
 import type { FastifyPluginCallbackZod } from "fastify-type-provider-zod"
 import { z } from "zod"
+import { defineAbilityFor } from "@/auth"
+import { prisma } from "@/database/prisma"
+import { ConflictException } from "@/http/exceptions/conflict-exception"
+import { ForbiddenException } from "@/http/exceptions/forbidden-exception"
+import { ResourceNotFoundException } from "@/http/exceptions/resource-not-found-exception"
+import { getAuthUser, getCaslCompanyGroup } from "@/http/helpers/casl"
+import { auth } from "@/http/hooks/auth"
 
 export const updateCompanyGroup: FastifyPluginCallbackZod = (app) => {
   app.put(
@@ -31,8 +34,17 @@ export const updateCompanyGroup: FastifyPluginCallbackZod = (app) => {
       },
     },
     async (request, reply) => {
+      const authUser = getAuthUser(request)
       const { companyGroupId } = request.params
       const { document, name } = request.body
+
+      const caslCompanyGroup = getCaslCompanyGroup({ companyGroupId })
+
+      const { can } = defineAbilityFor(authUser)
+
+      if (can("update", caslCompanyGroup) === false) {
+        throw new ForbiddenException()
+      }
 
       const companyGroup = await prisma.companyGroup.findUnique({
         where: {

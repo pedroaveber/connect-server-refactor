@@ -1,9 +1,12 @@
-import { prisma } from "@/database/prisma"
-import { BadRequestException } from "@/http/exceptions/bad-request-exception"
-import { ResourceNotFoundException } from "@/http/exceptions/resource-not-found-exception"
-import { auth } from "@/http/hooks/auth"
 import type { FastifyPluginCallbackZod } from "fastify-type-provider-zod"
 import { z } from "zod"
+import { defineAbilityFor } from "@/auth"
+import { prisma } from "@/database/prisma"
+import { BadRequestException } from "@/http/exceptions/bad-request-exception"
+import { ForbiddenException } from "@/http/exceptions/forbidden-exception"
+import { ResourceNotFoundException } from "@/http/exceptions/resource-not-found-exception"
+import { getAuthUser } from "@/http/helpers/casl"
+import { auth } from "@/http/hooks/auth"
 
 export const deleteCompanyGroup: FastifyPluginCallbackZod = (app) => {
   app.delete(
@@ -25,7 +28,14 @@ export const deleteCompanyGroup: FastifyPluginCallbackZod = (app) => {
       },
     },
     async (request, reply) => {
+      const authUser = getAuthUser(request)
       const { companyGroupId } = request.params
+
+      const { can } = defineAbilityFor(authUser)
+
+      if (can("delete", "CompanyGroup") === false) {
+        throw new ForbiddenException()
+      }
 
       const companyGroup = await prisma.companyGroup.findUnique({
         where: {

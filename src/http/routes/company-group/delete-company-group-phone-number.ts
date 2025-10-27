@@ -1,8 +1,11 @@
-import { prisma } from "@/database/prisma"
-import { ResourceNotFoundException } from "@/http/exceptions/resource-not-found-exception"
-import { auth } from "@/http/hooks/auth"
 import type { FastifyPluginCallbackZod } from "fastify-type-provider-zod"
 import { z } from "zod"
+import { defineAbilityFor } from "@/auth"
+import { prisma } from "@/database/prisma"
+import { ForbiddenException } from "@/http/exceptions/forbidden-exception"
+import { ResourceNotFoundException } from "@/http/exceptions/resource-not-found-exception"
+import { getAuthUser, getCaslCompanyGroup } from "@/http/helpers/casl"
+import { auth } from "@/http/hooks/auth"
 
 export const deleteCompanyGroupPhoneNumber: FastifyPluginCallbackZod = (
   app
@@ -27,7 +30,16 @@ export const deleteCompanyGroupPhoneNumber: FastifyPluginCallbackZod = (
       },
     },
     async (request, reply) => {
+      const authUser = getAuthUser(request)
       const { companyGroupId, phoneId } = request.params
+
+      const caslCompanyGroup = getCaslCompanyGroup({ companyGroupId })
+
+      const { can } = defineAbilityFor(authUser)
+
+      if (can("update", caslCompanyGroup) === false) {
+        throw new ForbiddenException()
+      }
 
       const phone = await prisma.phone.findUnique({
         where: {

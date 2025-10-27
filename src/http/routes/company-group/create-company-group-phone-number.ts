@@ -1,8 +1,11 @@
-import { prisma } from "@/database/prisma"
-import { ConflictException } from "@/http/exceptions/conflict-exception"
-import { auth } from "@/http/hooks/auth"
 import type { FastifyPluginCallbackZod } from "fastify-type-provider-zod"
 import { z } from "zod"
+import { defineAbilityFor } from "@/auth"
+import { prisma } from "@/database/prisma"
+import { ConflictException } from "@/http/exceptions/conflict-exception"
+import { ForbiddenException } from "@/http/exceptions/forbidden-exception"
+import { getAuthUser, getCaslCompanyGroup } from "@/http/helpers/casl"
+import { auth } from "@/http/hooks/auth"
 
 export const createCompanyGroupPhoneNumber: FastifyPluginCallbackZod = (
   app
@@ -33,8 +36,18 @@ export const createCompanyGroupPhoneNumber: FastifyPluginCallbackZod = (
       },
     },
     async (request, reply) => {
+      const authUser = getAuthUser(request)
+
       const { companyGroupId } = request.params
       const { number } = request.body
+
+      const { can } = defineAbilityFor(authUser)
+
+      const caslCompanyGroup = getCaslCompanyGroup({ companyGroupId })
+
+      if (can("update", caslCompanyGroup) === false) {
+        throw new ForbiddenException()
+      }
 
       const phone = await prisma.phone.findFirst({
         where: {
