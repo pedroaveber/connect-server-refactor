@@ -1,9 +1,12 @@
-import { prisma } from "@/database/prisma";
-import { ConflictException } from "@/http/exceptions/conflict-exception";
-import { ResourceNotFoundException } from "@/http/exceptions/resource-not-found-exception";
-import { auth } from "@/http/hooks/auth";
-import type { FastifyPluginCallbackZod } from "fastify-type-provider-zod";
-import { z } from "zod";
+import type { FastifyPluginCallbackZod } from "fastify-type-provider-zod"
+import { z } from "zod"
+import { defineAbilityFor } from "@/auth"
+import { prisma } from "@/database/prisma"
+import { ConflictException } from "@/http/exceptions/conflict-exception"
+import { ForbiddenException } from "@/http/exceptions/forbidden-exception"
+import { ResourceNotFoundException } from "@/http/exceptions/resource-not-found-exception"
+import { getAuthUser, getCaslCompany } from "@/http/helpers/casl"
+import { auth } from "@/http/hooks/auth"
 
 export const createCompany: FastifyPluginCallbackZod = (app) => {
   app.post(
@@ -43,27 +46,38 @@ export const createCompany: FastifyPluginCallbackZod = (app) => {
       },
     },
     async (request, reply) => {
-      const { document, name, phones, companyGroupId } =
-        request.body;
+      const authUser = getAuthUser(request)
+      const { document, name, phones, companyGroupId } = request.body
+
+      const caslCompany = getCaslCompany({
+        companyGroupId,
+        companyId: "FAKE_CUID",
+      })
+
+      const { can } = defineAbilityFor(authUser)
+
+      if (can("create", caslCompany) === false) {
+        throw new ForbiddenException()
+      }
 
       const companyGroup = await prisma.companyGroup.findUnique({
         where: {
           id: companyGroupId,
         },
-      });
+      })
 
       if (!companyGroup) {
-        throw new ResourceNotFoundException("Grupo empresarial não encontrado");
+        throw new ResourceNotFoundException("Grupo empresarial não encontrado")
       }
 
       const companyWithSameDocument = await prisma.company.findUnique({
         where: {
           document,
         },
-      });
+      })
 
       if (companyWithSameDocument) {
-        throw new ConflictException("Já existe uma empresa com este documento");
+        throw new ConflictException("Já existe uma empresa com este documento")
       }
 
       const modules = await prisma.module.findMany()
@@ -83,15 +97,15 @@ export const createCompany: FastifyPluginCallbackZod = (app) => {
               data: modules.map((m) => ({
                 moduleId: m.id,
                 active: false,
-              }))
-            }
-          }
+              })),
+            },
+          },
         },
-      });
+      })
 
       return reply.status(201).send({
         id: company.id,
-      });
+      })
     }
-  );
-};
+  )
+}
