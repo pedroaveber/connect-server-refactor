@@ -4,6 +4,10 @@
   "editor.codeActionsOnSave": {
     "source.fixAll.biome": "always"
   },
+  "[prisma]": {
+    "editor.defaultFormatter": "Prisma.prisma",
+    "editor.formatOnSave": true
+  },
   "[javascript]": {
     "editor.defaultFormatter": "biomejs.biome"
   },

@@ -1,6 +1,5 @@
 generator client {
   provider = "prisma-client-js"
-  // output   = "./generated/prisma"
 }
 
 datasource db {
@@ -8,116 +7,73 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Ambulance {
-  id String @id @default(cuid())
+enum InvoiceMode {
+  GENERAL
+  DISCRIMINATED
+}
 
-  // Base values
+enum UserRole {
+  ADMIN
+  COMPANY_GROUP_ADMIN
+  MEMBER
+}
+
+model CompanyGroup {
+  id          String      @id @default(cuid())
   name        String
-  observation String?
-  plateNumber String    @unique @map("plate_number")
-  linkingCode String?   @unique @map("linking_code")
-  avatarUrl   String?   @map("avatar_url")
-  createdAt   DateTime  @default(now()) @map("created_at")
-  updatedAt   DateTime  @updatedAt @map("updated_at")
-  deletedAt   DateTime? @map("deleted_at")
+  document    String      @unique
+  invoiceMode InvoiceMode @default(GENERAL) @map("invoice_mode")
+  createdAt   DateTime    @default(now()) @map("created_at")
+  updatedAt   DateTime    @updatedAt @map("updated_at")
+  deletedAt   DateTime?   @map("deleted_at")
 
-  // Base Relation
-  ambulanceBase   Base   @relation(fields: [ambulanceBaseId], references: [id])
-  ambulanceBaseId String @map("ambulance_base_id")
+  companies Company[]
+  units     Unit[]
+  bases     Base[]
+  phones    Phone[]
+  members   UserOrganization[]
 
-  // Relations
-  ambulanceShift               AmbulanceShift[]
-  ambulanceStatus              AmbulanceStatus[]
-  ambulanceDestinationCommands AmbulanceDestinationCommands[]
-  ambulanceDocuments           AmbulanceDocuments[]
-  chat                         Chat[]
-
-  @@map("ambulances")
+  @@map("company_groups")
 }
 
-model AmbulanceDestinationCommands {
-  id String @id @default(cuid())
-
-  // Endereço
-  latitude  Float?
-  longitude Float?
-  address   String?
-
-  // Pode ser vinculado a uma base
-  base   Base?   @relation(fields: [baseId], references: [id])
-  baseId String? @map("base_id")
-
-  // Atendido
-  attended   Boolean?  @default(false)
-  attendedAt DateTime? @default(now())
-
-  ambulance   Ambulance @relation(fields: [ambulanceId], references: [id])
-  ambulanceId String    @map("ambulance_id")
-
-  user   User   @relation(fields: [userId], references: [id])
-  userId String @map("user_id")
-
+model Company {
+  id        String    @id @default(cuid())
+  name      String
+  document  String    @unique
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
 
-  @@map("ambulance_destination_commands")
+  companyGroup   CompanyGroup @relation(fields: [companyGroupId], references: [id])
+  companyGroupId String       @map("company_group_id")
+
+  units   Unit[]
+  bases   Base[]
+  phones  Phone[]
+  members UserOrganization[]
+
+  @@map("companies")
 }
 
-model AmbulanceDocuments {
-  id String @id @default(cuid())
-
-  // Documentos
-  documentTitle String    @map("document_title")
-  documentType  String    @map("document_type")
-  documentUrl   String    @map("document_url")
-  validUntil    DateTime? @map("valid_until")
-
-  ambulance   Ambulance @relation(fields: [ambulanceId], references: [id])
-  ambulanceId String    @map("ambulance_id")
-
+model Unit {
+  id        String    @id @default(cuid())
+  name      String
+  document  String    @unique
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
 
-  @@map("ambulance_documents")
-}
+  company   Company @relation(fields: [companyId], references: [id])
+  companyId String  @map("company_id")
 
-model AmbulanceShift {
-  id String @id @default(cuid())
+  companyGroup   CompanyGroup @relation(fields: [companyGroupId], references: [id])
+  companyGroupId String       @map("company_group_id")
 
-  startDate DateTime @map("start_date")
-  endDate   DateTime @map("end_date")
+  bases   Base[]
+  phones  Phone[]
+  members UserOrganization[]
 
-  ambulance   Ambulance @relation(fields: [ambulanceId], references: [id])
-  ambulanceId String    @map("ambulance_id")
-
-  user   User?   @relation(fields: [userId], references: [id])
-  userId String? @map("user_id")
-
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime  @updatedAt @map("updated_at")
-  deletedAt DateTime? @map("deleted_at")
-
-  @@map("ambulance_shifts")
-}
-
-model AmbulanceStatus {
-  id String @id @default(cuid())
-
-  status AmbulanceStatusEnum @default(FA)
-
-  ambulance   Ambulance @relation(fields: [ambulanceId], references: [id])
-  ambulanceId String    @map("ambulance_id")
-
-  user   User?   @relation(fields: [userId], references: [id])
-  userId String? @map("user_id")
-
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime  @updatedAt @map("updated_at")
-  deletedAt DateTime? @map("deleted_at")
-
-  @@map("ambulance_statuses")
+  @@map("units")
 }
 
 model Base {
@@ -127,337 +83,532 @@ model Base {
   updatedAt DateTime  @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
 
-  latitude  Float
-  longitude Float
-  ambulance Ambulance[]
-
   unit   Unit   @relation(fields: [unitId], references: [id])
   unitId String @map("unit_id")
 
-  companyId      String @map("company_id")
-  companyGroupId String @map("company_group_id")
-
-  company      Company      @relation(fields: [companyId], references: [id])
-  companyGroup CompanyGroup @relation(fields: [companyGroupId], references: [id])
-
-  phones                       Phone[]
-  ambulanceDestinationCommands AmbulanceDestinationCommands[]
-  User                         User[]
-
-  @@map("bases")
-}
-
-model Chat {
-  id String @id @default(cuid())
-
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime  @updatedAt @map("updated_at")
-  deletedAt DateTime? @map("deleted_at")
-
-  ambulance   Ambulance  @relation(fields: [ambulanceId], references: [id])
-  ambulanceId String     @map("ambulance_id")
-  messages    Messages[]
-
-  @@index([ambulanceId]) // busca rápida por chat de uma ambulância
-  @@map("chats")
-}
-
-model Company {
-  id       String @id @default(cuid())
-  name     String
-  document String @unique
-
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime  @updatedAt @map("updated_at")
-  deletedAt DateTime? @map("deleted_at")
-
   companyGroup   CompanyGroup @relation(fields: [companyGroupId], references: [id])
   companyGroupId String       @map("company_group_id")
-
-  // Validade do contrato (geralmente mensal)
-  billingStartDate DateTime  @default(now()) @map("start_date")
-  billingEndDate   DateTime? @map("end_date")
-  billingCycle     String    @default("MONTHLY") // poderia ser enum se quiser
-
-  phones        Phone[]
-  units         Unit[]
-  companyModule CompanyModule[]
-  integration   Integration[]
-  bases         Base[]
-  User          User[]
-
-  @@map("companies")
-}
-
-model CompanyGroup {
-  id       String @id @default(cuid())
-  name     String
-  document String @unique
-
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime  @updatedAt @map("updated_at")
-  deletedAt DateTime? @map("deleted_at")
-
-  phones      Phone[]
-  companies   Company[]
-  integration Integration[]
-  units       Unit[]
-  bases       Base[]
-  User        User[]
-
-  @@map("company_groups")
-}
-
-model CompanyModule {
-  id String @id @default(cuid())
 
   company   Company @relation(fields: [companyId], references: [id])
   companyId String  @map("company_id")
 
-  module   Module @relation(fields: [moduleId], references: [id])
-  moduleId String @map("module_id")
+  phones  Phone[]
+  members UserOrganization[]
 
-  // Valor específico contratado (pode sobrescrever o default)
-  customPrice Float? @map("custom_price")
-
-  // Quantidade contratada (ambulâncias, bases, motoristas, etc.)
-  quantity Int? @default(1)
-
-  // Ativo ou não
-  active       Boolean  @default(true)
-  contractedAt DateTime @default(now()) @map("contracted_at")
-
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  @@unique([companyId, moduleId]) // Evita duplicidade de módulos contratados
-  @@map("company_modules")
+  @@map("bases")
 }
 
-model Integration {
-  id String @id @default(cuid())
-
-  // Tipo da integração (ex: IRIS, DRIVERS)
-  type IntegrationType
+model Phone {
+  id         String   @id @default(cuid())
+  number     String
+  name       String?
+  isWhatsapp Boolean  @default(false) @map("is_whatsapp")
+  createdAt  DateTime @default(now()) @map("created_at")
 
   companyGroup   CompanyGroup @relation(fields: [companyGroupId], references: [id])
   companyGroupId String       @map("company_group_id")
 
-  isCompanyGroupWide Boolean   @default(false)
-  companies          Company[]
-
-  // Campos comuns
-  url      String? @map("url")
-  login    String? @map("login")
-  password String? @map("password")
-  apiKey   String? @map("api_key")
-
-  // Campos específicos (ex: custom headers, endpoint IDs, tokens temporários, etc.)
-  config Json? @map("config")
-
-  // Auditoria
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  @@unique([companyGroupId, type])
-  @@map("integrations")
-}
-
-model MessageReadReceipt {
-  id String @id @default(cuid())
-
-  message   Messages @relation(fields: [messageId], references: [id])
-  messageId String   @map("message_id")
-
-  user   User   @relation(fields: [userId], references: [id])
-  userId String @map("user_id")
-
-  readAt DateTime @default(now()) @map("read_at")
-
-  @@unique([messageId, userId]) // cada user só pode ler uma vez a mesma mensagem
-  @@index([userId]) // busca rápida por mensagens lidas por um user
-  @@index([messageId, readAt]) // busca rápida por quem leu uma mensagem e quando
-  @@map("message_read_receipts")
-}
-
-model Messages {
-  id String @id @default(cuid())
-
-  messageContent String  @map("message_content")
-  messageType    String  @map("message_type")
-  messageFile    String? @map("message_file")
-
-  chat   Chat   @relation(fields: [chatId], references: [id])
-  chatId String @map("chat_id")
-
-  user   User   @relation(fields: [userId], references: [id])
-  userId String @map("user_id")
-
-  createdAt          DateTime             @default(now()) @map("created_at")
-  updatedAt          DateTime             @updatedAt @map("updated_at")
-  deletedAt          DateTime?            @map("deleted_at")
-  messageReadReceipt MessageReadReceipt[]
-
-  @@index([chatId]) // busca rápida por mensagens de um chat
-  @@index([userId]) // busca rápida por mensagens de um user
-  @@index([createdAt]) // busca rápida por mensagens em um período
-  @@map("messages")
-}
-
-model Module {
-  id           String            @id @default(cuid())
-  name         Modules           @unique
-  description  String?
-  billingType  ModuleBillingType @map("billing_type")
-  defaultPrice Float             @default(0) @map("default_price")
-
-  internal Boolean @default(false)
-
-  companyModules CompanyModule[]
-
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  @@map("modules")
-}
-
-model Phone {
-  id        String   @id @default(cuid())
-  number    String
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  companyGroup   CompanyGroup? @relation(fields: [companyGroupId], references: [id])
-  companyGroupId String?       @map("company_group_id")
-
-  company   Company? @relation(fields: [companyId], references: [id])
-  companyId String?  @map("company_id")
+  company   Company @relation(fields: [companyId], references: [id])
+  companyId String  @map("company_id")
 
   unit   Unit?   @relation(fields: [unitId], references: [id])
   unitId String? @map("unit_id")
 
   base   Base?   @relation(fields: [baseId], references: [id])
-  baseId String?
-
-  @@index([number]) // busca rápida por número de telefone
-  @@map("phones")
+  baseId String? @map("base_id")
 }
 
-// model Role {
-//   id   String       @id @default(cuid())
-//   name UserRoleEnum @unique
+model User {
+  id        String     @id @default(cuid())
+  name      String
+  document  String     @unique
+  password  String
+  roles     UserRole[] @default([MEMBER])
+  birthDate DateTime   @map("birth_date")
+  avatarUrl String?    @map("avatar_url")
+  createdAt DateTime   @default(now()) @map("created_at")
+  updatedAt DateTime   @updatedAt @map("updated_at")
+  deletedAt DateTime?  @map("deleted_at")
 
-//   users User[] @relation("UserRoles")
+  organizations UserOrganization[]
+
+  @@index([document])
+  @@map("users")
+}
+
+model UserOrganization {
+  id String @id @default(cuid())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId String @map("user_id")
+
+  companyGroup   CompanyGroup @relation(fields: [companyGroupId], references: [id])
+  companyGroupId String       @map("company_group_id")
+
+  company   Company @relation(fields: [companyId], references: [id])
+  companyId String  @map("company_id")
+
+  unit   Unit?   @relation(fields: [unitId], references: [id])
+  unitId String? @map("unit_id")
+
+  base   Base?   @relation(fields: [baseId], references: [id])
+  baseId String? @map("base_id")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("user_organizations")
+}
+
+// model Ambulance {
+//   id String @id @default(cuid())
+
+//   // Base values
+//   name        String
+//   observation String?
+//   plateNumber String    @unique @map("plate_number")
+//   linkingCode String?   @unique @map("linking_code")
+//   avatarUrl   String?   @map("avatar_url")
+//   createdAt   DateTime  @default(now()) @map("created_at")
+//   updatedAt   DateTime  @updatedAt @map("updated_at")
+//   deletedAt   DateTime? @map("deleted_at")
+
+//   // Base Relation
+//   ambulanceBase   Base   @relation(fields: [ambulanceBaseId], references: [id])
+//   ambulanceBaseId String @map("ambulance_base_id")
+
+//   // Relations
+//   ambulanceShift               AmbulanceShift[]
+//   ambulanceStatus              AmbulanceStatus[]
+//   ambulanceDestinationCommands AmbulanceDestinationCommands[]
+//   ambulanceDocuments           AmbulanceDocuments[]
+//   chat                         Chat[]
+
+//   @@map("ambulances")
+// }
+
+// model AmbulanceDestinationCommands {
+//   id String @id @default(cuid())
+
+//   // Endereço
+//   latitude  Float?
+//   longitude Float?
+//   address   String?
+
+//   // Pode ser vinculado a uma base
+//   base   Base?   @relation(fields: [baseId], references: [id])
+//   baseId String? @map("base_id")
+
+//   // Atendido
+//   attended   Boolean?  @default(false)
+//   attendedAt DateTime? @default(now())
+
+//   ambulance   Ambulance @relation(fields: [ambulanceId], references: [id])
+//   ambulanceId String    @map("ambulance_id")
+
+//   user   User   @relation(fields: [userId], references: [id])
+//   userId String @map("user_id")
 
 //   createdAt DateTime  @default(now()) @map("created_at")
 //   updatedAt DateTime  @updatedAt @map("updated_at")
 //   deletedAt DateTime? @map("deleted_at")
 
-//   @@map("roles")
+//   @@map("ambulance_destination_commands")
 // }
 
-model Unit {
-  id       String  @id @default(cuid())
-  name     String
-  document String? @unique
+// model AmbulanceDocuments {
+//   id String @id @default(cuid())
 
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime  @updatedAt @map("updated_at")
-  deletedAt DateTime? @map("deleted_at")
+//   // Documentos
+//   documentTitle String    @map("document_title")
+//   documentType  String    @map("document_type")
+//   documentUrl   String    @map("document_url")
+//   validUntil    DateTime? @map("valid_until")
 
-  company   Company @relation(fields: [companyId], references: [id])
-  companyId String  @map("company_id")
+//   ambulance   Ambulance @relation(fields: [ambulanceId], references: [id])
+//   ambulanceId String    @map("ambulance_id")
 
-  companyGroup   CompanyGroup @relation(fields: [companyGroupId], references: [id])
-  companyGroupId String       @map("company_group_id")
+//   createdAt DateTime  @default(now()) @map("created_at")
+//   updatedAt DateTime  @updatedAt @map("updated_at")
+//   deletedAt DateTime? @map("deleted_at")
 
-  phones Phone[]
-  base   Base[]
-  user   User[]
+//   @@map("ambulance_documents")
+// }
 
-  @@map("units")
-}
+// model AmbulanceShift {
+//   id String @id @default(cuid())
 
-enum UserRole {
-  SYS_ADMIN
-  COMPANY_GROUP_ADMIN
-  COMPANY_ADMIN
-  UNIT_ADMIN
-  BASE_ADMIN
-}
+//   startDate DateTime @map("start_date")
+//   endDate   DateTime @map("end_date")
 
-model User {
-  id        String    @id @default(cuid())
-  name      String
-  document  String    @unique
-  password  String
-  birthDate DateTime  @map("birth_date")
-  avatarUrl String?   @map("avatar_url")
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime  @updatedAt @map("updated_at")
-  deletedAt DateTime? @map("deleted_at")
+//   ambulance   Ambulance @relation(fields: [ambulanceId], references: [id])
+//   ambulanceId String    @map("ambulance_id")
 
-  companyGroup   CompanyGroup? @relation(fields: [companyGroupId], references: [id])
-  companyGroupId String?       @map("company_group_id")
+//   user   User?   @relation(fields: [userId], references: [id])
+//   userId String? @map("user_id")
 
-  company   Company? @relation(fields: [companyId], references: [id])
-  companyId String?  @map("company_id")
+//   createdAt DateTime  @default(now()) @map("created_at")
+//   updatedAt DateTime  @updatedAt @map("updated_at")
+//   deletedAt DateTime? @map("deleted_at")
 
-  base   Base?   @relation(fields: [baseId], references: [id])
-  baseId String? @map("base_id")
+//   @@map("ambulance_shifts")
+// }
 
-  unit   Unit?   @relation(fields: [unitId], references: [id])
-  unitId String? @map("unit_id")
+// model AmbulanceStatus {
+//   id String @id @default(cuid())
 
-  ambulanceShift     AmbulanceShift[]
-  ambulanceStatus    AmbulanceStatus[]
-  messages           Messages[]
-  messageReadReceipt MessageReadReceipt[]
+//   status AmbulanceStatusEnum @default(FA)
 
-  role                         UserRole
-  AmbulanceDestinationCommands AmbulanceDestinationCommands[]
+//   ambulance   Ambulance @relation(fields: [ambulanceId], references: [id])
+//   ambulanceId String    @map("ambulance_id")
 
-  @@index([document]) // busca rápida por documento
-  @@map("users")
-}
+//   user   User?   @relation(fields: [userId], references: [id])
+//   userId String? @map("user_id")
 
-enum Modules {
-  BASE
-  CHAT
-  LOCATION
-  STATUS
-  RADIO
-  PA_SYSTEM
-  DRIVERS
-  IRIS
-}
+//   createdAt DateTime  @default(now()) @map("created_at")
+//   updatedAt DateTime  @updatedAt @map("updated_at")
+//   deletedAt DateTime? @map("deleted_at")
 
-enum ModuleBillingType {
-  FIXED // Valor fixo por empresa
-  PER_AMBULANCE // Valor por ambulância
-  PER_BASE // Valor por base
-  PER_DRIVER_AMBULANCE // Valor por ambulância com motorista
-}
+//   @@map("ambulance_statuses")
+// }
 
-enum AmbulanceStatusEnum {
-  QAP
-  OCP
-  EVT
-  J4
-  J5
-  FA
-  MN
-}
+// model Base {
+//   id        String    @id @default(cuid())
+//   name      String
+//   createdAt DateTime  @default(now()) @map("created_at")
+//   updatedAt DateTime  @updatedAt @map("updated_at")
+//   deletedAt DateTime? @map("deleted_at")
 
-enum IntegrationType {
-  IRIS
-  DRIVERS
-}
+//   latitude  Float
+//   longitude Float
+//   ambulance Ambulance[]
 
-// enum UserRoleEnum {
-//   DRIVER
-//   NURSE
-//   REGULATOR
-//   REGULATOR_ADMIN
+//   unit   Unit   @relation(fields: [unitId], references: [id])
+//   unitId String @map("unit_id")
+
+//   companyId      String @map("company_id")
+//   companyGroupId String @map("company_group_id")
+
+//   company      Company      @relation(fields: [companyId], references: [id])
+//   companyGroup CompanyGroup @relation(fields: [companyGroupId], references: [id])
+
+//   phones                       Phone[]
+//   ambulanceDestinationCommands AmbulanceDestinationCommands[]
+//   User                         User[]
+
+//   @@map("bases")
+// }
+
+// model Chat {
+//   id String @id @default(cuid())
+
+//   createdAt DateTime  @default(now()) @map("created_at")
+//   updatedAt DateTime  @updatedAt @map("updated_at")
+//   deletedAt DateTime? @map("deleted_at")
+
+//   ambulance   Ambulance  @relation(fields: [ambulanceId], references: [id])
+//   ambulanceId String     @map("ambulance_id")
+//   messages    Messages[]
+
+//   @@index([ambulanceId]) // busca rápida por chat de uma ambulância
+//   @@map("chats")
+// }
+
+// model Company {
+//   id       String @id @default(cuid())
+//   name     String
+//   document String @unique
+
+//   createdAt DateTime  @default(now()) @map("created_at")
+//   updatedAt DateTime  @updatedAt @map("updated_at")
+//   deletedAt DateTime? @map("deleted_at")
+
+//   companyGroup   CompanyGroup @relation(fields: [companyGroupId], references: [id])
+//   companyGroupId String       @map("company_group_id")
+
+//   // Validade do contrato (geralmente mensal)
+//   billingStartDate DateTime  @default(now()) @map("start_date")
+//   billingEndDate   DateTime? @map("end_date")
+//   billingCycle     String    @default("MONTHLY") // poderia ser enum se quiser
+
+//   phones        Phone[]
+//   units         Unit[]
+//   companyModule CompanyModule[]
+//   integration   Integration[]
+//   bases         Base[]
+//   User          User[]
+
+//   @@map("companies")
+// }
+
+// model CompanyGroup {
+//   id       String @id @default(cuid())
+//   name     String
+//   document String @unique
+
+//   createdAt DateTime  @default(now()) @map("created_at")
+//   updatedAt DateTime  @updatedAt @map("updated_at")
+//   deletedAt DateTime? @map("deleted_at")
+
+//   phones      Phone[]
+//   companies   Company[]
+//   integration Integration[]
+//   units       Unit[]
+//   bases       Base[]
+//   User        User[]
+
+//   @@map("company_groups")
+// }
+
+// model CompanyModule {
+//   id String @id @default(cuid())
+
+//   company   Company @relation(fields: [companyId], references: [id])
+//   companyId String  @map("company_id")
+
+//   module   Module @relation(fields: [moduleId], references: [id])
+//   moduleId String @map("module_id")
+
+//   // Valor específico contratado (pode sobrescrever o default)
+//   customPrice Float? @map("custom_price")
+
+//   // Quantidade contratada (ambulâncias, bases, motoristas, etc.)
+//   quantity Int? @default(1)
+
+//   // Ativo ou não
+//   active       Boolean  @default(true)
+//   contractedAt DateTime @default(now()) @map("contracted_at")
+
+//   createdAt DateTime @default(now()) @map("created_at")
+//   updatedAt DateTime @updatedAt @map("updated_at")
+
+//   @@unique([companyId, moduleId]) // Evita duplicidade de módulos contratados
+//   @@map("company_modules")
+// }
+
+// model Integration {
+//   id String @id @default(cuid())
+
+//   // Tipo da integração (ex: IRIS, DRIVERS)
+//   type IntegrationType
+
+//   companyGroup   CompanyGroup @relation(fields: [companyGroupId], references: [id])
+//   companyGroupId String       @map("company_group_id")
+
+//   isCompanyGroupWide Boolean   @default(false)
+//   companies          Company[]
+
+//   // Campos comuns
+//   url      String? @map("url")
+//   login    String? @map("login")
+//   password String? @map("password")
+//   apiKey   String? @map("api_key")
+
+//   // Campos específicos (ex: custom headers, endpoint IDs, tokens temporários, etc.)
+//   config Json? @map("config")
+
+//   // Auditoria
+//   createdAt DateTime @default(now()) @map("created_at")
+//   updatedAt DateTime @updatedAt @map("updated_at")
+
+//   @@unique([companyGroupId, type])
+//   @@map("integrations")
+// }
+
+// model MessageReadReceipt {
+//   id String @id @default(cuid())
+
+//   message   Messages @relation(fields: [messageId], references: [id])
+//   messageId String   @map("message_id")
+
+//   user   User   @relation(fields: [userId], references: [id])
+//   userId String @map("user_id")
+
+//   readAt DateTime @default(now()) @map("read_at")
+
+//   @@unique([messageId, userId]) // cada user só pode ler uma vez a mesma mensagem
+//   @@index([userId]) // busca rápida por mensagens lidas por um user
+//   @@index([messageId, readAt]) // busca rápida por quem leu uma mensagem e quando
+//   @@map("message_read_receipts")
+// }
+
+// model Messages {
+//   id String @id @default(cuid())
+
+//   messageContent String  @map("message_content")
+//   messageType    String  @map("message_type")
+//   messageFile    String? @map("message_file")
+
+//   chat   Chat   @relation(fields: [chatId], references: [id])
+//   chatId String @map("chat_id")
+
+//   user   User   @relation(fields: [userId], references: [id])
+//   userId String @map("user_id")
+
+//   createdAt          DateTime             @default(now()) @map("created_at")
+//   updatedAt          DateTime             @updatedAt @map("updated_at")
+//   deletedAt          DateTime?            @map("deleted_at")
+//   messageReadReceipt MessageReadReceipt[]
+
+//   @@index([chatId]) // busca rápida por mensagens de um chat
+//   @@index([userId]) // busca rápida por mensagens de um user
+//   @@index([createdAt]) // busca rápida por mensagens em um período
+//   @@map("messages")
+// }
+
+// model Module {
+//   id           String            @id @default(cuid())
+//   name         Modules           @unique
+//   description  String?
+//   billingType  ModuleBillingType @map("billing_type")
+//   defaultPrice Float             @default(0) @map("default_price")
+
+//   internal Boolean @default(false)
+
+//   companyModules CompanyModule[]
+
+//   createdAt DateTime @default(now()) @map("created_at")
+//   updatedAt DateTime @updatedAt @map("updated_at")
+
+//   @@map("modules")
+// }
+
+// model Phone {
+//   id        String   @id @default(cuid())
+//   number    String
+//   createdAt DateTime @default(now()) @map("created_at")
+//   updatedAt DateTime @updatedAt @map("updated_at")
+
+//   companyGroup   CompanyGroup? @relation(fields: [companyGroupId], references: [id])
+//   companyGroupId String?       @map("company_group_id")
+
+//   company   Company? @relation(fields: [companyId], references: [id])
+//   companyId String?  @map("company_id")
+
+//   unit   Unit?   @relation(fields: [unitId], references: [id])
+//   unitId String? @map("unit_id")
+
+//   base   Base?   @relation(fields: [baseId], references: [id])
+//   baseId String?
+
+//   @@index([number]) // busca rápida por número de telefone
+//   @@map("phones")
+// }
+
+// // model Role {
+// //   id   String       @id @default(cuid())
+// //   name UserRoleEnum @unique
+
+// //   users User[] @relation("UserRoles")
+
+// //   createdAt DateTime  @default(now()) @map("created_at")
+// //   updatedAt DateTime  @updatedAt @map("updated_at")
+// //   deletedAt DateTime? @map("deleted_at")
+
+// //   @@map("roles")
+// // }
+
+// model Unit {
+//   id       String  @id @default(cuid())
+//   name     String
+//   document String? @unique
+
+//   createdAt DateTime  @default(now()) @map("created_at")
+//   updatedAt DateTime  @updatedAt @map("updated_at")
+//   deletedAt DateTime? @map("deleted_at")
+
+//   company   Company @relation(fields: [companyId], references: [id])
+//   companyId String  @map("company_id")
+
+//   companyGroup   CompanyGroup @relation(fields: [companyGroupId], references: [id])
+//   companyGroupId String       @map("company_group_id")
+
+//   phones Phone[]
+//   base   Base[]
+//   user   User[]
+
+//   @@map("units")
+// }
+
+// enum UserRole {
 //   SYS_ADMIN
+//   COMPANY_GROUP_ADMIN
+//   COMPANY_ADMIN
+//   UNIT_ADMIN
+//   BASE_ADMIN
 // }
+
+// model User {
+//   id        String    @id @default(cuid())
+//   name      String
+//   document  String    @unique
+//   password  String
+//   birthDate DateTime  @map("birth_date")
+//   avatarUrl String?   @map("avatar_url")
+//   createdAt DateTime  @default(now()) @map("created_at")
+//   updatedAt DateTime  @updatedAt @map("updated_at")
+//   deletedAt DateTime? @map("deleted_at")
+
+//   companyGroup   CompanyGroup? @relation(fields: [companyGroupId], references: [id])
+//   companyGroupId String?       @map("company_group_id")
+
+//   company   Company? @relation(fields: [companyId], references: [id])
+//   companyId String?  @map("company_id")
+
+//   base   Base?   @relation(fields: [baseId], references: [id])
+//   baseId String? @map("base_id")
+
+//   unit   Unit?   @relation(fields: [unitId], references: [id])
+//   unitId String? @map("unit_id")
+
+//   ambulanceShift     AmbulanceShift[]
+//   ambulanceStatus    AmbulanceStatus[]
+//   messages           Messages[]
+//   messageReadReceipt MessageReadReceipt[]
+
+//   role                         UserRole
+//   AmbulanceDestinationCommands AmbulanceDestinationCommands[]
+
+//   @@index([document]) // busca rápida por documento
+//   @@map("users")
+// }
+
+// enum Modules {
+//   BASE
+//   CHAT
+//   LOCATION
+//   STATUS
+//   RADIO
+//   PA_SYSTEM
+//   DRIVERS
+//   IRIS
+// }
+
+// enum ModuleBillingType {
+//   FIXED // Valor fixo por empresa
+//   PER_AMBULANCE // Valor por ambulância
+//   PER_BASE // Valor por base
+//   PER_DRIVER_AMBULANCE // Valor por ambulância com motorista
+// }
+
+// enum AmbulanceStatusEnum {
+//   QAP
+//   OCP
+//   EVT
+//   J4
+//   J5
+//   FA
+//   MN
+// }
+
+// enum IntegrationType {
+//   IRIS
+//   DRIVERS
+// }
+
+// // enum UserRoleEnum {
+// //   DRIVER
+// //   NURSE
+// //   REGULATOR
+// //   REGULATOR_ADMIN
+// //   SYS_ADMIN
+// // }

@@ -1,13 +1,14 @@
-import { roleSchema } from "../roles";
-import { z } from "zod";
+import { z } from "zod"
+import { roleSchema } from "../roles"
 
 export const userSchema = z.object({
-  __typename: z.literal('User').optional().default('User'),
-  role: roleSchema,
+  __typename: z.literal("User").optional().default("User"),
+  roles: z.array(roleSchema),
+  id: z.string(),
   companyGroupId: z.string().optional(),
-  companyId: z.string().optional(),
-  unitId: z.string().optional(),
-  baseId: z.string().optional(),
+  companiesIds: z.array(z.string()).optional().default([]),
+  unitsIds: z.array(z.string()).optional().default([]),
+  basesIds: z.array(z.string()).optional().default([]),
 })
 
 export type User = z.infer<typeof userSchema>

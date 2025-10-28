@@ -1,7 +1,7 @@
-import { z } from "zod";
+import { z } from "zod"
 
 export const companySchema = z.object({
-  __typename: z.literal('Company').default('Company'),
+  __typename: z.literal("Company").default("Company"),
   id: z.string(),
   companyGroupId: z.string(),
 })
