@@ -1,8 +1,12 @@
-import { prisma } from "@/database/prisma"
-import { ConflictException } from "@/http/exceptions/conflict-exception"
-import { auth } from "@/http/hooks/auth"
 import type { FastifyPluginCallbackZod } from "fastify-type-provider-zod"
 import { z } from "zod"
+import { defineAbilityFor } from "@/auth"
+import { prisma } from "@/database/prisma"
+import { ConflictException } from "@/http/exceptions/conflict-exception"
+import { ForbiddenException } from "@/http/exceptions/forbidden-exception"
+import { ResourceNotFoundException } from "@/http/exceptions/resource-not-found-exception"
+import { getAuthUser, getCaslCompany } from "@/http/helpers/casl"
+import { auth } from "@/http/hooks/auth"
 
 export const createCompanyPhoneNumber: FastifyPluginCallbackZod = (app) => {
   app.post(
@@ -19,6 +23,8 @@ export const createCompanyPhoneNumber: FastifyPluginCallbackZod = (app) => {
           companyId: z.cuid(),
         }),
         body: z.object({
+          name: z.string().optional(),
+          isWhatsapp: z.boolean().optional(),
           number: z.string().meta({
             description: "Brazilian phone number (example: +5511999999999)",
           }),
@@ -31,8 +37,30 @@ export const createCompanyPhoneNumber: FastifyPluginCallbackZod = (app) => {
       },
     },
     async (request, reply) => {
+      const authUser = getAuthUser(request)
+      const { can } = defineAbilityFor(authUser)
+
       const { companyId } = request.params
-      const { number } = request.body
+      const { name, isWhatsapp, number } = request.body
+
+      const company = await prisma.company.findUnique({
+        where: {
+          id: companyId,
+        },
+      })
+
+      if (!company) {
+        throw new ResourceNotFoundException("Empresa não encontrada")
+      }
+
+      const caslCompany = getCaslCompany({
+        companyId: company.id,
+        companyGroupId: company.companyGroupId,
+      })
+
+      if (can("update", caslCompany) === false) {
+        throw new ForbiddenException()
+      }
 
       const phone = await prisma.phone.findFirst({
         where: {
@@ -49,6 +77,8 @@ export const createCompanyPhoneNumber: FastifyPluginCallbackZod = (app) => {
         data: {
           number,
           companyId,
+          name,
+          isWhatsapp,
         },
       })
 

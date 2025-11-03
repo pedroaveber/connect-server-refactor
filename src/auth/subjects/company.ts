@@ -7,7 +7,7 @@ export const companySubject = z.tuple([
     z.literal("create"),
     z.literal("delete"),
     z.literal("update"),
-    z.literal("list"),
+    z.literal("listUnits"),
     z.literal("read"),
   ]),
   z.union([z.literal("Company"), companySchema]),

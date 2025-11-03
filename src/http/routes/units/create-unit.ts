@@ -1,9 +1,11 @@
-import { prisma } from "@/database/prisma"
-import { ConflictException } from "@/http/exceptions/conflict-exception"
-import { ResourceNotFoundException } from "@/http/exceptions/resource-not-found-exception"
-import { auth } from "@/http/hooks/auth"
 import type { FastifyPluginCallbackZod } from "fastify-type-provider-zod"
 import { z } from "zod"
+import { defineAbilityFor } from "@/auth"
+import { prisma } from "@/database/prisma"
+import { ForbiddenException } from "@/http/exceptions/forbidden-exception"
+import { ResourceNotFoundException } from "@/http/exceptions/resource-not-found-exception"
+import { getAuthUser, getCaslUnit } from "@/http/helpers/casl"
+import { auth } from "@/http/hooks/auth"
 
 export const createUnit: FastifyPluginCallbackZod = (app) => {
   app.post(
@@ -18,19 +20,9 @@ export const createUnit: FastifyPluginCallbackZod = (app) => {
         description: "Create unit",
         body: z.object({
           name: z.string(),
-          document: z.string().length(14).meta({
-            description: "Brazilian CNPJ",
-          }).optional(),
           companyId: z.cuid().meta({
             description: "Company ID",
           }),
-          phones: z.array(
-            z.object({
-              number: z.string().meta({
-                description: "Brazilian phone number (example: +5511999999999)",
-              }),
-            })
-          ).optional(),
         }),
         response: {
           201: z.object({
@@ -40,7 +32,8 @@ export const createUnit: FastifyPluginCallbackZod = (app) => {
       },
     },
     async (request, reply) => {
-      const { document, name, phones, companyId } = request.body
+      const authUser = getAuthUser(request)
+      const { name, companyId } = request.body
 
       const company = await prisma.company.findUnique({
         where: {
@@ -52,30 +45,23 @@ export const createUnit: FastifyPluginCallbackZod = (app) => {
         throw new ResourceNotFoundException("Empresa não encontrada")
       }
 
-      if(document) {
-        const unitWithSameDocument = await prisma.unit.findUnique({
-        where: {
-          document,
-        },
+      const caslUnit = getCaslUnit({
+        companyGroupId: company.companyGroupId,
+        companyId,
+        unitId: "FAKE_CUID",
       })
 
-      if (unitWithSameDocument) {
-        throw new ConflictException("Já existe uma unidade com este documento")
-      }
+      const { can } = defineAbilityFor(authUser)
+
+      if (can("create", caslUnit) === false) {
+        throw new ForbiddenException()
       }
 
       const unit = await prisma.unit.create({
         data: {
-          document,
           name,
-          companyId,
-          ...(phones && phones.length > 0
-            ? {
-                phones: {
-                  createMany: { data: phones },
-                },
-              }
-            : {}),
+          companyGroupId: company.companyGroupId,
+          companyId: company.id,
         },
       })
 

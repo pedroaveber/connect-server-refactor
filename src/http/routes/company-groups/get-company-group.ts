@@ -4,22 +4,22 @@ import { defineAbilityFor } from "@/auth"
 import { prisma } from "@/database/prisma"
 import { ForbiddenException } from "@/http/exceptions/forbidden-exception"
 import { ResourceNotFoundException } from "@/http/exceptions/resource-not-found-exception"
-import { getAuthUser, getCaslCompany } from "@/http/helpers/casl"
+import { getAuthUser, getCaslCompanyGroup } from "@/http/helpers/casl"
 import { auth } from "@/http/hooks/auth"
 
-export const getCompany: FastifyPluginCallbackZod = (app) => {
+export const getCompanyGroup: FastifyPluginCallbackZod = (app) => {
   app.get(
-    "/companies/:companyId",
+    "/company-groups/:companyGroupId",
     {
       preHandler: [auth],
       schema: {
-        tags: ["Company"],
-        summary: "Get company",
-        operationId: "getCompany",
+        tags: ["Company Group"],
+        summary: "Get company group",
+        operationId: "getCompanyGroup",
         security: [{ BearerAuth: [] }],
-        description: "Get company",
+        description: "Get company group",
         params: z.object({
-          companyId: z.cuid(),
+          companyGroupId: z.cuid(),
         }),
         response: {
           200: z.object({
@@ -27,21 +27,17 @@ export const getCompany: FastifyPluginCallbackZod = (app) => {
               id: z.cuid(),
               name: z.string(),
               document: z.string(),
-              companyGroupId: z.cuid(),
-              unitsCount: z.number(),
               createdAt: z.date(),
               updatedAt: z.date(),
-              companyGroup: z.object({
-                id: z.cuid(),
-                name: z.string(),
-                document: z.string(),
-              }),
+              deletedAt: z.date().nullable(),
+              companiesCount: z.number(),
+              invoiceMode: z.enum(["DISCRIMINATED", "GENERAL"]),
               phones: z.array(
                 z.object({
                   id: z.cuid(),
+                  number: z.string(),
                   name: z.string().nullable(),
                   isWhatsapp: z.boolean(),
-                  number: z.string(),
                   createdAt: z.date(),
                 })
               ),
@@ -52,26 +48,24 @@ export const getCompany: FastifyPluginCallbackZod = (app) => {
     },
     async (request, reply) => {
       const authUser = getAuthUser(request)
-      const { companyId } = request.params
+      const { companyGroupId } = request.params
 
-      const company = await prisma.company.findUnique({
-        where: {
-          id: companyId,
-        },
+      const { can } = defineAbilityFor(authUser)
+      const caslCompanyGroup = getCaslCompanyGroup({ companyGroupId })
+
+      if (can("read", caslCompanyGroup) === false) {
+        throw new ForbiddenException()
+      }
+
+      const companyGroup = await prisma.companyGroup.findUnique({
         select: {
           id: true,
           name: true,
           document: true,
-          companyGroupId: true,
           createdAt: true,
           updatedAt: true,
-          companyGroup: {
-            select: {
-              id: true,
-              name: true,
-              document: true,
-            },
-          },
+          deletedAt: true,
+          invoiceMode: true,
           phones: {
             select: {
               id: true,
@@ -83,31 +77,23 @@ export const getCompany: FastifyPluginCallbackZod = (app) => {
           },
           _count: {
             select: {
-              units: true,
+              companies: true,
             },
           },
         },
+        where: {
+          id: companyGroupId,
+        },
       })
 
-      if (!company) {
-        throw new ResourceNotFoundException("Empresa não encontrada")
-      }
-
-      const { can } = defineAbilityFor(authUser)
-
-      const caslCompany = getCaslCompany({
-        companyId: company.id,
-        companyGroupId: company.companyGroupId,
-      })
-
-      if (can("read", caslCompany) === false) {
-        throw new ForbiddenException()
+      if (!companyGroup) {
+        throw new ResourceNotFoundException("Grupo empresarial não encontrado")
       }
 
       return reply.status(200).send({
         data: {
-          ...company,
-          unitsCount: company._count.units,
+          ...companyGroup,
+          companiesCount: companyGroup._count.companies,
         },
       })
     }

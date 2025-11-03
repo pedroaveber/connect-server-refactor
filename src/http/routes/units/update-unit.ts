@@ -1,9 +1,11 @@
-import { prisma } from "@/database/prisma"
-import { ConflictException } from "@/http/exceptions/conflict-exception"
-import { ResourceNotFoundException } from "@/http/exceptions/resource-not-found-exception"
-import { auth } from "@/http/hooks/auth"
 import type { FastifyPluginCallbackZod } from "fastify-type-provider-zod"
 import { z } from "zod"
+import { defineAbilityFor } from "@/auth"
+import { prisma } from "@/database/prisma"
+import { ForbiddenException } from "@/http/exceptions/forbidden-exception"
+import { ResourceNotFoundException } from "@/http/exceptions/resource-not-found-exception"
+import { getAuthUser, getCaslUnit } from "@/http/helpers/casl"
+import { auth } from "@/http/hooks/auth"
 
 export const updateUnit: FastifyPluginCallbackZod = (app) => {
   app.put(
@@ -21,9 +23,6 @@ export const updateUnit: FastifyPluginCallbackZod = (app) => {
         }),
         body: z.object({
           name: z.string(),
-          document: z.string().length(14).meta({
-            description: "Brazilian CNPJ",
-          }),
         }),
         response: {
           204: z.null(),
@@ -31,8 +30,12 @@ export const updateUnit: FastifyPluginCallbackZod = (app) => {
       },
     },
     async (request, reply) => {
+      const authUser = getAuthUser(request)
+
       const { unitId } = request.params
-      const { document, name } = request.body
+      const { name } = request.body
+
+      const { can } = defineAbilityFor(authUser)
 
       const unit = await prisma.unit.findUnique({
         where: {
@@ -41,26 +44,17 @@ export const updateUnit: FastifyPluginCallbackZod = (app) => {
       })
 
       if (!unit) {
-        throw new ResourceNotFoundException("Unidade não encontrada")
+        throw new ResourceNotFoundException("Empresa não encontrada")
       }
 
-      const hasChangedDocument = unit.document !== document
+      const caslUnit = getCaslUnit({
+        unitId: unit.id,
+        companyId: unit.companyId,
+        companyGroupId: unit.companyGroupId,
+      })
 
-      if (hasChangedDocument) {
-        const unitWithSameDocument = await prisma.unit.findFirst({
-          where: {
-            document,
-            NOT: {
-              id: unitId,
-            },
-          },
-        })
-
-        if (unitWithSameDocument) {
-          throw new ConflictException(
-            "Já existe uma unidade com este documento"
-          )
-        }
+      if (can("update", caslUnit) === false) {
+        throw new ForbiddenException()
       }
 
       await prisma.unit.update({
@@ -69,7 +63,6 @@ export const updateUnit: FastifyPluginCallbackZod = (app) => {
         },
         data: {
           name,
-          document,
         },
       })
 

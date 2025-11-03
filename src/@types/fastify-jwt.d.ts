@@ -1,15 +1,16 @@
-import { Role } from "@/auth/roles"
+import type { Role } from "@/auth/roles"
 import "@fastify/jwt"
 
 declare module "@fastify/jwt" {
+  // biome-ignore lint/nursery/useConsistentTypeDefinitions: <Not necessary to be consistent>
   interface FastifyJWT {
     payload: {
       sub: string
       companyGroupId?: string
-      companyId?: string
-      unitId?: string
-      baseId?: string
-      role: Role
+      companiesIds?: string[]
+      unitsIds?: string[]
+      basesIds?: string[]
+      roles: Role[]
     }
   }
 }

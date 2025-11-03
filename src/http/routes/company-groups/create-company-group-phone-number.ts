@@ -24,6 +24,19 @@ export const createCompanyGroupPhoneNumber: FastifyPluginCallbackZod = (
           companyGroupId: z.cuid(),
         }),
         body: z.object({
+          name: z
+            .string()
+            .meta({
+              description: "Phone name",
+            })
+            .optional(),
+          isWhatsapp: z
+            .boolean()
+            .meta({
+              description: "Is whatsapp",
+            })
+            .optional()
+            .default(false),
           number: z.string().meta({
             description: "Brazilian phone number (example: +5511999999999)",
           }),
@@ -39,7 +52,7 @@ export const createCompanyGroupPhoneNumber: FastifyPluginCallbackZod = (
       const authUser = getAuthUser(request)
 
       const { companyGroupId } = request.params
-      const { number } = request.body
+      const { number, name, isWhatsapp } = request.body
 
       const { can } = defineAbilityFor(authUser)
 
@@ -62,7 +75,9 @@ export const createCompanyGroupPhoneNumber: FastifyPluginCallbackZod = (
 
       const newPhone = await prisma.phone.create({
         data: {
+          name,
           number,
+          isWhatsapp,
           companyGroupId,
         },
       })

@@ -1,14 +1,12 @@
-import { prisma } from "@/database/prisma";
-import { ResourceNotFoundException } from "@/http/exceptions/resource-not-found-exception";
-import { auth } from "@/http/hooks/auth";
-import type { FastifyPluginCallbackZod } from "fastify-type-provider-zod";
-import { z } from "zod";
-
-const updateBaseSchema = z.object({
-  name: z.string().optional(),
-  latitude: z.number().optional(),
-  longitude: z.number().optional(),
-});
+import type { FastifyPluginCallbackZod } from "fastify-type-provider-zod"
+import { z } from "zod"
+import { defineAbilityFor } from "@/auth"
+import { prisma } from "@/database/prisma"
+import { ConflictException } from "@/http/exceptions/conflict-exception"
+import { ForbiddenException } from "@/http/exceptions/forbidden-exception"
+import { ResourceNotFoundException } from "@/http/exceptions/resource-not-found-exception"
+import { getAuthUser, getCaslBase } from "@/http/helpers/casl"
+import { auth } from "@/http/hooks/auth"
 
 export const updateBase: FastifyPluginCallbackZod = (app) => {
   app.put(
@@ -20,23 +18,58 @@ export const updateBase: FastifyPluginCallbackZod = (app) => {
         summary: "Update base",
         operationId: "updateBase",
         params: z.object({ id: z.cuid() }),
-        body: updateBaseSchema,
-        response: { 200: z.object({ id: z.string() }) },
+        body: z.object({
+          name: z.string(),
+          document: z.string().optional(),
+          latitude: z.number(),
+          longitude: z.number(),
+        }),
+        response: { 204: z.null() },
       },
     },
     async (request, reply) => {
-      const { id } = request.params;
-      const { name, latitude, longitude } = request.body;
+      const authUser = getAuthUser(request)
 
-      const base = await prisma.base.findUnique({ where: { id } });
-      if (!base) throw new ResourceNotFoundException("Base não encontrada.");
+      const { id } = request.params
+      const { name, document, latitude, longitude } = request.body
 
-      const updated = await prisma.base.update({
+      const { can } = defineAbilityFor(authUser)
+
+      const base = await prisma.base.findUnique({ where: { id } })
+
+      if (!base) {
+        throw new ResourceNotFoundException("Base não encontrada.")
+      }
+
+      const caslBase = getCaslBase({
+        baseId: base.id,
+        unitId: base.unitId,
+        companyId: base.companyId,
+        companyGroupId: base.companyGroupId,
+      })
+
+      if (can("update", caslBase) === false) {
+        throw new ForbiddenException()
+      }
+
+      const hasChangedDocument = document !== base.document
+
+      if (hasChangedDocument) {
+        const baseWithSameDocument = await prisma.base.findUnique({
+          where: { document, NOT: { id } },
+        })
+
+        if (baseWithSameDocument) {
+          throw new ConflictException("Base with same document already exists")
+        }
+      }
+
+      await prisma.base.update({
         where: { id },
-        data: { name, latitude, longitude },
-      });
+        data: { name, document, latitude, longitude },
+      })
 
-      return reply.send({ id: updated.id });
+      return reply.status(204).send(null)
     }
-  );
-};
+  )
+}

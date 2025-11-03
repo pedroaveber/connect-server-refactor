@@ -9,7 +9,7 @@ type PermissionsByRole = (
 ) => void
 
 export const permissions: Record<Role, PermissionsByRole> = {
-  ADMIN(_, { can }) {
+  ADMIN(_user, { can }) {
     can("manage", "all")
   },
 
@@ -20,7 +20,10 @@ export const permissions: Record<Role, PermissionsByRole> = {
       },
     })
 
-    can("list", "Company")
+    can(["read", "listCompanies", "update"], "CompanyGroup", {
+      id: { $eq: user.companyGroupId },
+    })
+
     can("manage", "Company", { companyGroupId: { $eq: user.companyGroupId } })
     can("manage", "Unit", { companyGroupId: { $eq: user.companyGroupId } })
     can("manage", "Base", { companyGroupId: { $eq: user.companyGroupId } })

@@ -24,14 +24,13 @@ export const createCompany: FastifyPluginCallbackZod = (app) => {
           document: z.string().length(14).meta({
             description: "Brazilian CNPJ",
           }),
-          // billingStartDate: z.string().pipe(z.coerce.date()).optional(),
-          // billingEndDate: z.string().pipe(z.coerce.date()).optional(),
-          // billingCycle: z.enum(["monthly", "yearly"]).optional(),
           companyGroupId: z.cuid().meta({
             description: "Company group ID",
           }),
           phones: z.array(
             z.object({
+              name: z.string().optional(),
+              isWhatsapp: z.boolean().optional(),
               number: z.string().meta({
                 description: "Brazilian phone number (example: +5511999999999)",
               }),
@@ -80,8 +79,6 @@ export const createCompany: FastifyPluginCallbackZod = (app) => {
         throw new ConflictException("Já existe uma empresa com este documento")
       }
 
-      const modules = await prisma.module.findMany()
-
       const company = await prisma.company.create({
         data: {
           document,
@@ -90,14 +87,6 @@ export const createCompany: FastifyPluginCallbackZod = (app) => {
           phones: {
             createMany: {
               data: phones,
-            },
-          },
-          companyModule: {
-            createMany: {
-              data: modules.map((m) => ({
-                moduleId: m.id,
-                active: false,
-              })),
             },
           },
         },

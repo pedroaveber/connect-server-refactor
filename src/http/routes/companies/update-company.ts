@@ -1,9 +1,12 @@
-import { prisma } from "@/database/prisma";
-import { ConflictException } from "@/http/exceptions/conflict-exception";
-import { ResourceNotFoundException } from "@/http/exceptions/resource-not-found-exception";
-import { auth } from "@/http/hooks/auth";
-import type { FastifyPluginCallbackZod } from "fastify-type-provider-zod";
-import { z } from "zod";
+import type { FastifyPluginCallbackZod } from "fastify-type-provider-zod"
+import { z } from "zod"
+import { defineAbilityFor } from "@/auth"
+import { prisma } from "@/database/prisma"
+import { ConflictException } from "@/http/exceptions/conflict-exception"
+import { ForbiddenException } from "@/http/exceptions/forbidden-exception"
+import { ResourceNotFoundException } from "@/http/exceptions/resource-not-found-exception"
+import { getAuthUser, getCaslCompany } from "@/http/helpers/casl"
+import { auth } from "@/http/hooks/auth"
 
 export const updateCompany: FastifyPluginCallbackZod = (app) => {
   app.put(
@@ -31,20 +34,33 @@ export const updateCompany: FastifyPluginCallbackZod = (app) => {
       },
     },
     async (request, reply) => {
-      const { companyId } = request.params;
-      const { document, name } = request.body;
+      const authUser = getAuthUser(request)
+
+      const { companyId } = request.params
+      const { document, name } = request.body
+
+      const { can } = defineAbilityFor(authUser)
 
       const company = await prisma.company.findUnique({
         where: {
           id: companyId,
         },
-      });
+      })
 
       if (!company) {
-        throw new ResourceNotFoundException("Empresa não encontrada");
+        throw new ResourceNotFoundException("Empresa não encontrada")
       }
 
-      const hasChangedDocument = company.document !== document;
+      const caslCompany = getCaslCompany({
+        companyId: company.id,
+        companyGroupId: company.companyGroupId,
+      })
+
+      if (can("update", caslCompany) === false) {
+        throw new ForbiddenException()
+      }
+
+      const hasChangedDocument = company.document !== document
 
       if (hasChangedDocument) {
         const companyWithSameDocument = await prisma.company.findFirst({
@@ -54,12 +70,12 @@ export const updateCompany: FastifyPluginCallbackZod = (app) => {
               id: companyId,
             },
           },
-        });
+        })
 
         if (companyWithSameDocument) {
           throw new ConflictException(
             "Já existe uma empresa com este documento"
-          );
+          )
         }
       }
 
@@ -71,9 +87,9 @@ export const updateCompany: FastifyPluginCallbackZod = (app) => {
           name,
           document,
         },
-      });
+      })
 
-      return reply.status(204).send(null);
+      return reply.status(204).send(null)
     }
-  );
-};
+  )
+}

@@ -33,37 +33,9 @@ export const getCompaniesFromCompanyGroup: FastifyPluginCallbackZod = (app) => {
                 id: z.cuid(),
                 name: z.string(),
                 document: z.string(),
-                companyGroupId: z.cuid(),
-                billingStartDate: z.date(),
-                billingEndDate: z.date().nullable(),
-                billingCycle: z.string(),
                 createdAt: z.date(),
                 updatedAt: z.date(),
-                deletedAt: z.date().nullable(),
-                phones: z.array(
-                  z.object({
-                    id: z.cuid(),
-                    number: z.string(),
-                    createdAt: z.date(),
-                    updatedAt: z.date(),
-                  })
-                ),
-                companyModule: z.array(
-                  z.object({
-                    id: z.cuid(),
-                    customPrice: z.number().nullable(),
-                    quantity: z.number().nullable(),
-                    active: z.boolean(),
-                    contractedAt: z.date(),
-                    module: z.object({
-                      id: z.cuid(),
-                      name: z.string(),
-                      description: z.string().nullable(),
-                      billingType: z.string(),
-                      defaultPrice: z.number(),
-                    }),
-                  })
-                ),
+                unitsCount: z.number(),
               })
             ),
             pagination: z.object({
@@ -85,15 +57,32 @@ export const getCompaniesFromCompanyGroup: FastifyPluginCallbackZod = (app) => {
 
       const { can } = defineAbilityFor(authUser)
 
-      if (can("list", "Company") === false) {
+      if (can("listCompanies", "CompanyGroup") === false) {
         throw new ForbiddenException()
       }
 
       const [companies, total] = await Promise.all([
         prisma.company.findMany({
+          select: {
+            id: true,
+            name: true,
+            document: true,
+            createdAt: true,
+            updatedAt: true,
+            _count: {
+              select: {
+                units: {
+                  where: {
+                    deletedAt: null,
+                  },
+                },
+              },
+            },
+          },
           where: {
             name: {
               contains: name,
+              mode: "insensitive",
             },
             document: {
               contains: document,
@@ -101,35 +90,18 @@ export const getCompaniesFromCompanyGroup: FastifyPluginCallbackZod = (app) => {
             companyGroupId,
             deletedAt: null,
           },
+          orderBy: {
+            createdAt: "desc",
+          },
           skip: (page - 1) * perPage,
           take: perPage,
-          include: {
-            phones: true,
-            companyModule: {
-              select: {
-                id: true,
-                customPrice: true,
-                quantity: true,
-                active: true,
-                contractedAt: true,
-                module: {
-                  select: {
-                    id: true,
-                    name: true,
-                    description: true,
-                    billingType: true,
-                    defaultPrice: true,
-                  },
-                },
-              },
-            },
-          },
         }),
 
         prisma.company.count({
           where: {
             name: {
               contains: name,
+              mode: "insensitive",
             },
             document: {
               contains: document,
@@ -145,7 +117,10 @@ export const getCompaniesFromCompanyGroup: FastifyPluginCallbackZod = (app) => {
       const hasPreviousPage = page > 1
 
       return reply.status(200).send({
-        data: companies,
+        data: companies.map((company) => ({
+          ...company,
+          unitsCount: company._count.units,
+        })),
         pagination: {
           total,
           totalPages,

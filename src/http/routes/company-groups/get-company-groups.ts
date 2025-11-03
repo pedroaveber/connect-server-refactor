@@ -1,10 +1,10 @@
+import type { FastifyPluginCallbackZod } from "fastify-type-provider-zod"
+import { z } from "zod"
 import { defineAbilityFor } from "@/auth"
 import { prisma } from "@/database/prisma"
 import { ForbiddenException } from "@/http/exceptions/forbidden-exception"
 import { getAuthUser } from "@/http/helpers/casl"
 import { auth } from "@/http/hooks/auth"
-import type { FastifyPluginCallbackZod } from "fastify-type-provider-zod"
-import { z } from "zod"
 
 export const getCompanyGroups: FastifyPluginCallbackZod = (app) => {
   app.get(
@@ -30,17 +30,10 @@ export const getCompanyGroups: FastifyPluginCallbackZod = (app) => {
                 id: z.cuid(),
                 name: z.string(),
                 document: z.string(),
+                invoiceMode: z.enum(["DISCRIMINATED", "GENERAL"]),
+                companiesCount: z.number(),
                 createdAt: z.date(),
                 updatedAt: z.date(),
-                deletedAt: z.date().nullable(),
-                phones: z.array(
-                  z.object({
-                    id: z.cuid(),
-                    number: z.string(),
-                    createdAt: z.date(),
-                    updatedAt: z.date(),
-                  })
-                ),
               })
             ),
             pagination: z.object({
@@ -60,12 +53,25 @@ export const getCompanyGroups: FastifyPluginCallbackZod = (app) => {
 
       const { can } = defineAbilityFor(authUser)
 
-      if (can('list', 'CompanyGroup') === false) {
+      if (can("list", "CompanyGroup") === false) {
         throw new ForbiddenException()
       }
 
       const [companyGroups, total] = await Promise.all([
         prisma.companyGroup.findMany({
+          select: {
+            id: true,
+            name: true,
+            document: true,
+            invoiceMode: true,
+            createdAt: true,
+            updatedAt: true,
+            _count: {
+              select: {
+                companies: true,
+              },
+            },
+          },
           where: {
             name: {
               contains: name,
@@ -77,9 +83,6 @@ export const getCompanyGroups: FastifyPluginCallbackZod = (app) => {
           },
           skip: (page - 1) * perPage,
           take: perPage,
-          include: {
-            phones: true,
-          },
         }),
 
         prisma.companyGroup.count({
@@ -100,7 +103,10 @@ export const getCompanyGroups: FastifyPluginCallbackZod = (app) => {
       const hasPreviousPage = page > 1
 
       return reply.status(200).send({
-        data: companyGroups,
+        data: companyGroups.map((companyGroup) => ({
+          ...companyGroup,
+          companiesCount: companyGroup._count.companies,
+        })),
         pagination: {
           total,
           totalPages,

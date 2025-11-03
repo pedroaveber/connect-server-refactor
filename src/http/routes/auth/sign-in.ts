@@ -1,9 +1,9 @@
-import { prisma } from "@/database/prisma"
-import { env } from "@/env"
-import { BadRequestException } from "@/http/exceptions/bad-request-exception"
 import { verify } from "argon2"
 import type { FastifyPluginCallbackZod } from "fastify-type-provider-zod"
 import { z } from "zod"
+import { prisma } from "@/database/prisma"
+import { env } from "@/env"
+import { BadRequestException } from "@/http/exceptions/bad-request-exception"
 
 export const signIn: FastifyPluginCallbackZod = (app) => {
   app.post(
@@ -37,6 +37,9 @@ export const signIn: FastifyPluginCallbackZod = (app) => {
         where: {
           document,
         },
+        include: {
+          organizations: true,
+        },
       })
 
       if (userWithDocument === null) {
@@ -49,28 +52,50 @@ export const signIn: FastifyPluginCallbackZod = (app) => {
         throw new BadRequestException("Credenciais inválidas")
       }
 
+      let companyGroupId: string | undefined
+      const companiesIds: string[] = []
+      const unitsIds: string[] = []
+      const basesIds: string[] = []
+
+      for (const organization of userWithDocument.organizations) {
+        if (organization.companyGroupId) {
+          companyGroupId = organization.companyGroupId
+        }
+
+        if (organization.companyId) {
+          companiesIds.push(organization.companyId)
+        }
+
+        if (organization.unitId) {
+          unitsIds.push(organization.unitId)
+        }
+
+        if (organization.baseId) {
+          basesIds.push(organization.baseId)
+        }
+      }
       const accessToken = app.jwt.sign(
         {
           sub: userWithDocument.id,
-          companyGroupId: userWithDocument.companyGroupId ?? undefined,
-          companyId: userWithDocument.companyId ?? undefined,
-          unitId: userWithDocument.unitId ?? undefined,
-          baseId: userWithDocument.baseId ?? undefined,
-          role: userWithDocument.role,
+          companyGroupId,
+          companiesIds,
+          unitsIds,
+          basesIds,
+          roles: userWithDocument.roles,
         },
         {
-          expiresIn: "30m",
+          expiresIn: env.ENV === "development" ? "12h" : "30m",
         }
       )
 
       const refreshToken = app.jwt.sign(
         {
           sub: userWithDocument.id,
-          companyGroupId: userWithDocument.companyGroupId ?? undefined,
-          companyId: userWithDocument.companyId ?? undefined,
-          unitId: userWithDocument.unitId ?? undefined,
-          baseId: userWithDocument.baseId ?? undefined,
-          role: userWithDocument.role,
+          companyGroupId,
+          companiesIds,
+          unitsIds,
+          basesIds,
+          roles: userWithDocument.roles,
         },
         {
           expiresIn: "7d",

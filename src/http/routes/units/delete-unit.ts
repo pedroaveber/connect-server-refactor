@@ -1,9 +1,11 @@
-import { prisma } from "@/database/prisma"
-import { BadRequestException } from "@/http/exceptions/bad-request-exception"
-import { ResourceNotFoundException } from "@/http/exceptions/resource-not-found-exception"
-import { auth } from "@/http/hooks/auth"
 import type { FastifyPluginCallbackZod } from "fastify-type-provider-zod"
 import { z } from "zod"
+import { defineAbilityFor } from "@/auth"
+import { prisma } from "@/database/prisma"
+import { ForbiddenException } from "@/http/exceptions/forbidden-exception"
+import { ResourceNotFoundException } from "@/http/exceptions/resource-not-found-exception"
+import { getAuthUser, getCaslUnit } from "@/http/helpers/casl"
+import { auth } from "@/http/hooks/auth"
 
 export const deleteUnit: FastifyPluginCallbackZod = (app) => {
   app.delete(
@@ -25,11 +27,15 @@ export const deleteUnit: FastifyPluginCallbackZod = (app) => {
       },
     },
     async (request, reply) => {
+      const authUser = getAuthUser(request)
       const { unitId } = request.params
+
+      const { can } = defineAbilityFor(authUser)
 
       const unit = await prisma.unit.findUnique({
         where: {
           id: unitId,
+          deletedAt: null,
         },
       })
 
@@ -37,8 +43,14 @@ export const deleteUnit: FastifyPluginCallbackZod = (app) => {
         throw new ResourceNotFoundException("Unidade não encontrada")
       }
 
-      if (unit.deletedAt) {
-        throw new BadRequestException("Unidade já deletada")
+      const caslUnit = getCaslUnit({
+        companyId: unit.companyId,
+        unitId: unit.id,
+        companyGroupId: unit.companyGroupId,
+      })
+
+      if (can("delete", caslUnit) === false) {
+        throw new ForbiddenException()
       }
 
       await prisma.unit.update({

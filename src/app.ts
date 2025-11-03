@@ -1,9 +1,9 @@
+import fs from "node:fs"
 import { fastifyCookie } from "@fastify/cookie"
 import { fastifyCors } from "@fastify/cors"
 import { fastifyJwt } from "@fastify/jwt"
 import { fastifySwagger } from "@fastify/swagger"
 import scalarApiReference from "@scalar/fastify-api-reference"
-import fs from 'node:fs'
 import { fastify } from "fastify"
 import {
   jsonSchemaTransform,
@@ -12,8 +12,8 @@ import {
   type ZodTypeProvider,
 } from "fastify-type-provider-zod"
 import { env } from "./env"
-import Routing from "./http/routing"
 import { errorHandler } from "./error-handler"
+import { appRoutes } from "./http/routes"
 
 export const app = fastify({
   logger: {
@@ -34,7 +34,7 @@ app.setValidatorCompiler(validatorCompiler)
 // app.addHook("preValidation", decrypt)
 
 // Encrypt outgoing JSON bodies when payload is encrypted
-// app.addHook("onSend", encrypt) 
+// app.addHook("onSend", encrypt)
 
 app.register(fastifyCors, {
   origin: ["http://localhost:5173"],
@@ -83,11 +83,12 @@ if (env.ENV === "development") {
   })
 }
 
-Routing()
+// Http Routes
+app.register(appRoutes)
 
-app.ready(async ()  => {
-  const json = app.swagger()
-  fs.writeFileSync('swagger.json', JSON.stringify(json, null, 2))
+app.ready(async () => {
+  const json = await app.swagger()
+  fs.writeFileSync("swagger.json", JSON.stringify(json, null, 2))
 })
 
 app.setErrorHandler(errorHandler)

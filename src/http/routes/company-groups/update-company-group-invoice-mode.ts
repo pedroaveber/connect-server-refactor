@@ -4,53 +4,41 @@ import { defineAbilityFor } from "@/auth"
 import { prisma } from "@/database/prisma"
 import { ForbiddenException } from "@/http/exceptions/forbidden-exception"
 import { ResourceNotFoundException } from "@/http/exceptions/resource-not-found-exception"
-import { getAuthUser, getCaslCompanyGroup } from "@/http/helpers/casl"
+import { getAuthUser } from "@/http/helpers/casl"
 import { auth } from "@/http/hooks/auth"
 
-export const getCompanyGroup: FastifyPluginCallbackZod = (app) => {
-  app.get(
-    "/company-groups/:companyGroupId",
+export const updateCompanyGroupInvoiceMode: FastifyPluginCallbackZod = (
+  app
+) => {
+  app.patch(
+    "/company-groups/:companyGroupId/invoice-mode",
     {
       preHandler: [auth],
       schema: {
         tags: ["Company Group"],
-        summary: "Get company group",
-        operationId: "getCompanyGroup",
+        summary: "Update company group invoice mode",
+        operationId: "updateCompanyGroupInvoiceMode",
         security: [{ BearerAuth: [] }],
-        description: "Get company group",
+        description: "Update company group invoice mode",
         params: z.object({
           companyGroupId: z.cuid(),
         }),
+        body: z.object({
+          invoiceMode: z.enum(["DISCRIMINATED", "GENERAL"]),
+        }),
         response: {
-          200: z.object({
-            data: z.object({
-              id: z.cuid(),
-              name: z.string(),
-              document: z.string(),
-              createdAt: z.date(),
-              updatedAt: z.date(),
-              deletedAt: z.date().nullable(),
-              phones: z.array(
-                z.object({
-                  id: z.cuid(),
-                  number: z.string(),
-                  createdAt: z.date(),
-                  updatedAt: z.date(),
-                })
-              ),
-            }),
-          }),
+          204: z.null(),
         },
       },
     },
     async (request, reply) => {
       const authUser = getAuthUser(request)
       const { companyGroupId } = request.params
+      const { invoiceMode } = request.body
 
       const { can } = defineAbilityFor(authUser)
-      const caslCompanyGroup = getCaslCompanyGroup({ companyGroupId })
 
-      if (can("read", caslCompanyGroup) === false) {
+      if (can("update", "CompanyGroup") === false) {
         throw new ForbiddenException()
       }
 
@@ -58,18 +46,22 @@ export const getCompanyGroup: FastifyPluginCallbackZod = (app) => {
         where: {
           id: companyGroupId,
         },
-        include: {
-          phones: true,
-        },
       })
 
       if (!companyGroup) {
         throw new ResourceNotFoundException("Grupo empresarial não encontrado")
       }
 
-      return reply.status(200).send({
-        data: companyGroup,
+      await prisma.companyGroup.update({
+        where: {
+          id: companyGroupId,
+        },
+        data: {
+          invoiceMode,
+        },
       })
+
+      return reply.status(204).send(null)
     }
   )
 }

@@ -1,8 +1,11 @@
-import { prisma } from "@/database/prisma";
-import { ResourceNotFoundException } from "@/http/exceptions/resource-not-found-exception";
-import { auth } from "@/http/hooks/auth";
-import type { FastifyPluginCallbackZod } from "fastify-type-provider-zod";
-import { z } from "zod";
+import type { FastifyPluginCallbackZod } from "fastify-type-provider-zod"
+import { z } from "zod"
+import { defineAbilityFor } from "@/auth"
+import { prisma } from "@/database/prisma"
+import { ForbiddenException } from "@/http/exceptions/forbidden-exception"
+import { ResourceNotFoundException } from "@/http/exceptions/resource-not-found-exception"
+import { getAuthUser, getCaslBase } from "@/http/helpers/casl"
+import { auth } from "@/http/hooks/auth"
 
 export const deleteBasePhoneNumber: FastifyPluginCallbackZod = (app) => {
   app.delete(
@@ -25,26 +28,40 @@ export const deleteBasePhoneNumber: FastifyPluginCallbackZod = (app) => {
       },
     },
     async (request, reply) => {
-      const { baseId, phoneId } = request.params;
+      const authUser = getAuthUser(request)
+      const { baseId, phoneId } = request.params
 
-      const phone = await prisma.phone.findFirst({
+      const { can } = defineAbilityFor(authUser)
+
+      const base = await prisma.base.findUnique({
         where: {
-          id: phoneId,
-          baseId,
+          id: baseId,
         },
-      });
+      })
 
-      if (!phone) {
-        throw new ResourceNotFoundException("Número de telefone não encontrado");
+      if (!base) {
+        throw new ResourceNotFoundException("Base not found")
+      }
+
+      const caslBase = getCaslBase({
+        baseId: base.id,
+        unitId: base.unitId,
+        companyId: base.companyId,
+        companyGroupId: base.companyGroupId,
+      })
+
+      if (can("update", caslBase) === false) {
+        throw new ForbiddenException()
       }
 
       await prisma.phone.delete({
         where: {
           id: phoneId,
+          baseId: base.id,
         },
-      });
+      })
 
-      return reply.status(204).send(null);
+      return reply.status(204).send(null)
     }
-  );
-};
+  )
+}

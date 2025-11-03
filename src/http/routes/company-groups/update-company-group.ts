@@ -35,6 +35,7 @@ export const updateCompanyGroup: FastifyPluginCallbackZod = (app) => {
     },
     async (request, reply) => {
       const authUser = getAuthUser(request)
+
       const { companyGroupId } = request.params
       const { document, name } = request.body
 

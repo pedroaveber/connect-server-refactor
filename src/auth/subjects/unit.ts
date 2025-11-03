@@ -7,7 +7,7 @@ export const unitSubject = z.tuple([
     z.literal("create"),
     z.literal("delete"),
     z.literal("update"),
-    z.literal("list"),
+    z.literal("listBases"),
     z.literal("read"),
   ]),
   z.union([z.literal("Unit"), unitSchema]),
