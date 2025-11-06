@@ -1,18 +1,12 @@
-import { prisma } from "@/database/prisma";
-import { ConflictException } from "@/http/exceptions/conflict-exception";
-import { ResourceNotFoundException } from "@/http/exceptions/resource-not-found-exception";
-import { auth } from "@/http/hooks/auth";
-import type { FastifyPluginCallbackZod } from "fastify-type-provider-zod";
-import { z } from "zod";
-
-const createAmbulanceSchema = z.object({
-  name: z.string(),
-  plateNumber: z.string(),
-  ambulanceBaseId: z.cuid(),
-  observation: z.string().optional(),
-  linkingCode: z.string().optional(),
-  avatarUrl: z.string().optional(),
-});
+import type { FastifyPluginCallbackZod } from "fastify-type-provider-zod"
+import { z } from "zod"
+import { defineAbilityFor } from "@/auth"
+import { prisma } from "@/database/prisma"
+import { ConflictException } from "@/http/exceptions/conflict-exception"
+import { ForbiddenException } from "@/http/exceptions/forbidden-exception"
+import { ResourceNotFoundException } from "@/http/exceptions/resource-not-found-exception"
+import { getAuthUser, getCaslAmbulance } from "@/http/helpers/casl"
+import { auth } from "@/http/hooks/auth"
 
 export const createAmbulance: FastifyPluginCallbackZod = (app) => {
   app.post(
@@ -24,27 +18,69 @@ export const createAmbulance: FastifyPluginCallbackZod = (app) => {
         summary: "Create ambulance",
         operationId: "createAmbulance",
         security: [{ BearerAuth: [] }],
-        body: createAmbulanceSchema,
+        body: z.object({
+          name: z.string(),
+          baseId: z.cuid(),
+          licensePlate: z.string().meta({
+            description: "License plate of the ambulance",
+          }),
+          observations: z.string().optional(),
+        }),
         response: { 201: z.object({ id: z.cuid() }) },
       },
     },
     async (request, reply) => {
-      const { name, observation, plateNumber, linkingCode, ambulanceBaseId } =
-        request.body;
+      const authUser = getAuthUser(request)
+      const { name, observations, licensePlate, baseId } = request.body
 
-      const base = await prisma.base.findUnique({ where: { id: ambulanceBaseId } });
-      if (!base) throw new ResourceNotFoundException("Base não encontrada");
+      const base = await prisma.base.findUnique({
+        where: {
+          id: baseId,
+        },
+      })
 
-      const existing = await prisma.ambulance.findFirst({
-        where: { OR: [{ plateNumber }, { linkingCode }] },
-      });
-      if (existing) throw new ConflictException("Placa ou código já existente");
+      if (!base) {
+        throw new ResourceNotFoundException("Base not found")
+      }
+
+      const { can } = defineAbilityFor(authUser)
+
+      const caslAmbulance = getCaslAmbulance({
+        baseId: base.id,
+        unitId: base.unitId,
+        companyId: base.companyId,
+        companyGroupId: base.companyGroupId,
+      })
+
+      if (can("create", caslAmbulance) === false) {
+        throw new ForbiddenException()
+      }
+
+      const ambulanceWithSameLicensePlate = await prisma.ambulance.findUnique({
+        where: {
+          licensePlate,
+        },
+      })
+
+      if (ambulanceWithSameLicensePlate) {
+        throw new ConflictException(
+          "Ambulance with same license plate already exists"
+        )
+      }
 
       const ambulance = await prisma.ambulance.create({
-        data: { name, observation, plateNumber, linkingCode, ambulanceBaseId },
-      });
+        data: {
+          name,
+          observations,
+          licensePlate,
+          baseId: base.id,
+          unitId: base.unitId,
+          companyId: base.companyId,
+          companyGroupId: base.companyGroupId,
+        },
+      })
 
-      return reply.status(201).send({ id: ambulance.id });
+      return reply.status(201).send({ id: ambulance.id })
     }
-  );
-};
+  )
+}

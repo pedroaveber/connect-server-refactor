@@ -7,53 +7,63 @@ import { ResourceNotFoundException } from "@/http/exceptions/resource-not-found-
 import { getAuthUser, getCaslAmbulance } from "@/http/helpers/casl"
 import { auth } from "@/http/hooks/auth"
 
-export const deleteAmbulance: FastifyPluginCallbackZod = (app) => {
+export const deleteAmbulanceDocument: FastifyPluginCallbackZod = (app) => {
   app.delete(
-    "/ambulances/:id",
+    "/ambulances/:ambulanceId/documents/:documentId",
     {
       preHandler: [auth],
       schema: {
         tags: ["Ambulance"],
-        summary: "Delete ambulance by ID",
-        params: z.object({ id: z.cuid() }),
-        operationId: "deleteAmbulance",
+        summary: "Delete an ambulance document",
+        operationId: "deleteAmbulanceDocument",
+        security: [{ BearerAuth: [] }],
+        params: z.object({ ambulanceId: z.cuid(), documentId: z.cuid() }),
         response: {
           204: z.null(),
         },
       },
     },
     async (request, reply) => {
-      const { id } = request.params
-
       const authUser = getAuthUser(request)
-      const { can } = defineAbilityFor(authUser)
+
+      const { ambulanceId, documentId } = request.params
 
       const ambulance = await prisma.ambulance.findUnique({
-        where: { id, deletedAt: null },
+        where: { id: ambulanceId, deletedAt: null },
       })
 
       if (!ambulance) {
         throw new ResourceNotFoundException("Ambulance not found")
       }
 
+      const { can } = defineAbilityFor(authUser)
+
       const caslAmbulance = getCaslAmbulance({
         id: ambulance.id,
-        companyId: ambulance.companyId,
         baseId: ambulance.baseId,
         unitId: ambulance.unitId,
+        companyId: ambulance.companyId,
         companyGroupId: ambulance.companyGroupId,
       })
 
-      if (can("read", caslAmbulance) === false) {
+      if (can("update", caslAmbulance) === false) {
         throw new ForbiddenException()
       }
 
-      await prisma.ambulance.update({
-        where: { id },
+      const document = await prisma.ambulanceDocuments.findUnique({
+        where: { id: documentId, deletedAt: null, ambulanceId },
+      })
+
+      if (!document) {
+        throw new ResourceNotFoundException("Document not found")
+      }
+
+      await prisma.ambulanceDocuments.update({
+        where: { id: documentId },
         data: { deletedAt: new Date() },
       })
 
-      return reply.status(204).send(null)
+      return reply.status(204).send()
     }
   )
 }

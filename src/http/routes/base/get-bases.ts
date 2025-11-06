@@ -6,32 +6,36 @@ import { ForbiddenException } from "@/http/exceptions/forbidden-exception"
 import { getAuthUser, getCaslCompanyGroup } from "@/http/helpers/casl"
 import { auth } from "@/http/hooks/auth"
 
-export const getUsers: FastifyPluginCallbackZod = (app) => {
+export const getBases: FastifyPluginCallbackZod = (app) => {
   app.get(
-    "/users",
+    "/bases",
     {
       preHandler: [auth],
       schema: {
-        tags: ["User"],
-        summary: "Get users",
+        tags: ["Base"],
+        summary: "Get bases",
+        operationId: "getBases",
         security: [{ BearerAuth: [] }],
-        operationId: "getUsers",
+        description: "Get bases",
         querystring: z.object({
-          companyId: z.string().optional(),
-          unitId: z.string().optional(),
           page: z.coerce.number().int().min(1).default(1),
           perPage: z.coerce.number().int().min(1).default(10),
+          name: z.string().optional(),
+          unitId: z.cuid().optional(),
+          companyGroupId: z.cuid().optional(),
         }),
         response: {
           200: z.object({
             data: z.array(
               z.object({
-                id: z.string(),
+                id: z.cuid(),
                 name: z.string(),
-                document: z.string(),
-                avatarUrl: z.string().nullable(),
-                birthDate: z.date(),
+                unit: z.object({
+                  id: z.cuid(),
+                  name: z.string(),
+                }),
                 createdAt: z.date(),
+                updatedAt: z.date(),
               })
             ),
             pagination: z.object({
@@ -47,31 +51,58 @@ export const getUsers: FastifyPluginCallbackZod = (app) => {
     },
     async (request, reply) => {
       const authUser = getAuthUser(request)
-      const { associatedCompanyGroupId } = request.user
-      const { page, perPage } = request.query
+
+      const { page, perPage, name, companyGroupId } = request.query
+      const companyGroupIdToUse =
+        companyGroupId || authUser.associatedCompanyGroupId || "NOT_INFORMED"
 
       const { can } = defineAbilityFor(authUser)
 
       const caslCompanyGroup = getCaslCompanyGroup({
-        companyGroupId: associatedCompanyGroupId || "NOT_INFORMED",
+        companyGroupId: companyGroupIdToUse,
       })
 
-      if (can("listUsers", caslCompanyGroup) === false) {
+      if (can("listBases", caslCompanyGroup) === false) {
         throw new ForbiddenException()
       }
 
-      const [users, total] = await Promise.all([
-        prisma.user.findMany({
+      const [bases, total] = await Promise.all([
+        prisma.base.findMany({
+          select: {
+            id: true,
+            name: true,
+            unit: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+            createdAt: true,
+            updatedAt: true,
+          },
           where: {
-            associatedCompanyGroupId,
+            name: {
+              contains: name,
+              mode: "insensitive",
+            },
+            ...(companyGroupIdToUse && { companyGroupId: companyGroupIdToUse }),
+            deletedAt: null,
+          },
+          orderBy: {
+            createdAt: "desc",
           },
           skip: (page - 1) * perPage,
           take: perPage,
-          orderBy: { createdAt: "desc" },
         }),
-        prisma.user.count({
+
+        prisma.base.count({
           where: {
-            associatedCompanyGroupId,
+            name: {
+              contains: name,
+              mode: "insensitive",
+            },
+            ...(companyGroupIdToUse && { companyGroupId: companyGroupIdToUse }),
+            deletedAt: null,
           },
         }),
       ])
@@ -81,7 +112,7 @@ export const getUsers: FastifyPluginCallbackZod = (app) => {
       const hasPreviousPage = page > 1
 
       return reply.status(200).send({
-        data: users,
+        data: bases,
         pagination: {
           total,
           totalPages,

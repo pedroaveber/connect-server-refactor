@@ -11,6 +11,7 @@ declare module "@fastify/jwt" {
       unitsIds?: string[]
       basesIds?: string[]
       roles: Role[]
+      associatedCompanyGroupId?: string
     }
   }
 }

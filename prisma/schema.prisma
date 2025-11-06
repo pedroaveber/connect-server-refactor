@@ -27,11 +27,13 @@ model CompanyGroup {
   updatedAt   DateTime    @updatedAt @map("updated_at")
   deletedAt   DateTime?   @map("deleted_at")
 
-  companies Company[]
-  units     Unit[]
-  bases     Base[]
-  phones    Phone[]
-  members   UserOrganization[]
+  companies  Company[]
+  units      Unit[]
+  bases      Base[]
+  phones     Phone[]
+  members    UserOrganization[]
+  ambulances Ambulance[]
+  users      User[]
 
   @@map("company_groups")
 }
@@ -47,10 +49,11 @@ model Company {
   companyGroup   CompanyGroup @relation(fields: [companyGroupId], references: [id])
   companyGroupId String       @map("company_group_id")
 
-  units   Unit[]
-  bases   Base[]
-  phones  Phone[]
-  members UserOrganization[]
+  units      Unit[]
+  bases      Base[]
+  phones     Phone[]
+  members    UserOrganization[]
+  ambulances Ambulance[]
 
   @@map("companies")
 }
@@ -68,8 +71,9 @@ model Unit {
   companyGroup   CompanyGroup @relation(fields: [companyGroupId], references: [id])
   companyGroupId String       @map("company_group_id")
 
-  bases   Base[]
-  members UserOrganization[]
+  bases      Base[]
+  members    UserOrganization[]
+  ambulances Ambulance[]
 
   @@map("units")
 }
@@ -94,8 +98,9 @@ model Base {
   company   Company @relation(fields: [companyId], references: [id])
   companyId String  @map("company_id")
 
-  phones  Phone[]
-  members UserOrganization[]
+  phones     Phone[]
+  members    UserOrganization[]
+  ambulances Ambulance[]
 
   @@map("bases")
 }
@@ -129,7 +134,11 @@ model User {
   updatedAt DateTime   @updatedAt @map("updated_at")
   deletedAt DateTime?  @map("deleted_at")
 
-  organizations UserOrganization[]
+  associatedCompanyGroup   CompanyGroup? @relation(fields: [associatedCompanyGroupId], references: [id])
+  associatedCompanyGroupId String?       @map("associated_company_group_id")
+
+  organizations      UserOrganization[]
+  hasChangedStatusOn AmbulanceStatusHistory[]
 
   @@index([document])
   @@map("users")
@@ -157,6 +166,80 @@ model UserOrganization {
 
   @@unique([userId, companyGroupId, companyId, unitId, baseId])
   @@map("user_organizations")
+}
+
+enum AmbulanceStatusEnum {
+  QAP
+  OCP
+  EVT
+  J4
+  J5
+  FA
+  MN
+}
+
+model Ambulance {
+  id           String              @id @default(cuid())
+  name         String
+  status       AmbulanceStatusEnum @default(FA) @map("status")
+  observations String?
+  licensePlate String              @unique @map("license_plate")
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  base   Base   @relation(fields: [baseId], references: [id])
+  baseId String @map("base_id")
+
+  unit   Unit   @relation(fields: [unitId], references: [id])
+  unitId String @map("unit_id")
+
+  companyGroup   CompanyGroup @relation(fields: [companyGroupId], references: [id])
+  companyGroupId String       @map("company_group_id")
+
+  company       Company                  @relation(fields: [companyId], references: [id])
+  companyId     String                   @map("company_id")
+  documents     AmbulanceDocuments[]
+  statusHistory AmbulanceStatusHistory[]
+
+  @@index([licensePlate])
+  @@map("ambulances")
+}
+
+model AmbulanceDocuments {
+  id String @id @default(cuid())
+
+  ambulance   Ambulance @relation(fields: [ambulanceId], references: [id])
+  ambulanceId String    @map("ambulance_id")
+
+  name          String
+  downloadUrl   String @map("download_url")
+  fileExtension String @map("file_extension")
+  fileSize      Int    @map("file_size")
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  expiresAt DateTime  @map("expires_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  @@map("ambulance_documents")
+}
+
+model AmbulanceStatusHistory {
+  id String @id @default(cuid())
+
+  ambulance   Ambulance @relation(fields: [ambulanceId], references: [id])
+  ambulanceId String    @map("ambulance_id")
+
+  fromStatus AmbulanceStatusEnum @map("from_status")
+  toStatus   AmbulanceStatusEnum @map("to_status")
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String @map("user_id")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("ambulance_status_histories")
 }
 
 // model Ambulance {

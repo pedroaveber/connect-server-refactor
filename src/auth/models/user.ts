@@ -9,6 +9,7 @@ export const userSchema = z.object({
   companiesIds: z.array(z.string()).optional().default([]),
   unitsIds: z.array(z.string()).optional().default([]),
   basesIds: z.array(z.string()).optional().default([]),
+  associatedCompanyGroupId: z.string().optional(),
 })
 
 export type User = z.infer<typeof userSchema>

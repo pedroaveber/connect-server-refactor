@@ -1,4 +1,5 @@
 import type { FastifyRequest } from "fastify"
+import { ambulanceSchema } from "@/auth/models/ambulance"
 import { baseSchema } from "@/auth/models/base"
 import { companySchema } from "@/auth/models/company"
 import { companyGroupSchema } from "@/auth/models/company-group"
@@ -80,5 +81,45 @@ export function getCaslBase({
     unitId,
     companyId,
     companyGroupId,
+  })
+}
+
+export function getCaslAmbulance({
+  id,
+  baseId,
+  unitId,
+  companyId,
+  companyGroupId,
+}: {
+  id?: string
+  baseId: string
+  unitId: string
+  companyId: string
+  companyGroupId: string
+}) {
+  return ambulanceSchema.parse({
+    __typename: "Ambulance",
+    id: id ?? "fakeId",
+    baseId,
+    unitId,
+    companyId,
+    companyGroupId,
+  })
+}
+
+export function getCaslUser({
+  userId,
+  roles,
+  associatedCompanyGroupId,
+}: {
+  userId: string
+  roles: string[]
+  associatedCompanyGroupId?: string
+}) {
+  return userSchema.parse({
+    __typename: "User",
+    id: userId,
+    roles,
+    associatedCompanyGroupId,
   })
 }

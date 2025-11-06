@@ -20,13 +20,29 @@ export const permissions: Record<Role, PermissionsByRole> = {
       },
     })
 
-    can(["read", "listCompanies", "update"], "CompanyGroup", {
-      id: { $eq: user.companyGroupId },
-    })
+    can(
+      [
+        "read",
+        "listCompanies",
+        "listUnits",
+        "listBases",
+        "listAmbulances",
+        "listUsers",
+        "update",
+      ],
+      "CompanyGroup",
+      {
+        id: { $eq: user.companyGroupId },
+      }
+    )
 
     can("manage", "Company", { companyGroupId: { $eq: user.companyGroupId } })
     can("manage", "Unit", { companyGroupId: { $eq: user.companyGroupId } })
     can("manage", "Base", { companyGroupId: { $eq: user.companyGroupId } })
+    can("manage", "Ambulance", { companyGroupId: { $eq: user.companyGroupId } })
+    can("manage", "User", {
+      associatedCompanyGroupId: { $eq: user.associatedCompanyGroupId },
+    })
   },
 
   MEMBER(user, { can }) {

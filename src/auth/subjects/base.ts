@@ -8,6 +8,7 @@ export const baseSubject = z.tuple([
     z.literal("delete"),
     z.literal("update"),
     z.literal("list"),
+    z.literal("listAmbulances"),
     z.literal("read"),
   ]),
   z.union([z.literal("Base"), baseSchema]),

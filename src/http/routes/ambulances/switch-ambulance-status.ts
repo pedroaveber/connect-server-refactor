@@ -2,27 +2,26 @@ import type { FastifyPluginCallbackZod } from "fastify-type-provider-zod"
 import { z } from "zod"
 import { defineAbilityFor } from "@/auth"
 import { prisma } from "@/database/prisma"
-import { ConflictException } from "@/http/exceptions/conflict-exception"
+import { BadRequestException } from "@/http/exceptions/bad-request-exception"
 import { ForbiddenException } from "@/http/exceptions/forbidden-exception"
 import { ResourceNotFoundException } from "@/http/exceptions/resource-not-found-exception"
 import { getAuthUser, getCaslAmbulance } from "@/http/helpers/casl"
 import { auth } from "@/http/hooks/auth"
+import { zodAmbulanceStatusEnum } from "@/utils/zod"
 
-export const updateAmbulance: FastifyPluginCallbackZod = (app) => {
-  app.put(
-    "/ambulances/:id",
+export const switchAmbulanceStatus: FastifyPluginCallbackZod = (app) => {
+  app.patch(
+    "/ambulances/:id/switch-status",
     {
       preHandler: [auth],
       schema: {
         tags: ["Ambulance"],
-        summary: "Update an ambulance",
-        operationId: "updateAmbulance",
+        summary: "Switch an ambulance status",
+        operationId: "switchAmbulanceStatus",
         security: [{ BearerAuth: [] }],
         params: z.object({ id: z.cuid() }),
         body: z.object({
-          name: z.string(),
-          licensePlate: z.string(),
-          observations: z.string().optional(),
+          status: zodAmbulanceStatusEnum,
         }),
         response: { 204: z.null() },
       },
@@ -31,7 +30,7 @@ export const updateAmbulance: FastifyPluginCallbackZod = (app) => {
       const authUser = getAuthUser(request)
 
       const { id } = request.params
-      const { name, licensePlate, observations } = request.body
+      const { status } = request.body
 
       const ambulance = await prisma.ambulance.findUnique({
         where: { id, deletedAt: null },
@@ -51,29 +50,28 @@ export const updateAmbulance: FastifyPluginCallbackZod = (app) => {
         companyGroupId: ambulance.companyGroupId,
       })
 
-      if (can("update", caslAmbulance) === false) {
+      if (can("switchStatus", caslAmbulance) === false) {
         throw new ForbiddenException()
       }
 
-      const hasChangedLicensePlate = ambulance.licensePlate !== licensePlate
-
-      if (hasChangedLicensePlate) {
-        const ambulanceWithSameLicensePlate = await prisma.ambulance.findUnique(
-          {
-            where: { licensePlate, NOT: { id } },
-          }
-        )
-
-        if (ambulanceWithSameLicensePlate) {
-          throw new ConflictException(
-            "Ambulance with same license plate already exists"
-          )
-        }
+      if (ambulance.status === status) {
+        throw new BadRequestException("Ambulance already has this status")
       }
 
-      await prisma.ambulance.update({
-        where: { id },
-        data: { name, licensePlate, observations },
+      await prisma.$transaction(async (tx) => {
+        await tx.ambulanceStatusHistory.create({
+          data: {
+            fromStatus: ambulance.status,
+            toStatus: status,
+            ambulanceId: id,
+            userId: authUser.id,
+          },
+        })
+
+        await tx.ambulance.update({
+          where: { id },
+          data: { status },
+        })
       })
 
       return reply.status(204).send(null)

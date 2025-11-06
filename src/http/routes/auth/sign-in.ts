@@ -81,6 +81,8 @@ export const signIn: FastifyPluginCallbackZod = (app) => {
           companiesIds,
           unitsIds,
           basesIds,
+          associatedCompanyGroupId:
+            userWithDocument.associatedCompanyGroupId ?? undefined,
           roles: userWithDocument.roles,
         },
         {
@@ -95,6 +97,8 @@ export const signIn: FastifyPluginCallbackZod = (app) => {
           companiesIds,
           unitsIds,
           basesIds,
+          associatedCompanyGroupId:
+            userWithDocument.associatedCompanyGroupId ?? undefined,
           roles: userWithDocument.roles,
         },
         {
