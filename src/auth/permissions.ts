@@ -50,4 +50,6 @@ export const permissions: Record<Role, PermissionsByRole> = {
       id: { $eq: user.id },
     })
   },
+
+  // create_company, update_company, delete_company,
 }

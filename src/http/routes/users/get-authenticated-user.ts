@@ -27,6 +27,7 @@ export const getAuthenticatedUser: FastifyPluginCallbackZod = (app) => {
               avatarUrl: z.string().nullable(),
               birthDate: z.date(),
               roles: z.array(roleSchema),
+              associatedCompanyGroupId: z.cuid().nullable(),
               createdAt: z.date(),
             }),
           }),
@@ -52,6 +53,7 @@ export const getAuthenticatedUser: FastifyPluginCallbackZod = (app) => {
           avatarUrl: true,
           birthDate: true,
           createdAt: true,
+          associatedCompanyGroupId: true,
           roles: true,
         },
       })

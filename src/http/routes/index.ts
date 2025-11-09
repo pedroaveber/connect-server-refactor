@@ -42,6 +42,7 @@ import { getBasesFromUnit } from "./units/get-bases-from-unit"
 import { getUnit } from "./units/get-unit"
 import { getUnits } from "./units/get-units"
 import { updateUnit } from "./units/update-unit"
+import { createBatchUsers } from "./users/create-batch-users"
 import { createUser } from "./users/create-user"
 import { getAuthenticatedUser } from "./users/get-authenticated-user"
 import { getCompaniesFromUser } from "./users/get-companies-from-user"
@@ -112,5 +113,6 @@ export const appRoutes: FastifyPluginAsync = async (app) => {
   app.register(getAuthenticatedUser)
   app.register(getUsers)
   app.register(createUser)
+  app.register(createBatchUsers)
   app.register(getCompaniesFromUser)
 }

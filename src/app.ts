@@ -3,6 +3,7 @@ import { fastifyCookie } from "@fastify/cookie"
 import { fastifyCors } from "@fastify/cors"
 import { fastifyJwt } from "@fastify/jwt"
 import { fastifySwagger } from "@fastify/swagger"
+import { fastifyWebsocket } from "@fastify/websocket"
 import scalarApiReference from "@scalar/fastify-api-reference"
 import { fastify } from "fastify"
 import {
@@ -14,6 +15,11 @@ import {
 import { env } from "./env"
 import { errorHandler } from "./error-handler"
 import { appRoutes } from "./http/routes"
+import { createBatchUsersWs } from "./http/ws/create-batch-users-ws"
+import { bullMqAdapter } from "./jobs/adapter"
+
+// Workers
+import "./jobs/workers/create-batch-users-worker"
 
 export const app = fastify({
   logger: {
@@ -30,12 +36,6 @@ export const app = fastify({
 app.setSerializerCompiler(serializerCompiler)
 app.setValidatorCompiler(validatorCompiler)
 
-// Decrypt incoming JSON bodies when payload is encrypted
-// app.addHook("preValidation", decrypt)
-
-// Encrypt outgoing JSON bodies when payload is encrypted
-// app.addHook("onSend", encrypt)
-
 app.register(fastifyCors, {
   origin: ["http://localhost:5173"],
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
@@ -43,6 +43,8 @@ app.register(fastifyCors, {
 })
 
 app.register(fastifyCookie)
+app.register(bullMqAdapter)
+app.register(fastifyWebsocket)
 
 app.register(fastifyJwt, {
   sign: {
@@ -85,6 +87,9 @@ if (env.ENV === "development") {
 
 // Http Routes
 app.register(appRoutes)
+
+// WebSocket Routes
+app.register(createBatchUsersWs)
 
 app.ready(async () => {
   const json = await app.swagger()

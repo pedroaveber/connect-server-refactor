@@ -3,7 +3,7 @@ import { createCompany } from "../routes/companies/create-company";
 import { createCompanyPhoneNumber } from "../routes/companies/create-company-phone-number";
 import { deleteCompany } from "../routes/companies/delete-company";
 import { deleteCompanyPhoneNumber } from "../routes/companies/delete-company-phone-number";
-import { getCompanies } from "../routes/companies/get-companies";
+import { getCompanies } from "../routes/companies/get-units-from-company";
 import { getCompany } from "../routes/companies/get-company";
 import { updateCompany } from "../routes/companies/update-company";
 import { updateCompanyModule } from "../routes/companies/update-company-module";
