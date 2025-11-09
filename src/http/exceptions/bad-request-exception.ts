@@ -1,6 +1,7 @@
-export class BadRequestException extends Error {
-  constructor(message: string) {
-    super(message)
-    this.name = "BadRequestException"
+import { HttpException } from "./http-exception"
+
+export class BadRequestException extends HttpException {
+  constructor(message = "Requisição inválida") {
+    super(400, message, "BadRequestException", "E002")
   }
 }

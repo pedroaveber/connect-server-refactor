@@ -1,19 +1,20 @@
-import fs from "node:fs"
-import { fastifyCookie } from "@fastify/cookie"
-import { fastifyCors } from "@fastify/cors"
-import { fastifyJwt } from "@fastify/jwt"
-import { fastifySwagger } from "@fastify/swagger"
-import scalarApiReference from "@scalar/fastify-api-reference"
-import { fastify } from "fastify"
+import fs from "node:fs";
+import { fastifyCookie } from "@fastify/cookie";
+import { fastifyCors } from "@fastify/cors";
+import { fastifyJwt } from "@fastify/jwt";
+import { fastifySwagger } from "@fastify/swagger";
+import scalarApiReference from "@scalar/fastify-api-reference";
+import { fastify } from "fastify";
 import {
   jsonSchemaTransform,
   serializerCompiler,
   validatorCompiler,
   type ZodTypeProvider,
-} from "fastify-type-provider-zod"
-import { env } from "./env"
-import { errorHandler } from "./error-handler"
-import { appRoutes } from "./http/routes"
+} from "fastify-type-provider-zod";
+import { env } from "./env";
+import { errorHandler } from "./error-handler";
+import Routing from "./routes";
+import authorizePlugin from "./http/hooks/permissions/authorize-plugin";
 
 export const app = fastify({
   logger: {
@@ -25,10 +26,10 @@ export const app = fastify({
       },
     },
   },
-}).withTypeProvider<ZodTypeProvider>()
+}).withTypeProvider<ZodTypeProvider>();
 
-app.setSerializerCompiler(serializerCompiler)
-app.setValidatorCompiler(validatorCompiler)
+app.setSerializerCompiler(serializerCompiler);
+app.setValidatorCompiler(validatorCompiler);
 
 // Decrypt incoming JSON bodies when payload is encrypted
 // app.addHook("preValidation", decrypt)
@@ -40,9 +41,9 @@ app.register(fastifyCors, {
   origin: ["http://localhost:5173"],
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   credentials: true,
-})
+});
 
-app.register(fastifyCookie)
+app.register(fastifyCookie);
 
 app.register(fastifyJwt, {
   sign: {
@@ -52,7 +53,7 @@ app.register(fastifyJwt, {
     public: Buffer.from(env.JWT_PUBLIC_KEY, "base64"),
     private: Buffer.from(env.JWT_PRIVATE_KEY, "base64"),
   },
-})
+});
 
 app.register(fastifySwagger, {
   openapi: {
@@ -72,7 +73,7 @@ app.register(fastifySwagger, {
   },
 
   transform: jsonSchemaTransform,
-})
+});
 
 if (env.ENV === "development") {
   app.register(scalarApiReference, {
@@ -80,15 +81,16 @@ if (env.ENV === "development") {
     configuration: {
       theme: "elysiajs",
     },
-  })
+  });
 }
 
-// Http Routes
-app.register(appRoutes)
+app.register(authorizePlugin);
+
+Routing();
 
 app.ready(async () => {
-  const json = await app.swagger()
-  fs.writeFileSync("swagger.json", JSON.stringify(json, null, 2))
-})
+  const json = await app.swagger();
+  fs.writeFileSync("swagger.json", JSON.stringify(json, null, 2));
+});
 
-app.setErrorHandler(errorHandler)
+app.setErrorHandler(errorHandler);

@@ -1,1 +1,0 @@
-export const rolesEnum = ["DRIVER", "NURSE", "REGULATOR", "REGULATOR_ADMIN", "SYS_ADMIN"] as const

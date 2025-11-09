@@ -1,6 +1,7 @@
-export class UnauthorizedException extends Error {
-  constructor() {
-    super("Unauthorized")
-    this.name = "UnauthorizedException"
+import { HttpException } from "./http-exception"
+
+export class UnauthorizedException extends HttpException {
+  constructor(message = "Não autorizado") {
+    super(401, message, "UnauthorizedException", "E003")
   }
 }
