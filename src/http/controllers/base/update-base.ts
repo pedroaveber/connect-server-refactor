@@ -13,7 +13,7 @@ export const updateBase: FastifyPluginCallbackZod = (app) => {
         tags: ["Base"],
         summary: "Update base",
         operationId: "updateBase",
-        params: z.object({ id: z.cuid() }),
+        params: z.object({ id: z.string() }),
         body: z.object({
           name: z.string().optional(),
           document: z.string().optional(),

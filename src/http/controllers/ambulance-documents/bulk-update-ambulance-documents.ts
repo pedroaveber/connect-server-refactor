@@ -7,7 +7,7 @@ import { z } from "zod";
 const bulkUpdateDocumentsSchema = z.object({
   documents: z.array(
     z.object({
-      id: z.cuid(),
+      id: z.string(),
       name: z.string(),
       downloadUrl: z.string().url(),
       fileExtension: z.string(),

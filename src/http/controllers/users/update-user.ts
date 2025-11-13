@@ -8,7 +8,7 @@ const updateUserSchema = z.object({
   name: z.string().optional(),
   avatarUrl: z.string().url().nullable().optional(),
   birthDate: z.coerce.date().optional(),
-  companyGroupId: z.cuid(),
+  companyGroupId: z.string(),
   companiesIds: z.array(z.string()).optional(), // atualizar empresas do usuário
   unitIds: z.array(z.string()).optional(), // atualizar unidades do usuário
   roleIds: z.array(PermissionSchema).optional(), // atualizar roles do usuário

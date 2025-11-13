@@ -28,7 +28,7 @@ export const createAmbulanceDocuments: FastifyPluginCallbackZod = (app) => {
         summary: "Add documents to an ambulance",
         operationId: "addAmbulanceDocuments",
         security: [{ BearerAuth: [] }],
-        params: z.object({ id: z.cuid() }),
+        params: z.object({ id: z.string() }),
         body: addDocumentsSchema,
         response: { 201: z.object({ addedCount: z.number() }) },
       },

@@ -17,7 +17,7 @@ export const switchAmbulanceStatus: FastifyPluginCallbackZod = (app) => {
         summary: "Switch an ambulance status",
         operationId: "switchAmbulanceStatus",
         security: [{ BearerAuth: [] }],
-        params: z.object({ id: z.cuid() }),
+        params: z.object({ id: z.string() }),
         body: z.object({
           status: zodAmbulanceStatusEnum,
         }),

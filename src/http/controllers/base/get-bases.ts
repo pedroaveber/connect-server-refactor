@@ -20,9 +20,9 @@ export const getBases: FastifyPluginCallbackZod = (app) => {
             page: z.coerce.number().int().min(1).default(1),
             perPage: z.coerce.number().int().min(1).default(10),
             name: z.string().optional(),
-            unitId: z.cuid().optional(),
-            companyId: z.cuid().optional(),
-            companyGroupId: z.cuid().optional(),
+            unitId: z.string().optional(),
+            companyId: z.string().optional(),
+            companyGroupId: z.string().optional(),
           })
           .refine(
             (data) =>
@@ -38,10 +38,10 @@ export const getBases: FastifyPluginCallbackZod = (app) => {
           200: z.object({
             data: z.array(
               z.object({
-                id: z.cuid(),
+                id: z.string(),
                 name: z.string(),
                 unit: z.object({
-                  id: z.cuid(),
+                  id: z.string(),
                   name: z.string(),
                 }),
                 createdAt: z.date(),

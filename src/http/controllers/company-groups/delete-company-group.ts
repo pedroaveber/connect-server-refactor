@@ -16,7 +16,7 @@ export const deleteCompanyGroup: FastifyPluginCallbackZod = (app) => {
         security: [{ BearerAuth: [] }],
         description: "Delete company group",
         params: z.object({
-          companyGroupId: z.cuid(),
+          companyGroupId: z.string(),
         }),
         response: {
           204: z.null(),

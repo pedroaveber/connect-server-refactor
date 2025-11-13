@@ -13,7 +13,7 @@ export const deleteAmbulance: FastifyPluginCallbackZod = (app) => {
       schema: {
         tags: ["Ambulance"],
         summary: "Delete ambulance by ID",
-        params: z.object({ id: z.cuid() }),
+        params: z.object({ id: z.string() }),
         operationId: "deleteAmbulance",
         response: {
           204: z.null(),

@@ -18,7 +18,7 @@ export const createCompanyGroupPhoneNumber: FastifyPluginCallbackZod = (
         security: [{ BearerAuth: [] }],
         description: "Create company group phone number",
         params: z.object({
-          companyGroupId: z.cuid(),
+          companyGroupId: z.string(),
         }),
         body: z.object({
           name: z
@@ -40,7 +40,7 @@ export const createCompanyGroupPhoneNumber: FastifyPluginCallbackZod = (
         }),
         response: {
           201: z.object({
-            id: z.cuid(),
+            id: z.string(),
           }),
         },
       },

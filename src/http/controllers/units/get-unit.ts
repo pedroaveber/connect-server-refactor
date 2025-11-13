@@ -16,22 +16,22 @@ export const getUnit: FastifyPluginCallbackZod = (app) => {
         security: [{ BearerAuth: [] }],
         description: "Get unit",
         params: z.object({
-          unitId: z.cuid(),
+          unitId: z.string(),
         }),
         response: {
           200: z.object({
             data: z.object({
-              id: z.cuid(),
+              id: z.string(),
               name: z.string(),
               basesCount: z.number(),
               createdAt: z.date(),
               updatedAt: z.date(),
               company: z.object({
-                id: z.cuid(),
+                id: z.string(),
                 name: z.string(),
                 document: z.string(),
                 companyGroup: z.object({
-                  id: z.cuid(),
+                  id: z.string(),
                   name: z.string(),
                   document: z.string(),
                 }),

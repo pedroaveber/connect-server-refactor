@@ -17,12 +17,12 @@ export const getCompanyGroup: FastifyPluginCallbackZod = (app) => {
         security: [{ BearerAuth: [] }],
         description: "Get company group",
         params: z.object({
-          companyGroupId: z.cuid(),
+          companyGroupId: z.string(),
         }),
         response: {
           200: z.object({
             data: z.object({
-              id: z.cuid(),
+              id: z.string(),
               name: z.string(),
               document: z.string(),
               createdAt: z.date(),
@@ -31,7 +31,7 @@ export const getCompanyGroup: FastifyPluginCallbackZod = (app) => {
               companiesCount: z.number(),
               phones: z.array(
                 z.object({
-                  id: z.cuid(),
+                  id: z.string(),
                   number: z.string(),
                   name: z.string().nullable(),
                   isWhatsapp: z.boolean(),

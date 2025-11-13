@@ -15,7 +15,7 @@ export const deleteUser: FastifyPluginCallbackZod = (app) => {
         security: [{ BearerAuth: [] }],
         operationId: "deleteUser",
         params: z.object({ id: z.string() }),
-        body: z.object({ companyGroupId: z.cuid() }),
+        body: z.object({ companyGroupId: z.string() }),
         response: {
           200: z.object({
             id: z.string(),

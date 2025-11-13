@@ -1,5 +1,5 @@
-import type { FastifyPluginCallbackZod } from "fastify-type-provider-zod"
-import { z } from "zod"
+import type { FastifyPluginCallbackZod } from "fastify-type-provider-zod";
+import { z } from "zod";
 
 export const checkAuth: FastifyPluginCallbackZod = (app) => {
   app.get(
@@ -19,30 +19,30 @@ export const checkAuth: FastifyPluginCallbackZod = (app) => {
     },
     // biome-ignore lint/suspicious/useAwait: <This kind of function must be async>
     async (request, reply) => {
-      const authorization = request.headers.authorization
+      const authorization = request.headers.authorization;
 
       const headerAccessToken = authorization?.startsWith("Bearer ")
         ? authorization.slice(7)
-        : undefined
+        : undefined;
 
-      const token = request.cookies.accessToken || headerAccessToken
+      const token = request.cookies.accessToken || headerAccessToken;
 
       if (!token) {
         return reply.status(200).send({
           isAuthenticated: false,
-        })
+        });
       }
 
       try {
-        app.jwt.verify(token)
+        const response = await app.jwt.verify(token);
         return reply.status(200).send({
           isAuthenticated: true,
-        })
+        });
       } catch {
         return reply.status(200).send({
           isAuthenticated: false,
-        })
+        });
       }
     }
-  )
-}
+  );
+};

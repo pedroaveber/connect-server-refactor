@@ -20,7 +20,7 @@ export const createCompany: FastifyPluginCallbackZod = (app) => {
           document: z.string().length(14).meta({
             description: "Brazilian CNPJ",
           }),
-          companyGroupId: z.cuid().meta({
+          companyGroupId: z.string().meta({
             description: "Company group ID",
           }),
           phones: z.array(
@@ -35,7 +35,7 @@ export const createCompany: FastifyPluginCallbackZod = (app) => {
         }),
         response: {
           201: z.object({
-            id: z.cuid(),
+            id: z.string(),
           }),
         },
       },

@@ -14,7 +14,7 @@ export const deleteAmbulanceDocument: FastifyPluginCallbackZod = (app) => {
         summary: "Delete (soft) an ambulance document",
         operationId: "deleteAmbulanceDocument",
         security: [{ BearerAuth: [] }],
-        params: z.object({ id: z.cuid(), baseId: z.string() }),
+        params: z.object({ id: z.string(), baseId: z.string() }),
         response: { 204: z.null() },
       },
     },

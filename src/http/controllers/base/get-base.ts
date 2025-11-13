@@ -17,7 +17,7 @@ export const getBase: FastifyPluginCallbackZod = (app) => {
         security: [{ BearerAuth: [] }],
         description: "Get base",
         params: z.object({
-          id: z.cuid(),
+          id: z.string(),
         }),
         response: {
           200: z.object({
@@ -31,7 +31,7 @@ export const getBase: FastifyPluginCallbackZod = (app) => {
               updatedAt: z.date(),
               phones: z.array(
                 z.object({
-                  id: z.cuid(),
+                  id: z.string(),
                   number: z.string(),
                   isWhatsapp: z.boolean(),
                   name: z.string().nullable(),
@@ -39,14 +39,14 @@ export const getBase: FastifyPluginCallbackZod = (app) => {
                 })
               ),
               unit: z.object({
-                id: z.cuid(),
+                id: z.string(),
                 name: z.string(),
                 company: z.object({
-                  id: z.cuid(),
+                  id: z.string(),
                   name: z.string(),
                   document: z.string(),
                   companyGroup: z.object({
-                    id: z.cuid(),
+                    id: z.string(),
                     name: z.string(),
                     document: z.string(),
                   }),

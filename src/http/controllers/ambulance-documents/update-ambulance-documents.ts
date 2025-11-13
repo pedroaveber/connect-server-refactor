@@ -5,7 +5,7 @@ import type { FastifyPluginCallbackZod } from "fastify-type-provider-zod";
 import { z } from "zod";
 
 const updateDocumentSchema = z.object({
-  id: z.cuid(),
+  id: z.string(),
   name: z.string(),
   downloadUrl: z.string().url(),
   fileExtension: z.string(),
@@ -24,7 +24,7 @@ export const updateAmbulanceDocument: FastifyPluginCallbackZod = (app) => {
         summary: "Update an ambulance document",
         operationId: "updateAmbulanceDocument",
         security: [{ BearerAuth: [] }],
-        params: z.object({ id: z.cuid(), baseId: z.string() }),
+        params: z.object({ id: z.string(), baseId: z.string() }),
         body: updateDocumentSchema,
         response: { 200: z.object({ id: z.string() }) },
       },

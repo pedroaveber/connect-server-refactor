@@ -20,13 +20,13 @@ export const getCompanies: FastifyPluginCallbackZod = (app) => {
           perPage: z.coerce.number().int().min(1).default(10),
           name: z.string().optional(),
           document: z.string().optional(),
-          companyGroupId: z.cuid().optional(),
+          companyGroupId: z.string().optional(),
         }),
         response: {
           200: z.object({
             data: z.array(
               z.object({
-                id: z.cuid(),
+                id: z.string(),
                 name: z.string(),
                 document: z.string(),
                 createdAt: z.date(),

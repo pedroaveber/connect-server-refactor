@@ -16,7 +16,7 @@ export const updateUnit: FastifyPluginCallbackZod = (app) => {
         security: [{ BearerAuth: [] }],
         description: "Update unit",
         params: z.object({
-          unitId: z.cuid(),
+          unitId: z.string(),
         }),
         body: z.object({
           name: z.string(),

@@ -16,26 +16,26 @@ export const getCompany: FastifyPluginCallbackZod = (app) => {
         security: [{ BearerAuth: [] }],
         description: "Get company",
         params: z.object({
-          companyId: z.cuid(),
+          companyId: z.string(),
         }),
         response: {
           200: z.object({
             data: z.object({
-              id: z.cuid(),
+              id: z.string(),
               name: z.string(),
               document: z.string(),
-              companyGroupId: z.cuid(),
+              companyGroupId: z.string(),
               unitsCount: z.number(),
               createdAt: z.date(),
               updatedAt: z.date(),
               companyGroup: z.object({
-                id: z.cuid(),
+                id: z.string(),
                 name: z.string(),
                 document: z.string(),
               }),
               phones: z.array(
                 z.object({
-                  id: z.cuid(),
+                  id: z.string(),
                   name: z.string().nullable(),
                   isWhatsapp: z.boolean(),
                   number: z.string(),

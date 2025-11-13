@@ -1,9 +1,9 @@
 import type { FastifyPluginCallbackZod } from "fastify-type-provider-zod";
 import { z } from "zod";
 import { prisma } from "@/database/prisma";
-import { ResourceNotFoundException } from "@/http/exceptions/resource-not-found-exception";
 import { auth } from "@/http/hooks/auth";
 import { Permission, PermissionSchema } from "@/data/permissions";
+import { UnauthorizedException } from "@/http/exceptions/unauthorized-exception";
 
 export const getAuthenticatedUser: FastifyPluginCallbackZod = (app) => {
   app.get(
@@ -22,9 +22,25 @@ export const getAuthenticatedUser: FastifyPluginCallbackZod = (app) => {
               name: z.string(),
               document: z.string(),
               avatarUrl: z.string().nullable(),
-              birthDate: z.date(),
               roles: z.array(PermissionSchema),
-              createdAt: z.date(),
+              companyGroup: z
+                .object({
+                  id: z.string(),
+                  name: z.string(),
+                })
+                .nullable(),
+              companies: z.array(
+                z.object({
+                  id: z.string(),
+                  name: z.string(),
+                })
+              ),
+              units: z.array(
+                z.object({
+                  id: z.string(),
+                  name: z.string(),
+                })
+              ),
             }),
           }),
         },
@@ -40,14 +56,30 @@ export const getAuthenticatedUser: FastifyPluginCallbackZod = (app) => {
           name: true,
           document: true,
           avatarUrl: true,
-          birthDate: true,
-          createdAt: true,
           roles: true,
+          companyGroup: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+          companies: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+          units: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
         },
       });
 
       if (!user) {
-        throw new ResourceNotFoundException("Usuário não encontrado");
+        throw new UnauthorizedException("Usuário não encontrado");
       }
 
       return reply.status(200).send({

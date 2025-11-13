@@ -16,7 +16,7 @@ export const deleteUnit: FastifyPluginCallbackZod = (app) => {
         security: [{ BearerAuth: [] }],
         description: "Delete unit",
         params: z.object({
-          unitId: z.cuid(),
+          unitId: z.string(),
         }),
         response: {
           204: z.null(),

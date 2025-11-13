@@ -16,7 +16,7 @@ export const updateCompanyGroup: FastifyPluginCallbackZod = (app) => {
         security: [{ BearerAuth: [] }],
         description: "Update company group",
         params: z.object({
-          companyGroupId: z.cuid(),
+          companyGroupId: z.string(),
         }),
         body: z.object({
           name: z.string(),

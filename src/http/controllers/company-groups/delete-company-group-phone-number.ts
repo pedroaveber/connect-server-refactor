@@ -18,8 +18,8 @@ export const deleteCompanyGroupPhoneNumber: FastifyPluginCallbackZod = (
         security: [{ BearerAuth: [] }],
         description: "Delete company group phone number",
         params: z.object({
-          companyGroupId: z.cuid(),
-          phoneId: z.cuid(),
+          companyGroupId: z.string(),
+          phoneId: z.string(),
         }),
         response: {
           204: z.null(),

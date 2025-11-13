@@ -17,7 +17,7 @@ export const createUnit: FastifyPluginCallbackZod = (app) => {
         description: "Create unit",
         body: z.object({
           name: z.string(),
-          companyId: z.cuid().meta({
+          companyId: z.string().meta({
             description: "Company ID",
           }),
           companyGroupId: z.string().meta({
@@ -26,7 +26,7 @@ export const createUnit: FastifyPluginCallbackZod = (app) => {
         }),
         response: {
           201: z.object({
-            id: z.cuid(),
+            id: z.string(),
           }),
         },
       },

@@ -16,7 +16,7 @@ export const createBasePhoneNumber: FastifyPluginCallbackZod = (app) => {
         security: [{ BearerAuth: [] }],
         description: "Create a phone number for a base",
         params: z.object({
-          baseId: z.cuid(),
+          baseId: z.string(),
         }),
         body: z.object({
           isWhatsapp: z.boolean().default(false),
@@ -27,7 +27,7 @@ export const createBasePhoneNumber: FastifyPluginCallbackZod = (app) => {
         }),
         response: {
           201: z.object({
-            id: z.cuid(),
+            id: z.string(),
           }),
         },
       },

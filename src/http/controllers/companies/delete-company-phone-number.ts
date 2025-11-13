@@ -16,8 +16,8 @@ export const deleteCompanyPhoneNumber: FastifyPluginCallbackZod = (app) => {
         security: [{ BearerAuth: [] }],
         description: "Delete company phone number",
         params: z.object({
-          companyId: z.cuid(),
-          phoneId: z.cuid(),
+          companyId: z.string(),
+          phoneId: z.string(),
         }),
         response: {
           204: z.null(),

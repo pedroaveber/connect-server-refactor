@@ -273,9 +273,7 @@
         "parameters": [
           {
             "schema": {
-              "type": "string",
-              "format": "cuid",
-              "pattern": "^[cC][^\\s-]{8,}$"
+              "type": "string"
             },
             "in": "path",
             "name": "id",
@@ -324,9 +322,7 @@
                 "type": "object",
                 "properties": {
                   "id": {
-                    "type": "string",
-                    "format": "cuid",
-                    "pattern": "^[cC][^\\s-]{8,}$"
+                    "type": "string"
                   },
                   "name": {
                     "type": "string"
@@ -365,9 +361,7 @@
         "parameters": [
           {
             "schema": {
-              "type": "string",
-              "format": "cuid",
-              "pattern": "^[cC][^\\s-]{8,}$"
+              "type": "string"
             },
             "in": "path",
             "name": "id",
@@ -418,9 +412,7 @@
         "parameters": [
           {
             "schema": {
-              "type": "string",
-              "format": "cuid",
-              "pattern": "^[cC][^\\s-]{8,}$"
+              "type": "string"
             },
             "in": "path",
             "name": "id",
@@ -477,9 +469,7 @@
                       "type": "object",
                       "properties": {
                         "id": {
-                          "type": "string",
-                          "format": "cuid",
-                          "pattern": "^[cC][^\\s-]{8,}$"
+                          "type": "string"
                         },
                         "name": {
                           "type": "string"
@@ -570,24 +560,16 @@
                     "type": "string"
                   },
                   "companyGroupId": {
-                    "type": "string",
-                    "format": "cuid",
-                    "pattern": "^[cC][^\\s-]{8,}$"
+                    "type": "string"
                   },
                   "companyId": {
-                    "type": "string",
-                    "format": "cuid",
-                    "pattern": "^[cC][^\\s-]{8,}$"
+                    "type": "string"
                   },
                   "unitId": {
-                    "type": "string",
-                    "format": "cuid",
-                    "pattern": "^[cC][^\\s-]{8,}$"
+                    "type": "string"
                   },
                   "baseId": {
-                    "type": "string",
-                    "format": "cuid",
-                    "pattern": "^[cC][^\\s-]{8,}$"
+                    "type": "string"
                   },
                   "licensePlate": {
                     "description": "License plate of the ambulance",
@@ -624,9 +606,7 @@
                   "type": "object",
                   "properties": {
                     "id": {
-                      "type": "string",
-                      "format": "cuid",
-                      "pattern": "^[cC][^\\s-]{8,}$"
+                      "type": "string"
                     }
                   },
                   "required": [
@@ -650,9 +630,7 @@
         "parameters": [
           {
             "schema": {
-              "type": "string",
-              "format": "cuid",
-              "pattern": "^[cC][^\\s-]{8,}$"
+              "type": "string"
             },
             "in": "path",
             "name": "id",
@@ -685,9 +663,7 @@
         "parameters": [
           {
             "schema": {
-              "type": "string",
-              "format": "cuid",
-              "pattern": "^[cC][^\\s-]{8,}$"
+              "type": "string"
             },
             "in": "path",
             "name": "id",
@@ -857,9 +833,7 @@
                             "type": "object",
                             "properties": {
                               "id": {
-                                "type": "string",
-                                "format": "cuid",
-                                "pattern": "^[cC][^\\s-]{8,}$"
+                                "type": "string"
                               },
                               "fromStatus": {
                                 "type": "string",
@@ -893,9 +867,7 @@
                                 "type": "object",
                                 "properties": {
                                   "id": {
-                                    "type": "string",
-                                    "format": "cuid",
-                                    "pattern": "^[cC][^\\s-]{8,}$"
+                                    "type": "string"
                                   },
                                   "name": {
                                     "type": "string"
@@ -980,9 +952,7 @@
         "parameters": [
           {
             "schema": {
-              "type": "string",
-              "format": "cuid",
-              "pattern": "^[cC][^\\s-]{8,}$"
+              "type": "string"
             },
             "in": "path",
             "name": "id",
@@ -1049,9 +1019,7 @@
         "parameters": [
           {
             "schema": {
-              "type": "string",
-              "format": "cuid",
-              "pattern": "^[cC][^\\s-]{8,}$"
+              "type": "string"
             },
             "in": "path",
             "name": "id",
@@ -1328,9 +1296,7 @@
           },
           {
             "schema": {
-              "type": "string",
-              "format": "cuid",
-              "pattern": "^[cC][^\\s-]{8,}$"
+              "type": "string"
             },
             "in": "query",
             "name": "unitId",
@@ -1338,9 +1304,7 @@
           },
           {
             "schema": {
-              "type": "string",
-              "format": "cuid",
-              "pattern": "^[cC][^\\s-]{8,}$"
+              "type": "string"
             },
             "in": "query",
             "name": "companyId",
@@ -1348,9 +1312,7 @@
           },
           {
             "schema": {
-              "type": "string",
-              "format": "cuid",
-              "pattern": "^[cC][^\\s-]{8,}$"
+              "type": "string"
             },
             "in": "query",
             "name": "companyGroupId",
@@ -1376,9 +1338,7 @@
                         "type": "object",
                         "properties": {
                           "id": {
-                            "type": "string",
-                            "format": "cuid",
-                            "pattern": "^[cC][^\\s-]{8,}$"
+                            "type": "string"
                           },
                           "name": {
                             "type": "string"
@@ -1387,9 +1347,7 @@
                             "type": "object",
                             "properties": {
                               "id": {
-                                "type": "string",
-                                "format": "cuid",
-                                "pattern": "^[cC][^\\s-]{8,}$"
+                                "type": "string"
                               },
                               "name": {
                                 "type": "string"
@@ -1494,9 +1452,7 @@
         "parameters": [
           {
             "schema": {
-              "type": "string",
-              "format": "cuid",
-              "pattern": "^[cC][^\\s-]{8,}$"
+              "type": "string"
             },
             "in": "path",
             "name": "id",
@@ -1530,9 +1486,7 @@
         "parameters": [
           {
             "schema": {
-              "type": "string",
-              "format": "cuid",
-              "pattern": "^[cC][^\\s-]{8,}$"
+              "type": "string"
             },
             "in": "path",
             "name": "id",
@@ -1587,9 +1541,7 @@
                             "type": "object",
                             "properties": {
                               "id": {
-                                "type": "string",
-                                "format": "cuid",
-                                "pattern": "^[cC][^\\s-]{8,}$"
+                                "type": "string"
                               },
                               "number": {
                                 "type": "string"
@@ -1620,9 +1572,7 @@
                           "type": "object",
                           "properties": {
                             "id": {
-                              "type": "string",
-                              "format": "cuid",
-                              "pattern": "^[cC][^\\s-]{8,}$"
+                              "type": "string"
                             },
                             "name": {
                               "type": "string"
@@ -1631,9 +1581,7 @@
                               "type": "object",
                               "properties": {
                                 "id": {
-                                  "type": "string",
-                                  "format": "cuid",
-                                  "pattern": "^[cC][^\\s-]{8,}$"
+                                  "type": "string"
                                 },
                                 "name": {
                                   "type": "string"
@@ -1645,9 +1593,7 @@
                                   "type": "object",
                                   "properties": {
                                     "id": {
-                                      "type": "string",
-                                      "format": "cuid",
-                                      "pattern": "^[cC][^\\s-]{8,}$"
+                                      "type": "string"
                                     },
                                     "name": {
                                       "type": "string"
@@ -1714,9 +1660,7 @@
         "parameters": [
           {
             "schema": {
-              "type": "string",
-              "format": "cuid",
-              "pattern": "^[cC][^\\s-]{8,}$"
+              "type": "string"
             },
             "in": "path",
             "name": "id",
@@ -1778,9 +1722,7 @@
         "parameters": [
           {
             "schema": {
-              "type": "string",
-              "format": "cuid",
-              "pattern": "^[cC][^\\s-]{8,}$"
+              "type": "string"
             },
             "in": "path",
             "name": "baseId",
@@ -1801,9 +1743,7 @@
                   "type": "object",
                   "properties": {
                     "id": {
-                      "type": "string",
-                      "format": "cuid",
-                      "pattern": "^[cC][^\\s-]{8,}$"
+                      "type": "string"
                     }
                   },
                   "required": [
@@ -1828,9 +1768,7 @@
         "parameters": [
           {
             "schema": {
-              "type": "string",
-              "format": "cuid",
-              "pattern": "^[cC][^\\s-]{8,}$"
+              "type": "string"
             },
             "in": "path",
             "name": "baseId",
@@ -1838,9 +1776,7 @@
           },
           {
             "schema": {
-              "type": "string",
-              "format": "cuid",
-              "pattern": "^[cC][^\\s-]{8,}$"
+              "type": "string"
             },
             "in": "path",
             "name": "phoneId",
@@ -1895,9 +1831,7 @@
                   },
                   "companyGroupId": {
                     "description": "Company group ID",
-                    "type": "string",
-                    "format": "cuid",
-                    "pattern": "^[cC][^\\s-]{8,}$"
+                    "type": "string"
                   },
                   "phones": {
                     "type": "array",
@@ -1946,9 +1880,7 @@
                   "type": "object",
                   "properties": {
                     "id": {
-                      "type": "string",
-                      "format": "cuid",
-                      "pattern": "^[cC][^\\s-]{8,}$"
+                      "type": "string"
                     }
                   },
                   "required": [
@@ -2009,9 +1941,7 @@
           },
           {
             "schema": {
-              "type": "string",
-              "format": "cuid",
-              "pattern": "^[cC][^\\s-]{8,}$"
+              "type": "string"
             },
             "in": "query",
             "name": "companyGroupId",
@@ -2037,9 +1967,7 @@
                         "type": "object",
                         "properties": {
                           "id": {
-                            "type": "string",
-                            "format": "cuid",
-                            "pattern": "^[cC][^\\s-]{8,}$"
+                            "type": "string"
                           },
                           "name": {
                             "type": "string"
@@ -2147,9 +2075,7 @@
         "parameters": [
           {
             "schema": {
-              "type": "string",
-              "format": "cuid",
-              "pattern": "^[cC][^\\s-]{8,}$"
+              "type": "string"
             },
             "in": "path",
             "name": "companyId",
@@ -2188,9 +2114,7 @@
         "parameters": [
           {
             "schema": {
-              "type": "string",
-              "format": "cuid",
-              "pattern": "^[cC][^\\s-]{8,}$"
+              "type": "string"
             },
             "in": "path",
             "name": "companyId",
@@ -2229,9 +2153,7 @@
         "parameters": [
           {
             "schema": {
-              "type": "string",
-              "format": "cuid",
-              "pattern": "^[cC][^\\s-]{8,}$"
+              "type": "string"
             },
             "in": "path",
             "name": "companyId",
@@ -2255,9 +2177,7 @@
                       "type": "object",
                       "properties": {
                         "id": {
-                          "type": "string",
-                          "format": "cuid",
-                          "pattern": "^[cC][^\\s-]{8,}$"
+                          "type": "string"
                         },
                         "name": {
                           "type": "string"
@@ -2266,9 +2186,7 @@
                           "type": "string"
                         },
                         "companyGroupId": {
-                          "type": "string",
-                          "format": "cuid",
-                          "pattern": "^[cC][^\\s-]{8,}$"
+                          "type": "string"
                         },
                         "unitsCount": {
                           "type": "number"
@@ -2285,9 +2203,7 @@
                           "type": "object",
                           "properties": {
                             "id": {
-                              "type": "string",
-                              "format": "cuid",
-                              "pattern": "^[cC][^\\s-]{8,}$"
+                              "type": "string"
                             },
                             "name": {
                               "type": "string"
@@ -2309,9 +2225,7 @@
                             "type": "object",
                             "properties": {
                               "id": {
-                                "type": "string",
-                                "format": "cuid",
-                                "pattern": "^[cC][^\\s-]{8,}$"
+                                "type": "string"
                               },
                               "name": {
                                 "nullable": true,
@@ -2400,9 +2314,7 @@
         "parameters": [
           {
             "schema": {
-              "type": "string",
-              "format": "cuid",
-              "pattern": "^[cC][^\\s-]{8,}$"
+              "type": "string"
             },
             "in": "path",
             "name": "companyId",
@@ -2423,9 +2335,7 @@
                   "type": "object",
                   "properties": {
                     "id": {
-                      "type": "string",
-                      "format": "cuid",
-                      "pattern": "^[cC][^\\s-]{8,}$"
+                      "type": "string"
                     }
                   },
                   "required": [
@@ -2450,9 +2360,7 @@
         "parameters": [
           {
             "schema": {
-              "type": "string",
-              "format": "cuid",
-              "pattern": "^[cC][^\\s-]{8,}$"
+              "type": "string"
             },
             "in": "path",
             "name": "companyId",
@@ -2460,9 +2368,7 @@
           },
           {
             "schema": {
-              "type": "string",
-              "format": "cuid",
-              "pattern": "^[cC][^\\s-]{8,}$"
+              "type": "string"
             },
             "in": "path",
             "name": "phoneId",
@@ -2562,9 +2468,7 @@
                   "type": "object",
                   "properties": {
                     "id": {
-                      "type": "string",
-                      "format": "cuid",
-                      "pattern": "^[cC][^\\s-]{8,}$"
+                      "type": "string"
                     }
                   },
                   "required": [
@@ -2643,9 +2547,7 @@
                         "type": "object",
                         "properties": {
                           "id": {
-                            "type": "string",
-                            "format": "cuid",
-                            "pattern": "^[cC][^\\s-]{8,}$"
+                            "type": "string"
                           },
                           "name": {
                             "type": "string"
@@ -2663,6 +2565,39 @@
                           "updatedAt": {
                             "type": "string",
                             "format": "date-time"
+                          },
+                          "phones": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "type": "string"
+                                },
+                                "number": {
+                                  "type": "string"
+                                },
+                                "name": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "isWhatsapp": {
+                                  "type": "boolean"
+                                },
+                                "createdAt": {
+                                  "type": "string",
+                                  "format": "date-time"
+                                }
+                              },
+                              "required": [
+                                "id",
+                                "number",
+                                "name",
+                                "isWhatsapp",
+                                "createdAt"
+                              ],
+                              "additionalProperties": false
+                            }
                           }
                         },
                         "required": [
@@ -2671,7 +2606,8 @@
                           "document",
                           "companiesCount",
                           "createdAt",
-                          "updatedAt"
+                          "updatedAt",
+                          "phones"
                         ],
                         "additionalProperties": false
                       }
@@ -2753,9 +2689,7 @@
         "parameters": [
           {
             "schema": {
-              "type": "string",
-              "format": "cuid",
-              "pattern": "^[cC][^\\s-]{8,}$"
+              "type": "string"
             },
             "in": "path",
             "name": "companyGroupId",
@@ -2794,9 +2728,7 @@
         "parameters": [
           {
             "schema": {
-              "type": "string",
-              "format": "cuid",
-              "pattern": "^[cC][^\\s-]{8,}$"
+              "type": "string"
             },
             "in": "path",
             "name": "companyGroupId",
@@ -2835,9 +2767,7 @@
         "parameters": [
           {
             "schema": {
-              "type": "string",
-              "format": "cuid",
-              "pattern": "^[cC][^\\s-]{8,}$"
+              "type": "string"
             },
             "in": "path",
             "name": "companyGroupId",
@@ -2861,9 +2791,7 @@
                       "type": "object",
                       "properties": {
                         "id": {
-                          "type": "string",
-                          "format": "cuid",
-                          "pattern": "^[cC][^\\s-]{8,}$"
+                          "type": "string"
                         },
                         "name": {
                           "type": "string"
@@ -2893,9 +2821,7 @@
                             "type": "object",
                             "properties": {
                               "id": {
-                                "type": "string",
-                                "format": "cuid",
-                                "pattern": "^[cC][^\\s-]{8,}$"
+                                "type": "string"
                               },
                               "number": {
                                 "type": "string"
@@ -2986,9 +2912,7 @@
         "parameters": [
           {
             "schema": {
-              "type": "string",
-              "format": "cuid",
-              "pattern": "^[cC][^\\s-]{8,}$"
+              "type": "string"
             },
             "in": "path",
             "name": "companyGroupId",
@@ -3009,9 +2933,7 @@
                   "type": "object",
                   "properties": {
                     "id": {
-                      "type": "string",
-                      "format": "cuid",
-                      "pattern": "^[cC][^\\s-]{8,}$"
+                      "type": "string"
                     }
                   },
                   "required": [
@@ -3036,9 +2958,7 @@
         "parameters": [
           {
             "schema": {
-              "type": "string",
-              "format": "cuid",
-              "pattern": "^[cC][^\\s-]{8,}$"
+              "type": "string"
             },
             "in": "path",
             "name": "companyGroupId",
@@ -3046,9 +2966,7 @@
           },
           {
             "schema": {
-              "type": "string",
-              "format": "cuid",
-              "pattern": "^[cC][^\\s-]{8,}$"
+              "type": "string"
             },
             "in": "path",
             "name": "phoneId",
@@ -3097,9 +3015,7 @@
                   },
                   "companyId": {
                     "description": "Company ID",
-                    "type": "string",
-                    "format": "cuid",
-                    "pattern": "^[cC][^\\s-]{8,}$"
+                    "type": "string"
                   },
                   "companyGroupId": {
                     "description": "Company Group ID",
@@ -3130,9 +3046,7 @@
                   "type": "object",
                   "properties": {
                     "id": {
-                      "type": "string",
-                      "format": "cuid",
-                      "pattern": "^[cC][^\\s-]{8,}$"
+                      "type": "string"
                     }
                   },
                   "required": [
@@ -3193,9 +3107,7 @@
           },
           {
             "schema": {
-              "type": "string",
-              "format": "cuid",
-              "pattern": "^[cC][^\\s-]{8,}$"
+              "type": "string"
             },
             "in": "query",
             "name": "companyGroupId",
@@ -3203,9 +3115,7 @@
           },
           {
             "schema": {
-              "type": "string",
-              "format": "cuid",
-              "pattern": "^[cC][^\\s-]{8,}$"
+              "type": "string"
             },
             "in": "query",
             "name": "companyId",
@@ -3231,9 +3141,7 @@
                         "type": "object",
                         "properties": {
                           "id": {
-                            "type": "string",
-                            "format": "cuid",
-                            "pattern": "^[cC][^\\s-]{8,}$"
+                            "type": "string"
                           },
                           "name": {
                             "type": "string"
@@ -3242,9 +3150,7 @@
                             "type": "object",
                             "properties": {
                               "id": {
-                                "type": "string",
-                                "format": "cuid",
-                                "pattern": "^[cC][^\\s-]{8,}$"
+                                "type": "string"
                               },
                               "name": {
                                 "type": "string"
@@ -3349,9 +3255,7 @@
         "parameters": [
           {
             "schema": {
-              "type": "string",
-              "format": "cuid",
-              "pattern": "^[cC][^\\s-]{8,}$"
+              "type": "string"
             },
             "in": "path",
             "name": "unitId",
@@ -3390,9 +3294,7 @@
         "parameters": [
           {
             "schema": {
-              "type": "string",
-              "format": "cuid",
-              "pattern": "^[cC][^\\s-]{8,}$"
+              "type": "string"
             },
             "in": "path",
             "name": "unitId",
@@ -3431,9 +3333,7 @@
         "parameters": [
           {
             "schema": {
-              "type": "string",
-              "format": "cuid",
-              "pattern": "^[cC][^\\s-]{8,}$"
+              "type": "string"
             },
             "in": "path",
             "name": "unitId",
@@ -3457,9 +3357,7 @@
                       "type": "object",
                       "properties": {
                         "id": {
-                          "type": "string",
-                          "format": "cuid",
-                          "pattern": "^[cC][^\\s-]{8,}$"
+                          "type": "string"
                         },
                         "name": {
                           "type": "string"
@@ -3479,9 +3377,7 @@
                           "type": "object",
                           "properties": {
                             "id": {
-                              "type": "string",
-                              "format": "cuid",
-                              "pattern": "^[cC][^\\s-]{8,}$"
+                              "type": "string"
                             },
                             "name": {
                               "type": "string"
@@ -3493,9 +3389,7 @@
                               "type": "object",
                               "properties": {
                                 "id": {
-                                  "type": "string",
-                                  "format": "cuid",
-                                  "pattern": "^[cC][^\\s-]{8,}$"
+                                  "type": "string"
                                 },
                                 "name": {
                                   "type": "string"
@@ -3554,9 +3448,7 @@
         "parameters": [
           {
             "schema": {
-              "type": "string",
-              "format": "cuid",
-              "pattern": "^[cC][^\\s-]{8,}$"
+              "type": "string"
             },
             "in": "path",
             "name": "unitId",
@@ -3564,9 +3456,7 @@
           },
           {
             "schema": {
-              "type": "string",
-              "format": "cuid",
-              "pattern": "^[cC][^\\s-]{8,}$"
+              "type": "string"
             },
             "in": "path",
             "name": "phoneId",
@@ -3669,32 +3559,24 @@
                     }
                   },
                   "companyGroupId": {
-                    "type": "string",
-                    "format": "cuid",
-                    "pattern": "^[cC][^\\s-]{8,}$"
+                    "type": "string"
                   },
                   "companiesIds": {
                     "type": "array",
                     "items": {
-                      "type": "string",
-                      "format": "cuid",
-                      "pattern": "^[cC][^\\s-]{8,}$"
+                      "type": "string"
                     }
                   },
                   "unitsIds": {
                     "type": "array",
                     "items": {
-                      "type": "string",
-                      "format": "cuid",
-                      "pattern": "^[cC][^\\s-]{8,}$"
+                      "type": "string"
                     }
                   },
                   "basesIds": {
                     "type": "array",
                     "items": {
-                      "type": "string",
-                      "format": "cuid",
-                      "pattern": "^[cC][^\\s-]{8,}$"
+                      "type": "string"
                     }
                   }
                 },
@@ -3892,9 +3774,7 @@
                 "type": "object",
                 "properties": {
                   "companyGroupId": {
-                    "type": "string",
-                    "format": "cuid",
-                    "pattern": "^[cC][^\\s-]{8,}$"
+                    "type": "string"
                   }
                 },
                 "required": [
@@ -3989,9 +3869,7 @@
                   },
                   "birthDate": {},
                   "companyGroupId": {
-                    "type": "string",
-                    "format": "cuid",
-                    "pattern": "^[cC][^\\s-]{8,}$"
+                    "type": "string"
                   },
                   "companiesIds": {
                     "type": "array",
@@ -4112,6 +3990,202 @@
                   },
                   "required": [
                     "message"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/me": {
+      "get": {
+        "operationId": "getAuthenticatedUser",
+        "summary": "Get authenticated user",
+        "tags": [
+          "User"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "document": {
+                          "type": "string"
+                        },
+                        "avatarUrl": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "roles": {
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "enum": [
+                              "companyGroup:read",
+                              "companyGroup:update",
+                              "companyGroup:createPhoneNumber",
+                              "companyGroup:deletePhoneNumber",
+                              "companyGroup:updatePhoneNumber",
+                              "company:create",
+                              "company:read",
+                              "company:update",
+                              "company:delete",
+                              "company:createPhoneNumber",
+                              "company:deletePhoneNumber",
+                              "company:updatePhoneNumber",
+                              "unit:create",
+                              "unit:read",
+                              "unit:update",
+                              "unit:delete",
+                              "unit:createPhoneNumber",
+                              "unit:deletePhoneNumber",
+                              "unit:updatePhoneNumber",
+                              "base:create",
+                              "base:read",
+                              "base:update",
+                              "base:delete",
+                              "base:createPhoneNumber",
+                              "base:deletePhoneNumber",
+                              "base:updatePhoneNumber",
+                              "user:create",
+                              "user:read",
+                              "user:update",
+                              "user:delete",
+                              "user:assignRole",
+                              "ambulance:create",
+                              "ambulance:read",
+                              "ambulance:update",
+                              "ambulance:delete",
+                              "ambulance:switchBase",
+                              "ambulance:switchStatus",
+                              "ambulanceDocuments:create",
+                              "ambulanceDocuments:update",
+                              "ambulanceDocuments:delete",
+                              "ambulanceDocuments:bulkUpdate",
+                              "sys_admin:accessAll"
+                            ]
+                          }
+                        },
+                        "companyGroup": {
+                          "nullable": true,
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string"
+                            },
+                            "name": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "name"
+                          ],
+                          "additionalProperties": false
+                        },
+                        "companies": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "name": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "name"
+                            ],
+                            "additionalProperties": false
+                          }
+                        },
+                        "units": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "name": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "name"
+                            ],
+                            "additionalProperties": false
+                          }
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name",
+                        "document",
+                        "avatarUrl",
+                        "roles",
+                        "companyGroup",
+                        "companies",
+                        "units"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/init": {
+      "post": {
+        "operationId": "createInitialUser",
+        "summary": "Create initial user",
+        "tags": [
+          "User"
+        ],
+        "responses": {
+          "201": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id"
                   ],
                   "additionalProperties": false
                 }

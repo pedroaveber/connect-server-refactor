@@ -15,7 +15,7 @@ export const updateAmbulance: FastifyPluginCallbackZod = (app) => {
         summary: "Update an ambulance",
         operationId: "updateAmbulance",
         security: [{ BearerAuth: [] }],
-        params: z.object({ id: z.cuid() }),
+        params: z.object({ id: z.string() }),
         body: z.object({
           name: z.string(),
           licensePlate: z.string(),

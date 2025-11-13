@@ -17,16 +17,16 @@ export const createAmbulance: FastifyPluginCallbackZod = (app) => {
         security: [{ BearerAuth: [] }],
         body: z.object({
           name: z.string(),
-          companyGroupId: z.cuid(),
-          companyId: z.cuid(),
-          unitId: z.cuid(),
-          baseId: z.cuid(),
+          companyGroupId: z.string(),
+          companyId: z.string(),
+          unitId: z.string(),
+          baseId: z.string(),
           licensePlate: z.string().meta({
             description: "License plate of the ambulance",
           }),
           observations: z.string().optional(),
         }),
-        response: { 201: z.object({ id: z.cuid() }) },
+        response: { 201: z.object({ id: z.string() }) },
       },
     },
     async (request, reply) => {

@@ -13,7 +13,7 @@ export const getAmbulance: FastifyPluginCallbackZod = (app) => {
       schema: {
         tags: ["Ambulance"],
         summary: "Get ambulance by ID",
-        params: z.object({ id: z.cuid() }),
+        params: z.object({ id: z.string() }),
         operationId: "getAmbulance",
         response: {
           200: z.object({
@@ -55,12 +55,12 @@ export const getAmbulance: FastifyPluginCallbackZod = (app) => {
               ),
               statusHistory: z.array(
                 z.object({
-                  id: z.cuid(),
+                  id: z.string(),
                   fromStatus: zodAmbulanceStatusEnum,
                   toStatus: zodAmbulanceStatusEnum,
                   createdAt: z.date(),
                   user: z.object({
-                    id: z.cuid(),
+                    id: z.string(),
                     name: z.string(),
                   }),
                 })

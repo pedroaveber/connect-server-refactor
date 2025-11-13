@@ -32,7 +32,7 @@ export const createCompanyGroup: FastifyPluginCallbackZod = (app) => {
         }),
         response: {
           201: z.object({
-            id: z.cuid(),
+            id: z.string(),
           }),
         },
       },

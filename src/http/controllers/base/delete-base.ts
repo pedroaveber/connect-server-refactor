@@ -13,7 +13,7 @@ export const deleteBase: FastifyPluginCallbackZod = (app) => {
         tags: ["Base"],
         summary: "Delete base",
         operationId: "deleteBase",
-        params: z.object({ id: z.cuid() }),
+        params: z.object({ id: z.string() }),
         response: { 204: z.null() },
       },
     },
