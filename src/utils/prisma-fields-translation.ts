@@ -124,6 +124,7 @@ const fieldTranslations: Record<string, string> = {
 
 // Traduz modelo ou campo
 export function translateName(name: string, isModel = false): string {
+  console.log(name, isModel);
   const translations = isModel ? modelTranslations : fieldTranslations;
   return translations[name] || name;
 }
@@ -133,7 +134,5 @@ export function formatFieldName(fieldName: string | undefined): string {
   if (!fieldName) {
     return "";
   }
-  return translateName(fieldName)
-    .toLowerCase()
-    .replace(/_/g, " ");
+  return translateName(fieldName).toLowerCase().replace(/_/g, " ");
 }

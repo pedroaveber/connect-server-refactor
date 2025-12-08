@@ -4,6 +4,7 @@ import { prisma } from "@/database/prisma";
 import { auth } from "@/http/hooks/auth";
 import { Permission, PermissionSchema } from "@/data/permissions";
 import { UnauthorizedException } from "@/http/exceptions/unauthorized-exception";
+import { Platform } from "@prisma/client";
 
 export const getAuthenticatedUser: FastifyPluginCallbackZod = (app) => {
   app.get(
@@ -20,7 +21,7 @@ export const getAuthenticatedUser: FastifyPluginCallbackZod = (app) => {
             data: z.object({
               id: z.string(),
               name: z.string(),
-              document: z.string(),
+              document: z.string().nullable(),
               avatarUrl: z.string().nullable(),
               roles: z.array(PermissionSchema),
               companyGroup: z
@@ -41,6 +42,33 @@ export const getAuthenticatedUser: FastifyPluginCallbackZod = (app) => {
                   name: z.string(),
                 })
               ),
+              ambulance: z
+                .object({
+                  id: z.string(),
+                  name: z.string(),
+                  status: z.string(),
+                  ambulanceShiftHistories: z.array(
+                    z.object({
+                      shiftStart: z.date(),
+                      shiftEnd: z.date().nullable(),
+                    })
+                  ),
+                  licensePlate: z.string(),
+                  chats: z.array(
+                    z.object({
+                      id: z.string(),
+                      readByAppAt: z.date().nullable(),
+                      readByWebAt: z.date().nullable(),
+                      messages: z.array(
+                        z.object({
+                          createdAt: z.date(),
+                        })
+                      ),
+                    })
+                  ),
+                  unitId: z.string(),
+                })
+                .nullable(),
             }),
           }),
         },
@@ -73,6 +101,41 @@ export const getAuthenticatedUser: FastifyPluginCallbackZod = (app) => {
             select: {
               id: true,
               name: true,
+            },
+          },
+
+          ambulance: {
+            select: {
+              id: true,
+              name: true,
+              status: true,
+              ambulanceShiftHistories: {
+                select: {
+                  shiftStart: true,
+                  shiftEnd: true,
+                },
+                orderBy: { createdAt: "desc" },
+                take: 1,
+              },
+              licensePlate: true,
+              chats: {
+                select: {
+                  id: true,
+                  readByAppAt: true,
+                  readByWebAt: true,
+                  messages: {
+                    orderBy: { createdAt: "desc" },
+                    take: 1,
+                    where: {
+                      platform: Platform.WEB,
+                    },
+                    select: {
+                      createdAt: true,
+                    },
+                  },
+                },
+              },
+              unitId: true,
             },
           },
         },

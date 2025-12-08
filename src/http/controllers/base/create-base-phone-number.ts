@@ -6,7 +6,7 @@ import { permissions } from "@/data/permissions";
 
 export const createBasePhoneNumber: FastifyPluginCallbackZod = (app) => {
   app.post(
-    "/bases/:baseId/phones",
+    "/base/:baseId/phones",
     {
       preHandler: [auth],
       schema: {
@@ -14,46 +14,55 @@ export const createBasePhoneNumber: FastifyPluginCallbackZod = (app) => {
         summary: "Create base phone number",
         operationId: "createBasePhoneNumber",
         security: [{ BearerAuth: [] }],
-        description: "Create a phone number for a base",
+        description: "Create base phone number",
         params: z.object({
           baseId: z.string(),
         }),
-        body: z.object({
-          isWhatsapp: z.boolean().default(false),
-          name: z.string().optional(),
-          number: z.string().meta({
-            description: "Brazilian phone number (example: +5511999999999)",
-          }),
-        }),
+        body: z.array(
+          z.object({
+            name: z
+              .string()
+              .meta({
+                description: "Phone name",
+              })
+              .optional(),
+            isWhatsapp: z
+              .boolean()
+              .meta({
+                description: "Is whatsapp",
+              })
+              .optional()
+              .default(false),
+            number: z.string().meta({
+              description: "Brazilian phone number (example: +5511999999999)",
+            }),
+          })
+        ),
         response: {
           201: z.object({
-            id: z.string(),
+            count: z.number(),
           }),
         },
       },
     },
     async (request, reply) => {
-      await request.authorize({
+      request.authorize({
+        permission: permissions.base.createPhoneNumber,
         target: {
           baseId: request.params.baseId,
         },
-        permission: permissions.base.createPhoneNumber,
       });
 
       const { baseId } = request.params;
-      const { number, isWhatsapp, name } = request.body;
-
-      const newPhone = await prisma.phone.create({
-        data: {
-          name,
+      const newPhone = await prisma.phone.createMany({
+        data: request.body.map((phone) => ({
+          ...phone,
           baseId,
-          number,
-          isWhatsapp,
-        },
+        })),
       });
 
       return reply.status(201).send({
-        id: newPhone.id,
+        count: newPhone.count,
       });
     }
   );

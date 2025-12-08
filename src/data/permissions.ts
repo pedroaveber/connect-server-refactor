@@ -65,6 +65,20 @@ export const permissions = {
   sys_admin: {
     accessAll: "sys_admin:accessAll",
   },
+  chat: {
+    create: "chat:create",
+    delete: "chat:delete",
+    read: "chat:read",
+    sendMessage: "chat:sendMessage",
+  },
+  driver: {
+    read: "driver:read",
+    create: "driver:create",
+    update: "driver:update",
+    delete: "driver:delete",
+
+    driver: "driver:driver",
+  },
 } as const;
 
 // 🔒 Tipo automático — gera um tipo union com todas as permissões ("company:create" | "user:read" | ...)

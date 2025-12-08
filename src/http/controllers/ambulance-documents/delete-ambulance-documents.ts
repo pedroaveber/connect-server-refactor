@@ -6,7 +6,7 @@ import { z } from "zod";
 
 export const deleteAmbulanceDocument: FastifyPluginCallbackZod = (app) => {
   app.delete(
-    "/ambulances/documents/:id",
+    "/ambulances/documents/:id/:baseId",
     {
       preHandler: [auth],
       schema: {

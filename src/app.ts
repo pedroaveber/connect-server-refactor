@@ -15,6 +15,7 @@ import { env } from "./env";
 import { errorHandler } from "./error-handler";
 import Routing from "./routes";
 import authorizePlugin from "./http/hooks/permissions/authorize-plugin";
+import qs from "qs";
 
 export const app = fastify({
   logger: {
@@ -26,6 +27,7 @@ export const app = fastify({
       },
     },
   },
+  querystringParser: (str) => qs.parse(str),
 }).withTypeProvider<ZodTypeProvider>();
 
 app.setSerializerCompiler(serializerCompiler);
@@ -39,7 +41,7 @@ app.setValidatorCompiler(validatorCompiler);
 
 app.register(fastifyCors, {
   origin: ["http://localhost:5173"],
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
   credentials: true,
 });
 

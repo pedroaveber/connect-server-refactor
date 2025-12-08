@@ -23,34 +23,34 @@ export const getAmbulance: FastifyPluginCallbackZod = (app) => {
               status: zodAmbulanceStatusEnum,
               observations: z.string().nullable(),
               licensePlate: z.string(),
+              ambulanceCode: z.string(),
+              companyGroup: z.object({
+                id: z.string(),
+                name: z.string(),
+                document: z.string(),
+              }),
+              company: z.object({
+                id: z.string(),
+                name: z.string(),
+                document: z.string(),
+              }),
+              unit: z.object({
+                id: z.string(),
+                name: z.string(),
+              }),
               base: z.object({
                 id: z.string(),
                 name: z.string(),
                 document: z.string().nullable(),
-                unit: z.object({
-                  id: z.string(),
-                  name: z.string(),
-                  company: z.object({
-                    id: z.string(),
-                    name: z.string(),
-                    document: z.string(),
-                    companyGroup: z.object({
-                      id: z.string(),
-                      name: z.string(),
-                      document: z.string(),
-                    }),
-                  }),
-                }),
               }),
               documents: z.array(
                 z.object({
                   id: z.string(),
-                  name: z.string(),
-                  downloadUrl: z.string(),
-                  fileExtension: z.string(),
-                  fileSize: z.number(),
+                  title: z.string(),
+                  type: z.string(),
+                  content: z.string(),
+                  validUntil: z.string().nullable(),
                   createdAt: z.date(),
-                  expiresAt: z.date(),
                 })
               ),
               statusHistory: z.array(
@@ -79,31 +79,31 @@ export const getAmbulance: FastifyPluginCallbackZod = (app) => {
           documents: {
             where: { deletedAt: null },
           },
+          companyGroup: {
+            select: {
+              id: true,
+              name: true,
+              document: true,
+            },
+          },
+          company: {
+            select: {
+              id: true,
+              name: true,
+              document: true,
+            },
+          },
+          unit: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
           base: {
             select: {
               id: true,
               name: true,
               document: true,
-              unit: {
-                select: {
-                  id: true,
-                  name: true,
-                  company: {
-                    select: {
-                      id: true,
-                      name: true,
-                      document: true,
-                      companyGroup: {
-                        select: {
-                          id: true,
-                          name: true,
-                          document: true,
-                        },
-                      },
-                    },
-                  },
-                },
-              },
             },
           },
           statusHistory: {

@@ -20,17 +20,18 @@ export const getBases: FastifyPluginCallbackZod = (app) => {
             page: z.coerce.number().int().min(1).default(1),
             perPage: z.coerce.number().int().min(1).default(10),
             name: z.string().optional(),
-            unitId: z.string().optional(),
-            companyId: z.string().optional(),
+            unitsId: z.array(z.string()).optional(),
+            companiesId: z.array(z.string()).optional(),
             companyGroupId: z.string().optional(),
           })
           .refine(
             (data) =>
-              [data.companyGroupId, data.companyId, data.unitId].filter(Boolean)
-                .length === 1,
+              [data.companyGroupId, data.companiesId, data.unitsId].filter(
+                Boolean
+              ).length === 1,
             {
               message:
-                "Informe apenas um dos campos: 'companyGroupId', 'companyId' ou 'unitId'",
+                "Informe apenas um dos campos: 'companyGroupId', 'companiesId' ou 'unitsId'",
               path: ["companyGroupId"], // o campo onde o erro será exibido
             }
           ),
@@ -40,6 +41,14 @@ export const getBases: FastifyPluginCallbackZod = (app) => {
               z.object({
                 id: z.string(),
                 name: z.string(),
+                companyGroup: z.object({
+                  id: z.string(),
+                  name: z.string(),
+                }),
+                company: z.object({
+                  id: z.string(),
+                  name: z.string(),
+                }),
                 unit: z.object({
                   id: z.string(),
                   name: z.string(),
@@ -64,23 +73,23 @@ export const getBases: FastifyPluginCallbackZod = (app) => {
         permission: permissions.base.read,
         target: {
           companyGroupId: request.query.companyGroupId,
-          companyId: request.query.companyId,
-          unitId: request.query.unitId,
+          companyId: request.query.companiesId,
+          unitId: request.query.unitsId,
         },
       });
-      const { page, perPage, name, companyGroupId, companyId, unitId } =
+      const { page, perPage, name, companyGroupId, companiesId, unitsId } =
         request.query;
 
       let whereScope;
 
       if (companyGroupId) {
         whereScope = { companyGroupId };
-      } else if (companyId) {
+      } else if (companiesId && companiesId.length > 0) {
         whereScope = {
-          unit: { company: { id: companyId } },
+          unit: { companyId: { in: companiesId } },
         };
-      } else if (unitId) {
-        whereScope = { unitId };
+      } else if (unitsId && unitsId.length > 0) {
+        whereScope = { unitId: { in: unitsId } };
       }
 
       const [bases, total] = await Promise.all([
@@ -88,6 +97,18 @@ export const getBases: FastifyPluginCallbackZod = (app) => {
           select: {
             id: true,
             name: true,
+            companyGroup: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+            company: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
             unit: {
               select: {
                 id: true,

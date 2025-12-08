@@ -4,8 +4,11 @@ import { createCompanyPhoneNumber } from "@/http/controllers/companies/create-co
 import { deleteCompany } from "@/http/controllers/companies/delete-company";
 import { deleteCompanyPhoneNumber } from "@/http/controllers/companies/delete-company-phone-number";
 import { getCompanies } from "@/http/controllers/companies/get-companies";
+import { getCompaniesPhones } from "@/http/controllers/companies/get-companies-phones";
 import { getCompany } from "@/http/controllers/companies/get-company";
+import { getCompanyModules } from "@/http/controllers/companies/get-company-module";
 import { updateCompany } from "@/http/controllers/companies/update-company";
+import { updateCompanyModule } from "@/http/controllers/companies/update-company-module";
 
 export default function companiesRoutes() {
   app.register(createCompany);
@@ -15,4 +18,7 @@ export default function companiesRoutes() {
   app.register(getCompany);
   app.register(createCompanyPhoneNumber);
   app.register(deleteCompanyPhoneNumber);
+  app.register(getCompaniesPhones);
+  app.register(getCompanyModules);
+  app.register(updateCompanyModule);
 }

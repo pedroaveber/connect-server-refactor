@@ -3,7 +3,9 @@ import { PrismaException } from "@/http/exceptions/prisma-exception";
 import { PrismaClient } from "@prisma/client";
 import { withAccelerate } from "@prisma/extension-accelerate";
 
-export const prisma = new PrismaClient()
+export const prisma = new PrismaClient({
+  log: ["query"],
+})
   .$extends({
     query: {
       $allModels: {
@@ -19,6 +21,7 @@ export const prisma = new PrismaClient()
             const result = await query(args);
             return result;
           } catch (error: any) {
+            console.log(error);
             const errorMessage = handlePrismaError(error);
             throw new PrismaException(errorMessage);
           }

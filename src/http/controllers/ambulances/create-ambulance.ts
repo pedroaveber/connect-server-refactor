@@ -24,9 +24,12 @@ export const createAmbulance: FastifyPluginCallbackZod = (app) => {
           licensePlate: z.string().meta({
             description: "License plate of the ambulance",
           }),
+          ambulanceCode: z.string().meta({
+            description: "Unique code for the ambulance",
+          }),
           observations: z.string().optional(),
         }),
-        response: { 201: z.object({ id: z.string() }) },
+        response: { 201: z.object({ id: z.string(), baseId: z.string() }) },
       },
     },
     async (request, reply) => {
@@ -46,6 +49,7 @@ export const createAmbulance: FastifyPluginCallbackZod = (app) => {
         unitId,
         companyId,
         companyGroupId,
+        ambulanceCode,
       } = request.body;
 
       const ambulance = await prisma.ambulance.create({
@@ -57,10 +61,19 @@ export const createAmbulance: FastifyPluginCallbackZod = (app) => {
           unitId,
           companyId,
           companyGroupId,
+          ambulanceCode,
         },
       });
 
-      return reply.status(201).send({ id: ambulance.id });
+      prisma.chats.create({
+        data: {
+          ambulance: { connect: { id: ambulance.id } },
+        },
+      });
+
+      return reply
+        .status(201)
+        .send({ id: ambulance.id, baseId: ambulance.baseId });
     }
   );
 };

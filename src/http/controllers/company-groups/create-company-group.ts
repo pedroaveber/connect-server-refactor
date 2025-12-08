@@ -20,15 +20,15 @@ export const createCompanyGroup: FastifyPluginCallbackZod = (app) => {
           document: z.string().length(14).meta({
             description: "Brazilian CNPJ",
           }),
-          phones: z.array(
-            z.object({
-              isWhatsapp: z.boolean().optional().default(false),
-              name: z.string().optional(),
-              number: z.string().meta({
-                description: "Brazilian phone number (example: +5511999999999)",
-              }),
-            })
-          ),
+          // phones: z.array(
+          //   z.object({
+          //     isWhatsapp: z.boolean().optional().default(false),
+          //     name: z.string().optional(),
+          //     number: z.string().meta({
+          //       description: "Brazilian phone number (example: +5511999999999)",
+          //     }),
+          //   })
+          // ),
         }),
         response: {
           201: z.object({
@@ -42,17 +42,12 @@ export const createCompanyGroup: FastifyPluginCallbackZod = (app) => {
         permission: permissions.sys_admin.accessAll,
       });
 
-      const { document, name, phones } = request.body;
+      const { document, name } = request.body;
 
       const companyGroup = await prisma.companyGroup.create({
         data: {
           document,
           name,
-          phones: {
-            createMany: {
-              data: phones,
-            },
-          },
         },
       });
 

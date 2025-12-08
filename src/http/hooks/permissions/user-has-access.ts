@@ -36,23 +36,32 @@ export function userHasAccess({
     }
   }
 
-  // --- Escopo hierárquico opcional (OR lógico) ---
+  // --- Escopos hierárquicos opcionais ---
   if (target) {
     const checks: boolean[] = [];
 
-    if (target.companyGroupId)
+    const normalize = (v?: string | string[]) =>
+      Array.isArray(v) ? v : v ? [v] : [];
+
+    if (target.companyGroupId) {
       checks.push(user.companyGroupId === target.companyGroupId);
+    }
 
-    if (target.companyId)
-      checks.push(user.companiesIds?.includes(target.companyId) ?? false);
+    if (target.companyId) {
+      const ids = normalize(target.companyId);
+      checks.push(ids.some((id) => user.companiesIds?.includes(id)));
+    }
 
-    if (target.unitId)
-      checks.push(user.unitsIds?.includes(target.unitId) ?? false);
+    if (target.unitId) {
+      const ids = normalize(target.unitId);
+      checks.push(ids.some((id) => user.unitsIds?.includes(id)));
+    }
 
-    if (target.baseId)
-      checks.push(user.basesIds?.includes(target.baseId) ?? false);
+    if (target.baseId) {
+      const ids = normalize(target.baseId);
+      checks.push(ids.some((id) => user.basesIds?.includes(id)));
+    }
 
-    // Se há pelo menos um target definido e nenhum passou → negar acesso
     if (checks.length > 0 && !checks.some(Boolean)) {
       throw new ForbiddenException(
         "Usuário não possui acesso a nenhum dos escopos informados"

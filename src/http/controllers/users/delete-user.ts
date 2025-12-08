@@ -38,7 +38,7 @@ export const deleteUser: FastifyPluginCallbackZod = (app) => {
       // Soft delete
       const deletedUser = await prisma.user.update({
         where: { id },
-        data: { deletedAt: new Date() },
+        data: { deletedAt: new Date(), document: "" },
       });
 
       return reply.status(200).send({

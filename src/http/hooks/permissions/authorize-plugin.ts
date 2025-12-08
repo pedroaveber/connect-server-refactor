@@ -4,9 +4,9 @@ import type { Permission } from "@/data/permissions";
 
 export type TargetScope = {
   companyGroupId?: string;
-  companyId?: string;
-  unitId?: string;
-  baseId?: string;
+  companyId?: string | string[];
+  unitId?: string | string[];
+  baseId?: string | string[];
 };
 
 export default fp(async (app) => {

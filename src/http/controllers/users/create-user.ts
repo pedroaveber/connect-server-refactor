@@ -18,7 +18,7 @@ export const createUser: FastifyPluginCallbackZod = (app) => {
         body: z.object({
           name: z.string(),
           document: z.string(),
-          birthDate: z.string(),
+          birthDate: z.coerce.date(),
           roles: z.array(PermissionSchema),
           companyGroupId: z.string(),
           companiesIds: z.array(z.string()).optional(),
@@ -56,7 +56,7 @@ export const createUser: FastifyPluginCallbackZod = (app) => {
           roles,
           document,
           password,
-          birthDate: new Date(birthDate),
+          birthDate,
           companyGroup: {
             connect: {
               id: companyGroupId,
@@ -68,9 +68,11 @@ export const createUser: FastifyPluginCallbackZod = (app) => {
           units: {
             connect: unitsIds?.map((id) => ({ id })),
           },
-          bases: {
-            connect: basesIds?.map((id) => ({ id })),
-          },
+          bases: basesIds?.length
+            ? {
+                connect: basesIds.map((id) => ({ id })),
+              }
+            : undefined,
         },
       });
 

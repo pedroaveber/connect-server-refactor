@@ -6,16 +6,14 @@ import { z } from "zod";
 
 const updateDocumentSchema = z.object({
   id: z.string(),
-  name: z.string(),
-  downloadUrl: z.string().url(),
-  fileExtension: z.string(),
-  fileSize: z.number(),
-  ambulanceId: z.string(),
-  expiresAt: z.string().pipe(z.coerce.date()),
+  title: z.string(),
+  type: z.string(),
+  validUntil: z.string().nullable(),
+  content: z.string(),
 });
 
 export const updateAmbulanceDocument: FastifyPluginCallbackZod = (app) => {
-  app.patch(
+  app.put(
     "/ambulances/documents/:id",
     {
       preHandler: [auth],

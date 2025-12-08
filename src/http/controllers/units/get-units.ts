@@ -15,30 +15,25 @@ export const getUnits: FastifyPluginCallbackZod = (app) => {
         operationId: "getUnits",
         security: [{ BearerAuth: [] }],
         description: "Get units",
-        querystring: z
-          .object({
-            page: z.coerce.number().int().min(1).default(1),
-            perPage: z.coerce.number().int().min(1).default(10),
-            name: z.string().optional(),
-            document: z.string().optional(),
-            companyGroupId: z.string().optional(),
-            companyId: z.string().optional(),
-          })
-          .refine(
-            (data) =>
-              (data.companyGroupId && !data.companyId) ||
-              (!data.companyGroupId && data.companyId),
-            {
-              message:
-                "Informe apenas 'companyGroupId' ou apenas 'companyId', não ambos",
-            }
-          ),
+        querystring: z.object({
+          page: z.coerce.number().int().min(1).default(1),
+          perPage: z.coerce.number().int().min(1).default(10),
+          name: z.string().optional(),
+          document: z.string().optional(),
+          companyGroupId: z.string().optional(),
+          companyId: z.string().optional(),
+          companiesId: z.array(z.string()).optional(),
+        }),
         response: {
           200: z.object({
             data: z.array(
               z.object({
                 id: z.string(),
                 name: z.string(),
+                companyGroup: z.object({
+                  id: z.string(),
+                  name: z.string(),
+                }),
                 company: z.object({
                   id: z.string(),
                   name: z.string(),
@@ -68,7 +63,8 @@ export const getUnits: FastifyPluginCallbackZod = (app) => {
         },
       });
 
-      const { page, perPage, name, companyGroupId, companyId } = request.query;
+      const { page, perPage, name, companyGroupId, companyId, companiesId } =
+        request.query;
 
       let whereScope;
 
@@ -76,6 +72,8 @@ export const getUnits: FastifyPluginCallbackZod = (app) => {
         whereScope = { companyGroupId };
       } else if (companyId) {
         whereScope = { companyId };
+      } else if (companiesId) {
+        whereScope = { companyId: { in: companiesId } };
       }
 
       const [units, total] = await Promise.all([
@@ -83,6 +81,12 @@ export const getUnits: FastifyPluginCallbackZod = (app) => {
           select: {
             id: true,
             name: true,
+            companyGroup: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
             company: {
               select: {
                 id: true,

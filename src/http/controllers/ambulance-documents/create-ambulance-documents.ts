@@ -7,12 +7,10 @@ import { z } from "zod";
 const addDocumentsSchema = z.object({
   documents: z.array(
     z.object({
-      name: z.string(),
-      downloadUrl: z.string().url(),
-      fileExtension: z.string(),
-      fileSize: z.number(),
-      ambulanceId: z.string(),
-      expiresAt: z.string().pipe(z.coerce.date()),
+      title: z.string(),
+      type: z.string(),
+      validUntil: z.string().nullable(),
+      content: z.string(),
     })
   ),
   baseId: z.string(),
@@ -26,7 +24,7 @@ export const createAmbulanceDocuments: FastifyPluginCallbackZod = (app) => {
       schema: {
         tags: ["Ambulance"],
         summary: "Add documents to an ambulance",
-        operationId: "addAmbulanceDocuments",
+        operationId: "createAmbulanceDocuments",
         security: [{ BearerAuth: [] }],
         params: z.object({ id: z.string() }),
         body: addDocumentsSchema,

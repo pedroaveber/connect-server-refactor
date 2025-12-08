@@ -1,4 +1,4 @@
-import { z } from "zod"
+import { z } from "zod";
 
 const envSchema = z.object({
   PORT: z.coerce.number(),
@@ -14,6 +14,10 @@ const envSchema = z.object({
   AWS_JURISDICTION: z.string(),
   AWS_ACCOUNT_ID: z.string(),
   AWS_PUBLIC_SUBDOMAIN: z.string().url(),
-})
+  ABLY_PRIVATE_KEY: z.string(),
+  CLOUDFARE_REALTIME_API_URL: z.string(),
+  CLOUDFARE_ORGANIZATION_ID: z.string(),
+  CLOUDFARE_API_KEY: z.string(),
+});
 
-export const env = envSchema.parse(process.env)
+export const env = envSchema.parse(process.env);

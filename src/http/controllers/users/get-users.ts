@@ -26,8 +26,26 @@ export const getUsers: FastifyPluginCallbackZod = (app) => {
             data: z.array(
               z.object({
                 id: z.string(),
+                companyGroup: z
+                  .object({
+                    id: z.string(),
+                    name: z.string(),
+                  })
+                  .nullable(),
+                companies: z.array(
+                  z.object({
+                    id: z.string(),
+                    name: z.string(),
+                  })
+                ),
+                units: z.array(
+                  z.object({
+                    id: z.string(),
+                    name: z.string(),
+                  })
+                ),
                 name: z.string(),
-                document: z.string(),
+                document: z.string().nullable(),
                 avatarUrl: z.string().nullable(),
                 birthDate: z.date(),
                 createdAt: z.date(),
@@ -75,13 +93,39 @@ export const getUsers: FastifyPluginCallbackZod = (app) => {
 
       const [users, total] = await Promise.all([
         prisma.user.findMany({
-          where: whereScope,
+          where: {
+            ...whereScope,
+            deletedAt: null,
+          },
+          include: {
+            companyGroup: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+            companies: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+            units: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+          },
           skip: (page - 1) * perPage,
           take: perPage,
           orderBy: { createdAt: "desc" },
         }),
         prisma.user.count({
-          where: whereScope,
+          where: {
+            ...whereScope,
+            deletedAt: null,
+          },
         }),
       ]);
 

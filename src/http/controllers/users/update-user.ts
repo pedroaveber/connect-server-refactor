@@ -6,11 +6,12 @@ import { z } from "zod";
 
 const updateUserSchema = z.object({
   name: z.string().optional(),
+  document: z.string().optional(),
   avatarUrl: z.string().url().nullable().optional(),
   birthDate: z.coerce.date().optional(),
-  companyGroupId: z.string(),
+  companyGroupId: z.string().optional(),
   companiesIds: z.array(z.string()).optional(), // atualizar empresas do usuário
-  unitIds: z.array(z.string()).optional(), // atualizar unidades do usuário
+  unitsIds: z.array(z.string()).optional(), // atualizar unidades do usuário
   roleIds: z.array(PermissionSchema).optional(), // atualizar roles do usuário
 });
 
@@ -43,7 +44,8 @@ export const updateUser: FastifyPluginCallbackZod = (app) => {
       });
 
       const { id } = request.params;
-      const { name, avatarUrl, birthDate, unitIds, roleIds } = request.body;
+      const { name, avatarUrl, document, birthDate, unitsIds, roleIds } =
+        request.body;
 
       // Atualiza usuário
       const updatedUser = await prisma.user.update({
@@ -55,8 +57,9 @@ export const updateUser: FastifyPluginCallbackZod = (app) => {
           name,
           avatarUrl,
           birthDate,
-          units: unitIds
-            ? { set: unitIds.map((unitId) => ({ id: unitId })) }
+          document,
+          units: unitsIds
+            ? { set: unitsIds.map((unitId) => ({ id: unitId })) }
             : undefined,
           roles: roleIds,
         },

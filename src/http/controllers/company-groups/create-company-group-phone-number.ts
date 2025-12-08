@@ -20,27 +20,29 @@ export const createCompanyGroupPhoneNumber: FastifyPluginCallbackZod = (
         params: z.object({
           companyGroupId: z.string(),
         }),
-        body: z.object({
-          name: z
-            .string()
-            .meta({
-              description: "Phone name",
-            })
-            .optional(),
-          isWhatsapp: z
-            .boolean()
-            .meta({
-              description: "Is whatsapp",
-            })
-            .optional()
-            .default(false),
-          number: z.string().meta({
-            description: "Brazilian phone number (example: +5511999999999)",
-          }),
-        }),
+        body: z.array(
+          z.object({
+            name: z
+              .string()
+              .meta({
+                description: "Phone name",
+              })
+              .optional(),
+            isWhatsapp: z
+              .boolean()
+              .meta({
+                description: "Is whatsapp",
+              })
+              .optional()
+              .default(false),
+            number: z.string().meta({
+              description: "Brazilian phone number (example: +5511999999999)",
+            }),
+          })
+        ),
         response: {
           201: z.object({
-            id: z.string(),
+            count: z.number(),
           }),
         },
       },
@@ -54,19 +56,16 @@ export const createCompanyGroupPhoneNumber: FastifyPluginCallbackZod = (
       });
 
       const { companyGroupId } = request.params;
-      const { number, name, isWhatsapp } = request.body;
 
-      const newPhone = await prisma.phone.create({
-        data: {
-          name,
-          number,
-          isWhatsapp,
+      const newPhone = await prisma.phone.createMany({
+        data: request.body.map((phone) => ({
+          ...phone,
           companyGroupId,
-        },
+        })),
       });
 
       return reply.status(201).send({
-        id: newPhone.id,
+        count: newPhone.count,
       });
     }
   );

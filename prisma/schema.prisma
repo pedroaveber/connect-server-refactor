@@ -12,6 +12,30 @@ enum InvoiceMode {
   DISCRIMINATED
 }
 
+enum BillingType {
+  FIXED
+  BY_AMBULANCE
+  BY_BASE
+}
+
+enum Platform {
+  APP
+  WEB
+}
+
+enum MessageType {
+  TEXT
+  AUDIO
+  IMAGE
+  DOCUMENT
+  VIDEO
+}
+
+enum MessageStatus {
+  PENDING
+  SENT
+}
+
 model CompanyGroup {
   id        String    @id @default(cuid())
   name      String
@@ -44,9 +68,10 @@ model Company {
   units Unit[]
   bases Base[]
 
-  phones     Phone[]
-  ambulances Ambulance[]
-  users      User[]
+  phones         Phone[]
+  ambulances     Ambulance[]
+  users          User[]
+  companyModules CompanyModules[]
 
   @@map("companies")
 }
@@ -136,7 +161,7 @@ model Phone {
 model User {
   id                       String                   @id @default(cuid())
   name                     String
-  document                 String                   @unique
+  document                 String?                  @unique
   password                 String
   roles                    String[]                 @default([])
   birthDate                DateTime                 @map("birth_date")
@@ -149,9 +174,14 @@ model User {
   companyGroup   CompanyGroup? @relation(fields: [companyGroupId], references: [id])
   companyGroupId String?       @map("company_group_id")
 
-  companies Company[]
-  units     Unit[]
-  bases     Base[]
+  companies               Company[]
+  units                   Unit[]
+  bases                   Base[]
+  messages                Messages[]
+  ambulanceShiftHistories AmbulanceShiftHistory[]
+
+  ambulance   Ambulance? @relation(fields: [ambulanceId], references: [id])
+  ambulanceId String?    @map("ambulance_id")
 
   @@index([document])
   @@map("users")
@@ -168,11 +198,12 @@ enum AmbulanceStatusEnum {
 }
 
 model Ambulance {
-  id           String              @id @default(cuid())
-  name         String
-  status       AmbulanceStatusEnum @default(FA) @map("status")
-  observations String?
-  licensePlate String              @unique @map("license_plate")
+  id            String              @id @default(cuid())
+  name          String
+  status        AmbulanceStatusEnum @default(FA) @map("status")
+  observations  String?
+  licensePlate  String              @unique @map("license_plate")
+  ambulanceCode String              @unique @map("ambulance_code")
 
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")
@@ -190,8 +221,11 @@ model Ambulance {
   base   Base   @relation(fields: [baseId], references: [id])
   baseId String @map("base_id")
 
-  documents     AmbulanceDocuments[]
-  statusHistory AmbulanceStatusHistory[]
+  documents               AmbulanceDocuments[]
+  statusHistory           AmbulanceStatusHistory[]
+  chats                   Chats[]
+  ambulanceShiftHistories AmbulanceShiftHistory[]
+  users                   User[]
 
   @@index([licensePlate])
   @@map("ambulances")
@@ -200,16 +234,15 @@ model Ambulance {
 model AmbulanceDocuments {
   id String @id @default(cuid())
 
-  ambulance   Ambulance @relation(fields: [ambulanceId], references: [id])
+  ambulance   Ambulance @relation(fields: [ambulanceId], references: [id], onDelete: Cascade)
   ambulanceId String    @map("ambulance_id")
 
-  name          String
-  downloadUrl   String @map("download_url")
-  fileExtension String @map("file_extension")
-  fileSize      Int    @map("file_size")
+  title      String
+  type       String
+  content    String
+  validUntil String? @map("valid_until")
 
   createdAt DateTime  @default(now()) @map("created_at")
-  expiresAt DateTime  @map("expires_at")
   deletedAt DateTime? @map("deleted_at")
 
   @@map("ambulance_documents")
@@ -218,7 +251,7 @@ model AmbulanceDocuments {
 model AmbulanceStatusHistory {
   id String @id @default(cuid())
 
-  ambulance   Ambulance @relation(fields: [ambulanceId], references: [id])
+  ambulance   Ambulance @relation(fields: [ambulanceId], references: [id], onDelete: Cascade)
   ambulanceId String    @map("ambulance_id")
 
   fromStatus AmbulanceStatusEnum @map("from_status")
@@ -229,5 +262,105 @@ model AmbulanceStatusHistory {
 
   createdAt DateTime @default(now()) @map("created_at")
 
+  ambulanceShift   AmbulanceShiftHistory[]
+  ambulanceShiftId String?                 @map("ambulance_shift_id")
+
   @@map("ambulance_status_histories")
+}
+
+model AmbulanceShiftHistory {
+  id String @id @default(cuid())
+
+  ambulance   Ambulance @relation(fields: [ambulanceId], references: [id], onDelete: Cascade)
+  ambulanceId String    @map("ambulance_id")
+
+  shiftStart DateTime @map("shift_start")
+  shiftEnd   DateTime @map("shift_end")
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String @map("user_id")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  ambulanceStatusHistory AmbulanceStatusHistory[]
+
+  @@map("ambulance_shift_histories")
+}
+
+model Modules {
+  id   String @id @default(cuid())
+  name String @unique
+
+  billingValue Float       @map("billing_value")
+  billingType  BillingType @map("billing_type")
+
+  createdAt      DateTime         @default(now()) @map("created_at")
+  updatedAt      DateTime         @updatedAt @map("updated_at")
+  deletedAt      DateTime?        @map("deleted_at")
+  companyModules CompanyModules[]
+}
+
+model CompanyModules {
+  id String @id @default(cuid())
+
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  companyId String  @map("company_id")
+
+  module   Modules @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  moduleId String  @map("module_id")
+
+  customBillingValue Float?       @map("custom_billing_value")
+  customBillingType  BillingType? @map("custom_billing_type")
+
+  active Boolean @default(true)
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("company_modules")
+}
+
+model Chats {
+  id String @id @default(cuid())
+
+  ambulance   Ambulance @relation(fields: [ambulanceId], references: [id], onDelete: Cascade)
+  ambulanceId String    @map("ambulance_id")
+
+  lastMessageAt DateTime? @map("last_message_at")
+  readByAppAt   DateTime? @map("read_by_app_at")
+  readByWebAt   DateTime? @map("read_by_web_at")
+
+  unreadCountApp Int @default(0) @map("unread_count_app")
+  unreadCountWeb Int @default(0) @map("unread_count_web")
+
+  createdAt DateTime   @default(now()) @map("created_at")
+  updatedAt DateTime   @updatedAt @map("updated_at")
+  deletedAt DateTime?  @map("deleted_at")
+  messages  Messages[]
+
+  @@map("chats")
+}
+
+model Messages {
+  id String @id @default(cuid())
+
+  chat   Chats  @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  chatId String @map("chat_id")
+
+  messageType MessageType @map("message_type")
+  content     String
+  file        String?
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String @map("user_id")
+
+  platform Platform
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  offlineId String?       @map("offline_id")
+  status    MessageStatus @default(SENT)
+
+  @@index([chatId, createdAt])
+  @@map("messages")
 }

@@ -1,14 +1,15 @@
 // src/error-handler.ts
-import type { FastifyInstance } from "fastify"
-import { hasZodFastifySchemaValidationErrors } from "fastify-type-provider-zod"
-import { env } from "./env"
-import { HttpException } from "./http/exceptions/http-exception"
+import type { FastifyInstance } from "fastify";
+import { hasZodFastifySchemaValidationErrors } from "fastify-type-provider-zod";
+import { env } from "./env";
+import { HttpException } from "./http/exceptions/http-exception";
 
-type FastifyErrorHandler = FastifyInstance["errorHandler"]
+type FastifyErrorHandler = FastifyInstance["errorHandler"];
 
 export const errorHandler: FastifyErrorHandler = (error, request, reply) => {
+  console.log({ error });
   if (env.ENV !== "production") {
-    console.error(error)
+    console.error(error);
   }
 
   // 🔹 Erros de validação do Zod
@@ -21,7 +22,7 @@ export const errorHandler: FastifyErrorHandler = (error, request, reply) => {
         method: request.method,
         url: request.url,
       },
-    })
+    });
   }
 
   // 🔹 Erros customizados (HttpException)
@@ -33,7 +34,7 @@ export const errorHandler: FastifyErrorHandler = (error, request, reply) => {
         method: request.method,
         url: request.url,
       },
-    })
+    });
   }
 
   // 🔹 Fallback para erros não tratados
@@ -45,5 +46,5 @@ export const errorHandler: FastifyErrorHandler = (error, request, reply) => {
       method: request.method,
       url: request.url,
     },
-  })
-}
+  });
+};

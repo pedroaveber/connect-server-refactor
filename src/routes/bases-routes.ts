@@ -4,6 +4,7 @@ import { createBasePhoneNumber } from "@/http/controllers/base/create-base-phone
 import { deleteBase } from "@/http/controllers/base/delete-base";
 import { deleteBasePhoneNumber } from "@/http/controllers/base/delete-base-phone-number";
 import { getBase } from "@/http/controllers/base/get-base";
+import { getBasePhones } from "@/http/controllers/base/get-base-phones";
 import { getBases } from "@/http/controllers/base/get-bases";
 import { updateBase } from "@/http/controllers/base/update-base";
 
@@ -13,6 +14,7 @@ export default function basesRoutes() {
   app.register(getBases);
   app.register(getBase);
   app.register(deleteBase);
-  app.register(createBasePhoneNumber);
   app.register(deleteBasePhoneNumber);
+  app.register(getBasePhones);
+  app.register(createBasePhoneNumber);
 }

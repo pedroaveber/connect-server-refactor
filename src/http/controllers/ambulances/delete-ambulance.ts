@@ -38,9 +38,8 @@ export const deleteAmbulance: FastifyPluginCallbackZod = (app) => {
         },
       });
 
-      await prisma.ambulance.update({
+      await prisma.ambulance.delete({
         where: { id },
-        data: { deletedAt: new Date() },
       });
 
       return reply.status(204).send(null);

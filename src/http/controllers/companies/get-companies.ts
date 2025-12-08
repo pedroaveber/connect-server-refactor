@@ -32,6 +32,10 @@ export const getCompanies: FastifyPluginCallbackZod = (app) => {
                 createdAt: z.date(),
                 updatedAt: z.date(),
                 unitsCount: z.number(),
+                companyGroup: z.object({
+                  id: z.string(),
+                  name: z.string(),
+                }),
               })
             ),
             pagination: z.object({
@@ -70,6 +74,12 @@ export const getCompanies: FastifyPluginCallbackZod = (app) => {
                     deletedAt: null,
                   },
                 },
+              },
+            },
+            companyGroup: {
+              select: {
+                id: true,
+                name: true,
               },
             },
           },

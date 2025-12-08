@@ -20,6 +20,10 @@ export const updateAmbulance: FastifyPluginCallbackZod = (app) => {
           name: z.string(),
           licensePlate: z.string(),
           observations: z.string().optional(),
+          ambulanceCode: z.string(),
+          companyGroupId: z.string(),
+          companyId: z.string(),
+          unitId: z.string(),
           baseId: z.string(),
         }),
         response: { 204: z.null() },
@@ -27,7 +31,16 @@ export const updateAmbulance: FastifyPluginCallbackZod = (app) => {
     },
     async (request, reply) => {
       const { id } = request.params;
-      const { name, licensePlate, observations } = request.body;
+      const {
+        name,
+        licensePlate,
+        observations,
+        ambulanceCode,
+        companyGroupId,
+        companyId,
+        unitId,
+        baseId,
+      } = request.body;
 
       const ambulance = await prisma.ambulance.findUnique({
         where: { id, deletedAt: null },
@@ -46,7 +59,16 @@ export const updateAmbulance: FastifyPluginCallbackZod = (app) => {
 
       await prisma.ambulance.update({
         where: { id },
-        data: { name, licensePlate, observations },
+        data: {
+          name,
+          licensePlate,
+          observations,
+          ambulanceCode,
+          companyGroupId,
+          companyId,
+          unitId,
+          baseId,
+        },
       });
 
       return reply.status(204).send(null);

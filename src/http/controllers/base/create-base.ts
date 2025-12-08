@@ -17,16 +17,9 @@ export const createBase: FastifyPluginCallbackZod = (app) => {
         body: z.object({
           name: z.string(),
           document: z.string().optional(),
-          latitude: z.number().min(-90).max(90),
-          longitude: z.number().min(-180).max(180),
+          latitude: z.number().min(-90).max(90).optional(),
+          longitude: z.number().min(-180).max(180).optional(),
           unitId: z.string(),
-          phones: z.array(
-            z.object({
-              number: z.string(),
-              name: z.string().optional(),
-              isWhatsapp: z.boolean().optional(),
-            })
-          ),
         }),
         response: { 201: z.object({ id: z.string() }) },
       },
@@ -37,8 +30,7 @@ export const createBase: FastifyPluginCallbackZod = (app) => {
         target: { unitId: request.body.unitId },
       });
 
-      const { name, document, unitId, phones, latitude, longitude } =
-        request.body;
+      const { name, document, unitId, latitude, longitude } = request.body;
 
       const unit = await prisma.unit.findUnique({
         where: { id: unitId },
@@ -57,11 +49,6 @@ export const createBase: FastifyPluginCallbackZod = (app) => {
           longitude,
           companyId: unit.companyId,
           companyGroupId: unit.companyGroupId,
-          phones: {
-            createMany: {
-              data: phones,
-            },
-          },
         },
       });
 

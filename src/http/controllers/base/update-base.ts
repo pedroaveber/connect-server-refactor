@@ -6,14 +6,14 @@ import { permissions } from "@/data/permissions";
 
 export const updateBase: FastifyPluginCallbackZod = (app) => {
   app.put(
-    "/bases/:id",
+    "/bases/:baseId",
     {
       preHandler: [auth],
       schema: {
         tags: ["Base"],
         summary: "Update base",
         operationId: "updateBase",
-        params: z.object({ id: z.string() }),
+        params: z.object({ baseId: z.string() }),
         body: z.object({
           name: z.string().optional(),
           document: z.string().optional(),
@@ -27,15 +27,15 @@ export const updateBase: FastifyPluginCallbackZod = (app) => {
       request.authorize({
         permission: permissions.base.update,
         target: {
-          baseId: request.params.id,
+          baseId: request.params.baseId,
         },
       });
 
-      const { id } = request.params;
+      const { baseId } = request.params;
       const { name, document, latitude, longitude } = request.body;
 
       await prisma.base.update({
-        where: { id },
+        where: { id: baseId },
         data: { name, document, latitude, longitude },
       });
 

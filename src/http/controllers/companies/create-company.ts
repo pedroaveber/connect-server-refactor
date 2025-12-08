@@ -23,15 +23,6 @@ export const createCompany: FastifyPluginCallbackZod = (app) => {
           companyGroupId: z.string().meta({
             description: "Company group ID",
           }),
-          phones: z.array(
-            z.object({
-              name: z.string().optional(),
-              isWhatsapp: z.boolean().optional(),
-              number: z.string().meta({
-                description: "Brazilian phone number (example: +5511999999999)",
-              }),
-            })
-          ),
         }),
         response: {
           201: z.object({
@@ -48,19 +39,24 @@ export const createCompany: FastifyPluginCallbackZod = (app) => {
         },
       });
 
-      const { document, name, phones, companyGroupId } = request.body;
+      const { document, name, companyGroupId } = request.body;
+
+      const modules = await prisma.modules.findMany();
 
       const company = await prisma.company.create({
         data: {
           document,
           name,
           companyGroupId,
-          phones: {
-            createMany: {
-              data: phones,
-            },
-          },
         },
+      });
+
+      await prisma.companyModules.createMany({
+        data: modules.map((module) => ({
+          companyId: company.id,
+          moduleId: module.id,
+          active: false,
+        })),
       });
 
       return reply.status(201).send({

@@ -161,11 +161,11 @@
                       },
                       "fileName": {
                         "type": "string",
-                        "pattern": "\\.(m4a|webm|mp3|wav)$"
+                        "pattern": "\\.(m4a|webm|mp3|wav|mpeg4)$"
                       },
                       "fileType": {
                         "type": "string",
-                        "pattern": "audio\\/(m4a|webm|mp3|wav)"
+                        "pattern": "audio\\/(m4a|webm|mp3|wav|mp4)"
                       }
                     },
                     "required": [
@@ -211,7 +211,7 @@
     },
     "/ambulances/{id}/documents": {
       "post": {
-        "operationId": "addAmbulanceDocuments",
+        "operationId": "createAmbulanceDocuments",
         "summary": "Add documents to an ambulance",
         "tags": [
           "Ambulance"
@@ -227,33 +227,25 @@
                     "items": {
                       "type": "object",
                       "properties": {
-                        "name": {
+                        "title": {
                           "type": "string"
                         },
-                        "downloadUrl": {
-                          "type": "string",
-                          "format": "uri"
-                        },
-                        "fileExtension": {
+                        "type": {
                           "type": "string"
                         },
-                        "fileSize": {
-                          "type": "number"
-                        },
-                        "ambulanceId": {
+                        "validUntil": {
+                          "nullable": true,
                           "type": "string"
                         },
-                        "expiresAt": {
+                        "content": {
                           "type": "string"
                         }
                       },
                       "required": [
-                        "name",
-                        "downloadUrl",
-                        "fileExtension",
-                        "fileSize",
-                        "ambulanceId",
-                        "expiresAt"
+                        "title",
+                        "type",
+                        "validUntil",
+                        "content"
                       ]
                     }
                   },
@@ -306,10 +298,95 @@
             }
           }
         }
+      },
+      "get": {
+        "operationId": "getAmbulanceDocuments",
+        "summary": "Get ambulance documents by ID",
+        "tags": [
+          "Ambulance"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "documents": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "title": {
+                                "type": "string"
+                              },
+                              "type": {
+                                "type": "string"
+                              },
+                              "content": {
+                                "type": "string"
+                              },
+                              "validUntil": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "createdAt": {
+                                "type": "string",
+                                "format": "date-time"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "title",
+                              "type",
+                              "content",
+                              "validUntil",
+                              "createdAt"
+                            ],
+                            "additionalProperties": false
+                          }
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "documents"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/ambulances/documents/{id}": {
-      "patch": {
+      "put": {
         "operationId": "updateAmbulanceDocument",
         "summary": "Update an ambulance document",
         "tags": [
@@ -324,34 +401,26 @@
                   "id": {
                     "type": "string"
                   },
-                  "name": {
+                  "title": {
                     "type": "string"
                   },
-                  "downloadUrl": {
-                    "type": "string",
-                    "format": "uri"
-                  },
-                  "fileExtension": {
+                  "type": {
                     "type": "string"
                   },
-                  "fileSize": {
-                    "type": "number"
-                  },
-                  "ambulanceId": {
+                  "validUntil": {
+                    "nullable": true,
                     "type": "string"
                   },
-                  "expiresAt": {
+                  "content": {
                     "type": "string"
                   }
                 },
                 "required": [
                   "id",
-                  "name",
-                  "downloadUrl",
-                  "fileExtension",
-                  "fileSize",
-                  "ambulanceId",
-                  "expiresAt"
+                  "title",
+                  "type",
+                  "validUntil",
+                  "content"
                 ]
               }
             }
@@ -402,7 +471,94 @@
             }
           }
         }
-      },
+      }
+    },
+    "/ambulances/documents": {
+      "put": {
+        "operationId": "updateAmbulanceDocumentsInBulk",
+        "summary": "Update multiple ambulance documents",
+        "tags": [
+          "Ambulance"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "documents": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "title": {
+                          "type": "string"
+                        },
+                        "type": {
+                          "type": "string"
+                        },
+                        "validUntil": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "content": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "title",
+                        "type",
+                        "validUntil",
+                        "content"
+                      ]
+                    }
+                  },
+                  "baseId": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "documents",
+                  "baseId"
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "updatedCount": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "updatedCount"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ambulances/documents/{id}/{baseId}": {
       "delete": {
         "operationId": "deleteAmbulanceDocument",
         "summary": "Delete (soft) an ambulance document",
@@ -450,99 +606,6 @@
         }
       }
     },
-    "/ambulances/documents": {
-      "patch": {
-        "operationId": "updateAmbulanceDocumentsInBulk",
-        "summary": "Update multiple ambulance documents",
-        "tags": [
-          "Ambulance"
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "documents": {
-                    "type": "array",
-                    "items": {
-                      "type": "object",
-                      "properties": {
-                        "id": {
-                          "type": "string"
-                        },
-                        "name": {
-                          "type": "string"
-                        },
-                        "downloadUrl": {
-                          "type": "string",
-                          "format": "uri"
-                        },
-                        "fileExtension": {
-                          "type": "string"
-                        },
-                        "fileSize": {
-                          "type": "number"
-                        },
-                        "ambulanceId": {
-                          "type": "string"
-                        },
-                        "expiresAt": {
-                          "type": "string"
-                        }
-                      },
-                      "required": [
-                        "id",
-                        "name",
-                        "downloadUrl",
-                        "fileExtension",
-                        "fileSize",
-                        "ambulanceId",
-                        "expiresAt"
-                      ]
-                    }
-                  },
-                  "baseId": {
-                    "type": "string"
-                  }
-                },
-                "required": [
-                  "documents",
-                  "baseId"
-                ]
-              }
-            }
-          },
-          "required": true
-        },
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Default Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "updatedCount": {
-                      "type": "number"
-                    }
-                  },
-                  "required": [
-                    "updatedCount"
-                  ],
-                  "additionalProperties": false
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/ambulances": {
       "post": {
         "operationId": "createAmbulance",
@@ -575,6 +638,10 @@
                     "description": "License plate of the ambulance",
                     "type": "string"
                   },
+                  "ambulanceCode": {
+                    "description": "Unique code for the ambulance",
+                    "type": "string"
+                  },
                   "observations": {
                     "type": "string"
                   }
@@ -585,7 +652,8 @@
                   "companyId",
                   "unitId",
                   "baseId",
-                  "licensePlate"
+                  "licensePlate",
+                  "ambulanceCode"
                 ]
               }
             }
@@ -607,10 +675,418 @@
                   "properties": {
                     "id": {
                       "type": "string"
+                    },
+                    "baseId": {
+                      "type": "string"
                     }
                   },
                   "required": [
-                    "id"
+                    "id",
+                    "baseId"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "operationId": "getAmbulances",
+        "summary": "Get ambulances",
+        "tags": [
+          "Ambulance"
+        ],
+        "description": "Get ambulances",
+        "parameters": [
+          {
+            "schema": {
+              "default": 1,
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            },
+            "in": "query",
+            "name": "page",
+            "required": false
+          },
+          {
+            "schema": {
+              "default": 10,
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            },
+            "in": "query",
+            "name": "perPage",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "name",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "in": "query",
+            "name": "basesId",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "in": "query",
+            "name": "unitsId",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "in": "query",
+            "name": "companiesId",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "companyGroupId",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "QAP",
+                  "OCP",
+                  "EVT",
+                  "J4",
+                  "J5",
+                  "FA",
+                  "MN"
+                ]
+              }
+            },
+            "in": "query",
+            "name": "status",
+            "required": false
+          }
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "status": {
+                            "type": "string",
+                            "enum": [
+                              "QAP",
+                              "OCP",
+                              "EVT",
+                              "J4",
+                              "J5",
+                              "FA",
+                              "MN"
+                            ]
+                          },
+                          "observations": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "licensePlate": {
+                            "type": "string"
+                          },
+                          "companyGroup": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "name": {
+                                "type": "string"
+                              },
+                              "document": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "name",
+                              "document"
+                            ],
+                            "additionalProperties": false
+                          },
+                          "company": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "name": {
+                                "type": "string"
+                              },
+                              "document": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "name",
+                              "document"
+                            ],
+                            "additionalProperties": false
+                          },
+                          "unit": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "name": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "name"
+                            ],
+                            "additionalProperties": false
+                          },
+                          "base": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "name": {
+                                "type": "string"
+                              },
+                              "document": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "name",
+                              "document"
+                            ],
+                            "additionalProperties": false
+                          },
+                          "documents": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "type": "string"
+                                },
+                                "title": {
+                                  "type": "string"
+                                },
+                                "type": {
+                                  "type": "string"
+                                },
+                                "content": {
+                                  "type": "string"
+                                },
+                                "validUntil": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "createdAt": {
+                                  "type": "string",
+                                  "format": "date-time"
+                                }
+                              },
+                              "required": [
+                                "id",
+                                "title",
+                                "type",
+                                "content",
+                                "validUntil",
+                                "createdAt"
+                              ],
+                              "additionalProperties": false
+                            }
+                          },
+                          "statusHistory": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "type": "string"
+                                },
+                                "fromStatus": {
+                                  "type": "string",
+                                  "enum": [
+                                    "QAP",
+                                    "OCP",
+                                    "EVT",
+                                    "J4",
+                                    "J5",
+                                    "FA",
+                                    "MN"
+                                  ]
+                                },
+                                "toStatus": {
+                                  "type": "string",
+                                  "enum": [
+                                    "QAP",
+                                    "OCP",
+                                    "EVT",
+                                    "J4",
+                                    "J5",
+                                    "FA",
+                                    "MN"
+                                  ]
+                                },
+                                "createdAt": {
+                                  "type": "string",
+                                  "format": "date-time"
+                                },
+                                "user": {
+                                  "type": "object",
+                                  "properties": {
+                                    "id": {
+                                      "type": "string"
+                                    },
+                                    "name": {
+                                      "type": "string"
+                                    }
+                                  },
+                                  "required": [
+                                    "id",
+                                    "name"
+                                  ],
+                                  "additionalProperties": false
+                                }
+                              },
+                              "required": [
+                                "id",
+                                "fromStatus",
+                                "toStatus",
+                                "createdAt",
+                                "user"
+                              ],
+                              "additionalProperties": false
+                            }
+                          },
+                          "ambulanceShiftHistories": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "type": "string"
+                                },
+                                "shiftStart": {
+                                  "type": "string",
+                                  "format": "date-time"
+                                },
+                                "shiftEnd": {
+                                  "nullable": true,
+                                  "type": "string",
+                                  "format": "date-time"
+                                }
+                              },
+                              "required": [
+                                "id",
+                                "shiftStart",
+                                "shiftEnd"
+                              ],
+                              "additionalProperties": false
+                            }
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "name",
+                          "status",
+                          "observations",
+                          "licensePlate",
+                          "companyGroup",
+                          "company",
+                          "unit",
+                          "base",
+                          "documents",
+                          "statusHistory",
+                          "ambulanceShiftHistories"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "pagination": {
+                      "type": "object",
+                      "properties": {
+                        "total": {
+                          "type": "number"
+                        },
+                        "totalPages": {
+                          "type": "number"
+                        },
+                        "hasNextPage": {
+                          "type": "boolean"
+                        },
+                        "hasPreviousPage": {
+                          "type": "boolean"
+                        },
+                        "currentPage": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "total",
+                        "totalPages",
+                        "hasNextPage",
+                        "hasPreviousPage",
+                        "currentPage"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "pagination"
                   ],
                   "additionalProperties": false
                 }
@@ -706,6 +1182,65 @@
                         "licensePlate": {
                           "type": "string"
                         },
+                        "ambulanceCode": {
+                          "type": "string"
+                        },
+                        "companyGroup": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string"
+                            },
+                            "name": {
+                              "type": "string"
+                            },
+                            "document": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "name",
+                            "document"
+                          ],
+                          "additionalProperties": false
+                        },
+                        "company": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string"
+                            },
+                            "name": {
+                              "type": "string"
+                            },
+                            "document": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "name",
+                            "document"
+                          ],
+                          "additionalProperties": false
+                        },
+                        "unit": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string"
+                            },
+                            "name": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "name"
+                          ],
+                          "additionalProperties": false
+                        },
                         "base": {
                           "type": "object",
                           "properties": {
@@ -718,71 +1253,12 @@
                             "document": {
                               "nullable": true,
                               "type": "string"
-                            },
-                            "unit": {
-                              "type": "object",
-                              "properties": {
-                                "id": {
-                                  "type": "string"
-                                },
-                                "name": {
-                                  "type": "string"
-                                },
-                                "company": {
-                                  "type": "object",
-                                  "properties": {
-                                    "id": {
-                                      "type": "string"
-                                    },
-                                    "name": {
-                                      "type": "string"
-                                    },
-                                    "document": {
-                                      "type": "string"
-                                    },
-                                    "companyGroup": {
-                                      "type": "object",
-                                      "properties": {
-                                        "id": {
-                                          "type": "string"
-                                        },
-                                        "name": {
-                                          "type": "string"
-                                        },
-                                        "document": {
-                                          "type": "string"
-                                        }
-                                      },
-                                      "required": [
-                                        "id",
-                                        "name",
-                                        "document"
-                                      ],
-                                      "additionalProperties": false
-                                    }
-                                  },
-                                  "required": [
-                                    "id",
-                                    "name",
-                                    "document",
-                                    "companyGroup"
-                                  ],
-                                  "additionalProperties": false
-                                }
-                              },
-                              "required": [
-                                "id",
-                                "name",
-                                "company"
-                              ],
-                              "additionalProperties": false
                             }
                           },
                           "required": [
                             "id",
                             "name",
-                            "document",
-                            "unit"
+                            "document"
                           ],
                           "additionalProperties": false
                         },
@@ -794,35 +1270,31 @@
                               "id": {
                                 "type": "string"
                               },
-                              "name": {
+                              "title": {
                                 "type": "string"
                               },
-                              "downloadUrl": {
+                              "type": {
                                 "type": "string"
                               },
-                              "fileExtension": {
+                              "content": {
                                 "type": "string"
                               },
-                              "fileSize": {
-                                "type": "number"
+                              "validUntil": {
+                                "nullable": true,
+                                "type": "string"
                               },
                               "createdAt": {
-                                "type": "string",
-                                "format": "date-time"
-                              },
-                              "expiresAt": {
                                 "type": "string",
                                 "format": "date-time"
                               }
                             },
                             "required": [
                               "id",
-                              "name",
-                              "downloadUrl",
-                              "fileExtension",
-                              "fileSize",
-                              "createdAt",
-                              "expiresAt"
+                              "title",
+                              "type",
+                              "content",
+                              "validUntil",
+                              "createdAt"
                             ],
                             "additionalProperties": false
                           }
@@ -897,6 +1369,10 @@
                         "status",
                         "observations",
                         "licensePlate",
+                        "ambulanceCode",
+                        "companyGroup",
+                        "company",
+                        "unit",
                         "base",
                         "documents",
                         "statusHistory"
@@ -935,6 +1411,18 @@
                   "observations": {
                     "type": "string"
                   },
+                  "ambulanceCode": {
+                    "type": "string"
+                  },
+                  "companyGroupId": {
+                    "type": "string"
+                  },
+                  "companyId": {
+                    "type": "string"
+                  },
+                  "unitId": {
+                    "type": "string"
+                  },
                   "baseId": {
                     "type": "string"
                   }
@@ -942,6 +1430,10 @@
                 "required": [
                   "name",
                   "licensePlate",
+                  "ambulanceCode",
+                  "companyGroupId",
+                  "companyId",
+                  "unitId",
                   "baseId"
                 ]
               }
@@ -982,8 +1474,262 @@
         }
       }
     },
+    "/ambulances/control": {
+      "get": {
+        "operationId": "getAmbulancesControl",
+        "summary": "Get ambulances for control",
+        "tags": [
+          "Ambulance"
+        ],
+        "description": "Get ambulances for control",
+        "parameters": [
+          {
+            "schema": {
+              "default": 1,
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            },
+            "in": "query",
+            "name": "page",
+            "required": false
+          },
+          {
+            "schema": {
+              "default": 10,
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            },
+            "in": "query",
+            "name": "perPage",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "name",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "in": "query",
+            "name": "basesId",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "in": "query",
+            "name": "unitsId",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "in": "query",
+            "name": "companiesId",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "companyGroupId",
+            "required": false
+          }
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "status": {
+                            "type": "string",
+                            "enum": [
+                              "QAP",
+                              "OCP",
+                              "EVT",
+                              "J4",
+                              "J5",
+                              "FA",
+                              "MN"
+                            ]
+                          },
+                          "observations": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "ambulanceShiftHistories": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "type": "string"
+                                },
+                                "shiftStart": {
+                                  "type": "string",
+                                  "format": "date-time"
+                                },
+                                "shiftEnd": {
+                                  "type": "string",
+                                  "format": "date-time"
+                                }
+                              },
+                              "required": [
+                                "id",
+                                "shiftStart",
+                                "shiftEnd"
+                              ],
+                              "additionalProperties": false
+                            }
+                          },
+                          "companyGroup": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id"
+                            ],
+                            "additionalProperties": false
+                          },
+                          "company": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id"
+                            ],
+                            "additionalProperties": false
+                          },
+                          "unit": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id"
+                            ],
+                            "additionalProperties": false
+                          },
+                          "base": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "name": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "name"
+                            ],
+                            "additionalProperties": false
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "name",
+                          "status",
+                          "observations",
+                          "ambulanceShiftHistories",
+                          "companyGroup",
+                          "company",
+                          "unit",
+                          "base"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "pagination": {
+                      "type": "object",
+                      "properties": {
+                        "total": {
+                          "type": "number"
+                        },
+                        "totalPages": {
+                          "type": "number"
+                        },
+                        "hasNextPage": {
+                          "type": "boolean"
+                        },
+                        "hasPreviousPage": {
+                          "type": "boolean"
+                        },
+                        "currentPage": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "total",
+                        "totalPages",
+                        "hasNextPage",
+                        "hasPreviousPage",
+                        "currentPage"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "pagination"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/ambulances/{id}/switch-status": {
-      "patch": {
+      "put": {
         "operationId": "switchAmbulanceStatus",
         "summary": "Switch an ambulance status",
         "tags": [
@@ -1042,6 +1788,353 @@
                   "enum": [
                     null
                   ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ambulances/{id}/switch-shift": {
+      "put": {
+        "operationId": "switchAmbulanceShift",
+        "summary": "Switch an ambulance shift",
+        "tags": [
+          "Ambulance"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "shiftStart": {
+                    "type": "string"
+                  },
+                  "shiftEnd": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "shiftStart",
+                  "shiftEnd"
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "shiftStart": {
+                      "type": "string"
+                    },
+                    "shiftEnd": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "shiftStart",
+                    "shiftEnd"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ambulances/associate-user": {
+      "put": {
+        "operationId": "associateUserToAmbulance",
+        "summary": "Associate user to ambulance",
+        "tags": [
+          "Ambulance"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "ambulanceId": {
+                    "type": "string"
+                  },
+                  "userId": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "ambulanceId",
+                  "userId"
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "userId": {
+                      "type": "string"
+                    },
+                    "ambulanceId": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "userId",
+                    "ambulanceId"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ambulances/deassociate-user": {
+      "put": {
+        "operationId": "deassociateUserFromAmbulance",
+        "summary": "Deassociate user from ambulance",
+        "tags": [
+          "Ambulance"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "userId": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "userId"
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "nullable": true,
+                  "enum": [
+                    null
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ambulances/{id}/phones": {
+      "get": {
+        "operationId": "getAmbulancePhones",
+        "summary": "Get ambulance phones by ID",
+        "tags": [
+          "Ambulance"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "companyGroup": {
+                          "type": "object",
+                          "properties": {
+                            "phones": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "id": {
+                                    "type": "string"
+                                  },
+                                  "name": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "number": {
+                                    "type": "string"
+                                  },
+                                  "isWhatsapp": {
+                                    "type": "boolean"
+                                  }
+                                },
+                                "required": [
+                                  "id",
+                                  "name",
+                                  "number",
+                                  "isWhatsapp"
+                                ],
+                                "additionalProperties": false
+                              }
+                            }
+                          },
+                          "required": [
+                            "phones"
+                          ],
+                          "additionalProperties": false
+                        },
+                        "company": {
+                          "type": "object",
+                          "properties": {
+                            "phones": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "id": {
+                                    "type": "string"
+                                  },
+                                  "name": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "number": {
+                                    "type": "string"
+                                  },
+                                  "isWhatsapp": {
+                                    "type": "boolean"
+                                  }
+                                },
+                                "required": [
+                                  "id",
+                                  "name",
+                                  "number",
+                                  "isWhatsapp"
+                                ],
+                                "additionalProperties": false
+                              }
+                            }
+                          },
+                          "required": [
+                            "phones"
+                          ],
+                          "additionalProperties": false
+                        },
+                        "unit": {
+                          "type": "object",
+                          "properties": {
+                            "phones": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "id": {
+                                    "type": "string"
+                                  },
+                                  "name": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "number": {
+                                    "type": "string"
+                                  },
+                                  "isWhatsapp": {
+                                    "type": "boolean"
+                                  }
+                                },
+                                "required": [
+                                  "id",
+                                  "name",
+                                  "number",
+                                  "isWhatsapp"
+                                ],
+                                "additionalProperties": false
+                              }
+                            }
+                          },
+                          "required": [
+                            "phones"
+                          ],
+                          "additionalProperties": false
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "companyGroup",
+                        "company",
+                        "unit"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "additionalProperties": false
                 }
               }
             }
@@ -1200,34 +2293,11 @@
                   },
                   "unitId": {
                     "type": "string"
-                  },
-                  "phones": {
-                    "type": "array",
-                    "items": {
-                      "type": "object",
-                      "properties": {
-                        "number": {
-                          "type": "string"
-                        },
-                        "name": {
-                          "type": "string"
-                        },
-                        "isWhatsapp": {
-                          "type": "boolean"
-                        }
-                      },
-                      "required": [
-                        "number"
-                      ]
-                    }
                   }
                 },
                 "required": [
                   "name",
-                  "latitude",
-                  "longitude",
-                  "unitId",
-                  "phones"
+                  "unitId"
                 ]
               }
             }
@@ -1296,18 +2366,24 @@
           },
           {
             "schema": {
-              "type": "string"
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
             },
             "in": "query",
-            "name": "unitId",
+            "name": "unitsId",
             "required": false
           },
           {
             "schema": {
-              "type": "string"
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
             },
             "in": "query",
-            "name": "companyId",
+            "name": "companiesId",
             "required": false
           },
           {
@@ -1343,6 +2419,38 @@
                           "name": {
                             "type": "string"
                           },
+                          "companyGroup": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "name": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "name"
+                            ],
+                            "additionalProperties": false
+                          },
+                          "company": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "name": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "name"
+                            ],
+                            "additionalProperties": false
+                          },
                           "unit": {
                             "type": "object",
                             "properties": {
@@ -1371,6 +2479,8 @@
                         "required": [
                           "id",
                           "name",
+                          "companyGroup",
+                          "company",
                           "unit",
                           "createdAt",
                           "updatedAt"
@@ -1419,7 +2529,7 @@
         }
       }
     },
-    "/bases/{id}": {
+    "/bases/{baseId}": {
       "put": {
         "operationId": "updateBase",
         "summary": "Update base",
@@ -1455,7 +2565,7 @@
               "type": "string"
             },
             "in": "path",
-            "name": "id",
+            "name": "baseId",
             "required": true
           }
         ],
@@ -1475,7 +2585,9 @@
             }
           }
         }
-      },
+      }
+    },
+    "/bases/{id}": {
       "get": {
         "operationId": "getBase",
         "summary": "Get base",
@@ -1685,78 +2797,6 @@
         }
       }
     },
-    "/bases/{baseId}/phones": {
-      "post": {
-        "operationId": "createBasePhoneNumber",
-        "summary": "Create base phone number",
-        "tags": [
-          "Base"
-        ],
-        "description": "Create a phone number for a base",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "isWhatsapp": {
-                    "default": false,
-                    "type": "boolean"
-                  },
-                  "name": {
-                    "type": "string"
-                  },
-                  "number": {
-                    "description": "Brazilian phone number (example: +5511999999999)",
-                    "type": "string"
-                  }
-                },
-                "required": [
-                  "number"
-                ]
-              }
-            }
-          },
-          "required": true
-        },
-        "parameters": [
-          {
-            "schema": {
-              "type": "string"
-            },
-            "in": "path",
-            "name": "baseId",
-            "required": true
-          }
-        ],
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ],
-        "responses": {
-          "201": {
-            "description": "Default Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "id": {
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "id"
-                  ],
-                  "additionalProperties": false
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/bases/{baseId}/phones/{phoneId}": {
       "delete": {
         "operationId": "deleteBasePhoneNumber",
@@ -1806,6 +2846,169 @@
         }
       }
     },
+    "/base/{baseId}/phones": {
+      "get": {
+        "operationId": "getBasePhones",
+        "summary": "Get base phones",
+        "tags": [
+          "Base"
+        ],
+        "description": "Get base phones",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "baseId",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "phones": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "number": {
+                                "type": "string"
+                              },
+                              "name": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "isWhatsapp": {
+                                "type": "boolean"
+                              },
+                              "createdAt": {
+                                "type": "string",
+                                "format": "date-time"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "number",
+                              "name",
+                              "isWhatsapp",
+                              "createdAt"
+                            ],
+                            "additionalProperties": false
+                          }
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "phones"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "createBasePhoneNumber",
+        "summary": "Create base phone number",
+        "tags": [
+          "Base"
+        ],
+        "description": "Create base phone number",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "description": "Phone name",
+                      "type": "string"
+                    },
+                    "isWhatsapp": {
+                      "default": false,
+                      "description": "Is whatsapp",
+                      "type": "boolean"
+                    },
+                    "number": {
+                      "description": "Brazilian phone number (example: +5511999999999)",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "number"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "baseId",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "count": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "count"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/companies": {
       "post": {
         "operationId": "createCompany",
@@ -1832,34 +3035,12 @@
                   "companyGroupId": {
                     "description": "Company group ID",
                     "type": "string"
-                  },
-                  "phones": {
-                    "type": "array",
-                    "items": {
-                      "type": "object",
-                      "properties": {
-                        "name": {
-                          "type": "string"
-                        },
-                        "isWhatsapp": {
-                          "type": "boolean"
-                        },
-                        "number": {
-                          "description": "Brazilian phone number (example: +5511999999999)",
-                          "type": "string"
-                        }
-                      },
-                      "required": [
-                        "number"
-                      ]
-                    }
                   }
                 },
                 "required": [
                   "name",
                   "document",
-                  "companyGroupId",
-                  "phones"
+                  "companyGroupId"
                 ]
               }
             }
@@ -1985,6 +3166,22 @@
                           },
                           "unitsCount": {
                             "type": "number"
+                          },
+                          "companyGroup": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "name": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "name"
+                            ],
+                            "additionalProperties": false
                           }
                         },
                         "required": [
@@ -1993,7 +3190,8 @@
                           "document",
                           "createdAt",
                           "updatedAt",
-                          "unitsCount"
+                          "unitsCount",
+                          "companyGroup"
                         ],
                         "additionalProperties": false
                       }
@@ -2290,26 +3488,31 @@
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "properties": {
-                  "name": {
-                    "type": "string"
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "description": "Phone name",
+                      "type": "string"
+                    },
+                    "isWhatsapp": {
+                      "default": false,
+                      "description": "Is whatsapp",
+                      "type": "boolean"
+                    },
+                    "number": {
+                      "description": "Brazilian phone number (example: +5511999999999)",
+                      "type": "string"
+                    }
                   },
-                  "isWhatsapp": {
-                    "type": "boolean"
-                  },
-                  "number": {
-                    "description": "Brazilian phone number (example: +5511999999999)",
-                    "type": "string"
-                  }
-                },
-                "required": [
-                  "number"
-                ]
+                  "required": [
+                    "number"
+                  ]
+                }
               }
             }
-          },
-          "required": true
+          }
         },
         "parameters": [
           {
@@ -2334,12 +3537,99 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "id": {
-                      "type": "string"
+                    "count": {
+                      "type": "number"
                     }
                   },
                   "required": [
-                    "id"
+                    "count"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "operationId": "getCompaniesPhones",
+        "summary": "Get company phones",
+        "tags": [
+          "Company"
+        ],
+        "description": "Get company phones",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "companyId",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "phones": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "number": {
+                                "type": "string"
+                              },
+                              "name": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "isWhatsapp": {
+                                "type": "boolean"
+                              },
+                              "createdAt": {
+                                "type": "string",
+                                "format": "date-time"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "number",
+                              "name",
+                              "isWhatsapp",
+                              "createdAt"
+                            ],
+                            "additionalProperties": false
+                          }
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "phones"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "data"
                   ],
                   "additionalProperties": false
                 }
@@ -2398,6 +3688,208 @@
         }
       }
     },
+    "/company/modules/{id}": {
+      "get": {
+        "operationId": "getCompanyModules",
+        "summary": "Get company modules",
+        "tags": [
+          "Company"
+        ],
+        "description": "Get company modules",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "customBillingValue": {
+                            "nullable": true,
+                            "type": "number"
+                          },
+                          "customBillingType": {
+                            "nullable": true,
+                            "type": "string",
+                            "enum": [
+                              "FIXED",
+                              "BY_AMBULANCE",
+                              "BY_BASE"
+                            ]
+                          },
+                          "active": {
+                            "type": "boolean"
+                          },
+                          "module": {
+                            "type": "object",
+                            "properties": {
+                              "name": {
+                                "type": "string"
+                              },
+                              "billingValue": {
+                                "type": "number"
+                              },
+                              "billingType": {
+                                "type": "string",
+                                "enum": [
+                                  "FIXED",
+                                  "BY_AMBULANCE",
+                                  "BY_BASE"
+                                ]
+                              }
+                            },
+                            "required": [
+                              "name",
+                              "billingValue",
+                              "billingType"
+                            ],
+                            "additionalProperties": false
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "customBillingValue",
+                          "customBillingType",
+                          "active",
+                          "module"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "updateCompanyModule",
+        "summary": "Update company module",
+        "tags": [
+          "Company"
+        ],
+        "description": "Update company module",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "customBillingValue": {
+                    "nullable": true,
+                    "type": "number"
+                  },
+                  "customBillingType": {
+                    "nullable": true,
+                    "type": "string",
+                    "enum": [
+                      "FIXED",
+                      "BY_AMBULANCE",
+                      "BY_BASE"
+                    ]
+                  },
+                  "active": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "customBillingValue": {
+                          "nullable": true,
+                          "type": "number"
+                        },
+                        "customBillingType": {
+                          "nullable": true,
+                          "type": "string",
+                          "enum": [
+                            "FIXED",
+                            "BY_AMBULANCE",
+                            "BY_BASE"
+                          ]
+                        },
+                        "active": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "customBillingValue",
+                        "customBillingType",
+                        "active"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/company-groups": {
       "post": {
         "operationId": "createCompanyGroup",
@@ -2420,34 +3912,11 @@
                     "type": "string",
                     "minLength": 14,
                     "maxLength": 14
-                  },
-                  "phones": {
-                    "type": "array",
-                    "items": {
-                      "type": "object",
-                      "properties": {
-                        "isWhatsapp": {
-                          "default": false,
-                          "type": "boolean"
-                        },
-                        "name": {
-                          "type": "string"
-                        },
-                        "number": {
-                          "description": "Brazilian phone number (example: +5511999999999)",
-                          "type": "string"
-                        }
-                      },
-                      "required": [
-                        "number"
-                      ]
-                    }
                   }
                 },
                 "required": [
                   "name",
-                  "document",
-                  "phones"
+                  "document"
                 ]
               }
             }
@@ -2565,39 +4034,6 @@
                           "updatedAt": {
                             "type": "string",
                             "format": "date-time"
-                          },
-                          "phones": {
-                            "type": "array",
-                            "items": {
-                              "type": "object",
-                              "properties": {
-                                "id": {
-                                  "type": "string"
-                                },
-                                "number": {
-                                  "type": "string"
-                                },
-                                "name": {
-                                  "nullable": true,
-                                  "type": "string"
-                                },
-                                "isWhatsapp": {
-                                  "type": "boolean"
-                                },
-                                "createdAt": {
-                                  "type": "string",
-                                  "format": "date-time"
-                                }
-                              },
-                              "required": [
-                                "id",
-                                "number",
-                                "name",
-                                "isWhatsapp",
-                                "createdAt"
-                              ],
-                              "additionalProperties": false
-                            }
                           }
                         },
                         "required": [
@@ -2606,8 +4042,7 @@
                           "document",
                           "companiesCount",
                           "createdAt",
-                          "updatedAt",
-                          "phones"
+                          "updatedAt"
                         ],
                         "additionalProperties": false
                       }
@@ -2885,29 +4320,31 @@
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "properties": {
-                  "name": {
-                    "description": "Phone name",
-                    "type": "string"
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "description": "Phone name",
+                      "type": "string"
+                    },
+                    "isWhatsapp": {
+                      "default": false,
+                      "description": "Is whatsapp",
+                      "type": "boolean"
+                    },
+                    "number": {
+                      "description": "Brazilian phone number (example: +5511999999999)",
+                      "type": "string"
+                    }
                   },
-                  "isWhatsapp": {
-                    "default": false,
-                    "description": "Is whatsapp",
-                    "type": "boolean"
-                  },
-                  "number": {
-                    "description": "Brazilian phone number (example: +5511999999999)",
-                    "type": "string"
-                  }
-                },
-                "required": [
-                  "number"
-                ]
+                  "required": [
+                    "number"
+                  ]
+                }
               }
             }
-          },
-          "required": true
+          }
         },
         "parameters": [
           {
@@ -2932,12 +4369,99 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "id": {
-                      "type": "string"
+                    "count": {
+                      "type": "number"
                     }
                   },
                   "required": [
-                    "id"
+                    "count"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "operationId": "getCompanyGroupPhones",
+        "summary": "Get company group phones",
+        "tags": [
+          "Company Group"
+        ],
+        "description": "Get company group phones",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "companyGroupId",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "phones": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "number": {
+                                "type": "string"
+                              },
+                              "name": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "isWhatsapp": {
+                                "type": "boolean"
+                              },
+                              "createdAt": {
+                                "type": "string",
+                                "format": "date-time"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "number",
+                              "name",
+                              "isWhatsapp",
+                              "createdAt"
+                            ],
+                            "additionalProperties": false
+                          }
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "phones"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "data"
                   ],
                   "additionalProperties": false
                 }
@@ -3120,6 +4644,17 @@
             "in": "query",
             "name": "companyId",
             "required": false
+          },
+          {
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "in": "query",
+            "name": "companiesId",
+            "required": false
           }
         ],
         "security": [
@@ -3145,6 +4680,22 @@
                           },
                           "name": {
                             "type": "string"
+                          },
+                          "companyGroup": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "name": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "name"
+                            ],
+                            "additionalProperties": false
                           },
                           "company": {
                             "type": "object",
@@ -3177,6 +4728,7 @@
                         "required": [
                           "id",
                           "name",
+                          "companyGroup",
                           "company",
                           "createdAt",
                           "updatedAt",
@@ -3486,6 +5038,169 @@
         }
       }
     },
+    "/units/{unitId}/phones": {
+      "get": {
+        "operationId": "getUnitsPhones",
+        "summary": "Get units phones",
+        "tags": [
+          "Unit"
+        ],
+        "description": "Get unit phones",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "unitId",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "phones": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "number": {
+                                "type": "string"
+                              },
+                              "name": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "isWhatsapp": {
+                                "type": "boolean"
+                              },
+                              "createdAt": {
+                                "type": "string",
+                                "format": "date-time"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "number",
+                              "name",
+                              "isWhatsapp",
+                              "createdAt"
+                            ],
+                            "additionalProperties": false
+                          }
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "phones"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "createUnitPhoneNumber",
+        "summary": "Create unit phone number",
+        "tags": [
+          "Unit"
+        ],
+        "description": "Create unit phone number",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "description": "Phone name",
+                      "type": "string"
+                    },
+                    "isWhatsapp": {
+                      "default": false,
+                      "description": "Is whatsapp",
+                      "type": "boolean"
+                    },
+                    "number": {
+                      "description": "Brazilian phone number (example: +5511999999999)",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "number"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "unitId",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "count": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "count"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/users": {
       "post": {
         "operationId": "createUser",
@@ -3505,9 +5220,7 @@
                   "document": {
                     "type": "string"
                   },
-                  "birthDate": {
-                    "type": "string"
-                  },
+                  "birthDate": {},
                   "roles": {
                     "type": "array",
                     "items": {
@@ -3554,7 +5267,16 @@
                         "ambulanceDocuments:update",
                         "ambulanceDocuments:delete",
                         "ambulanceDocuments:bulkUpdate",
-                        "sys_admin:accessAll"
+                        "sys_admin:accessAll",
+                        "chat:create",
+                        "chat:delete",
+                        "chat:read",
+                        "chat:sendMessage",
+                        "driver:read",
+                        "driver:create",
+                        "driver:update",
+                        "driver:delete",
+                        "driver:driver"
                       ]
                     }
                   },
@@ -3689,10 +5411,66 @@
                           "id": {
                             "type": "string"
                           },
+                          "companyGroup": {
+                            "nullable": true,
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "name": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "name"
+                            ],
+                            "additionalProperties": false
+                          },
+                          "companies": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "type": "string"
+                                },
+                                "name": {
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "id",
+                                "name"
+                              ],
+                              "additionalProperties": false
+                            }
+                          },
+                          "units": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "type": "string"
+                                },
+                                "name": {
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "id",
+                                "name"
+                              ],
+                              "additionalProperties": false
+                            }
+                          },
                           "name": {
                             "type": "string"
                           },
                           "document": {
+                            "nullable": true,
                             "type": "string"
                           },
                           "avatarUrl": {
@@ -3710,6 +5488,9 @@
                         },
                         "required": [
                           "id",
+                          "companyGroup",
+                          "companies",
+                          "units",
                           "name",
                           "document",
                           "avatarUrl",
@@ -3862,6 +5643,9 @@
                   "name": {
                     "type": "string"
                   },
+                  "document": {
+                    "type": "string"
+                  },
                   "avatarUrl": {
                     "nullable": true,
                     "type": "string",
@@ -3877,7 +5661,7 @@
                       "type": "string"
                     }
                   },
-                  "unitIds": {
+                  "unitsIds": {
                     "type": "array",
                     "items": {
                       "type": "string"
@@ -3929,18 +5713,23 @@
                         "ambulanceDocuments:update",
                         "ambulanceDocuments:delete",
                         "ambulanceDocuments:bulkUpdate",
-                        "sys_admin:accessAll"
+                        "sys_admin:accessAll",
+                        "chat:create",
+                        "chat:delete",
+                        "chat:read",
+                        "chat:sendMessage",
+                        "driver:read",
+                        "driver:create",
+                        "driver:update",
+                        "driver:delete",
+                        "driver:driver"
                       ]
                     }
                   }
-                },
-                "required": [
-                  "companyGroupId"
-                ]
+                }
               }
             }
-          },
-          "required": true
+          }
         },
         "parameters": [
           {
@@ -3952,6 +5741,137 @@
             "required": true
           }
         ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/permissions": {
+      "put": {
+        "operationId": "updateUserPermissions",
+        "summary": "Update a user permissions",
+        "tags": [
+          "User"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "roleIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": [
+                        "companyGroup:read",
+                        "companyGroup:update",
+                        "companyGroup:createPhoneNumber",
+                        "companyGroup:deletePhoneNumber",
+                        "companyGroup:updatePhoneNumber",
+                        "company:create",
+                        "company:read",
+                        "company:update",
+                        "company:delete",
+                        "company:createPhoneNumber",
+                        "company:deletePhoneNumber",
+                        "company:updatePhoneNumber",
+                        "unit:create",
+                        "unit:read",
+                        "unit:update",
+                        "unit:delete",
+                        "unit:createPhoneNumber",
+                        "unit:deletePhoneNumber",
+                        "unit:updatePhoneNumber",
+                        "base:create",
+                        "base:read",
+                        "base:update",
+                        "base:delete",
+                        "base:createPhoneNumber",
+                        "base:deletePhoneNumber",
+                        "base:updatePhoneNumber",
+                        "user:create",
+                        "user:read",
+                        "user:update",
+                        "user:delete",
+                        "user:assignRole",
+                        "ambulance:create",
+                        "ambulance:read",
+                        "ambulance:update",
+                        "ambulance:delete",
+                        "ambulance:switchBase",
+                        "ambulance:switchStatus",
+                        "ambulanceDocuments:create",
+                        "ambulanceDocuments:update",
+                        "ambulanceDocuments:delete",
+                        "ambulanceDocuments:bulkUpdate",
+                        "sys_admin:accessAll",
+                        "chat:create",
+                        "chat:delete",
+                        "chat:read",
+                        "chat:sendMessage",
+                        "driver:read",
+                        "driver:create",
+                        "driver:update",
+                        "driver:delete",
+                        "driver:driver"
+                      ]
+                    }
+                  }
+                },
+                "required": [
+                  "id"
+                ]
+              }
+            }
+          },
+          "required": true
+        },
         "security": [
           {
             "BearerAuth": []
@@ -4029,6 +5949,7 @@
                           "type": "string"
                         },
                         "document": {
+                          "nullable": true,
                           "type": "string"
                         },
                         "avatarUrl": {
@@ -4081,7 +6002,16 @@
                               "ambulanceDocuments:update",
                               "ambulanceDocuments:delete",
                               "ambulanceDocuments:bulkUpdate",
-                              "sys_admin:accessAll"
+                              "sys_admin:accessAll",
+                              "chat:create",
+                              "chat:delete",
+                              "chat:read",
+                              "chat:sendMessage",
+                              "driver:read",
+                              "driver:create",
+                              "driver:update",
+                              "driver:delete",
+                              "driver:driver"
                             ]
                           }
                         },
@@ -4139,6 +6069,103 @@
                             ],
                             "additionalProperties": false
                           }
+                        },
+                        "ambulance": {
+                          "nullable": true,
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string"
+                            },
+                            "name": {
+                              "type": "string"
+                            },
+                            "status": {
+                              "type": "string"
+                            },
+                            "ambulanceShiftHistories": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "shiftStart": {
+                                    "type": "string",
+                                    "format": "date-time"
+                                  },
+                                  "shiftEnd": {
+                                    "nullable": true,
+                                    "type": "string",
+                                    "format": "date-time"
+                                  }
+                                },
+                                "required": [
+                                  "shiftStart",
+                                  "shiftEnd"
+                                ],
+                                "additionalProperties": false
+                              }
+                            },
+                            "licensePlate": {
+                              "type": "string"
+                            },
+                            "chats": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "id": {
+                                    "type": "string"
+                                  },
+                                  "readByAppAt": {
+                                    "nullable": true,
+                                    "type": "string",
+                                    "format": "date-time"
+                                  },
+                                  "readByWebAt": {
+                                    "nullable": true,
+                                    "type": "string",
+                                    "format": "date-time"
+                                  },
+                                  "messages": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "object",
+                                      "properties": {
+                                        "createdAt": {
+                                          "type": "string",
+                                          "format": "date-time"
+                                        }
+                                      },
+                                      "required": [
+                                        "createdAt"
+                                      ],
+                                      "additionalProperties": false
+                                    }
+                                  }
+                                },
+                                "required": [
+                                  "id",
+                                  "readByAppAt",
+                                  "readByWebAt",
+                                  "messages"
+                                ],
+                                "additionalProperties": false
+                              }
+                            },
+                            "unitId": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "name",
+                            "status",
+                            "ambulanceShiftHistories",
+                            "licensePlate",
+                            "chats",
+                            "unitId"
+                          ],
+                          "additionalProperties": false
                         }
                       },
                       "required": [
@@ -4149,7 +6176,257 @@
                         "roles",
                         "companyGroup",
                         "companies",
+                        "units",
+                        "ambulance"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/{id}": {
+      "get": {
+        "operationId": "getUser",
+        "summary": "Get user by ID",
+        "tags": [
+          "User"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "document": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "avatarUrl": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "birthDate": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "createdAt": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "roles": {
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "enum": [
+                              "companyGroup:read",
+                              "companyGroup:update",
+                              "companyGroup:createPhoneNumber",
+                              "companyGroup:deletePhoneNumber",
+                              "companyGroup:updatePhoneNumber",
+                              "company:create",
+                              "company:read",
+                              "company:update",
+                              "company:delete",
+                              "company:createPhoneNumber",
+                              "company:deletePhoneNumber",
+                              "company:updatePhoneNumber",
+                              "unit:create",
+                              "unit:read",
+                              "unit:update",
+                              "unit:delete",
+                              "unit:createPhoneNumber",
+                              "unit:deletePhoneNumber",
+                              "unit:updatePhoneNumber",
+                              "base:create",
+                              "base:read",
+                              "base:update",
+                              "base:delete",
+                              "base:createPhoneNumber",
+                              "base:deletePhoneNumber",
+                              "base:updatePhoneNumber",
+                              "user:create",
+                              "user:read",
+                              "user:update",
+                              "user:delete",
+                              "user:assignRole",
+                              "ambulance:create",
+                              "ambulance:read",
+                              "ambulance:update",
+                              "ambulance:delete",
+                              "ambulance:switchBase",
+                              "ambulance:switchStatus",
+                              "ambulanceDocuments:create",
+                              "ambulanceDocuments:update",
+                              "ambulanceDocuments:delete",
+                              "ambulanceDocuments:bulkUpdate",
+                              "sys_admin:accessAll",
+                              "chat:create",
+                              "chat:delete",
+                              "chat:read",
+                              "chat:sendMessage",
+                              "driver:read",
+                              "driver:create",
+                              "driver:update",
+                              "driver:delete",
+                              "driver:driver"
+                            ]
+                          }
+                        },
+                        "companyGroupId": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "companies": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id"
+                            ],
+                            "additionalProperties": false
+                          }
+                        },
+                        "units": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id"
+                            ],
+                            "additionalProperties": false
+                          }
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name",
+                        "document",
+                        "avatarUrl",
+                        "birthDate",
+                        "createdAt",
+                        "roles",
+                        "companyGroupId",
+                        "companies",
                         "units"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/me/shift/validation": {
+      "get": {
+        "operationId": "getAuthenticatedUserShiftValidation",
+        "summary": "Get authenticated user with shift validation",
+        "tags": [
+          "User"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "shift": {
+                          "type": "object",
+                          "properties": {
+                            "isValid": {
+                              "type": "boolean"
+                            },
+                            "shiftStart": {
+                              "nullable": true,
+                              "type": "string",
+                              "format": "date-time"
+                            },
+                            "shiftEnd": {
+                              "nullable": true,
+                              "type": "string",
+                              "format": "date-time"
+                            },
+                            "refetchAt": {
+                              "type": "string",
+                              "format": "date-time"
+                            }
+                          },
+                          "required": [
+                            "isValid",
+                            "shiftStart",
+                            "shiftEnd",
+                            "refetchAt"
+                          ],
+                          "additionalProperties": false
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "shift"
                       ],
                       "additionalProperties": false
                     }
@@ -4172,6 +6449,1414 @@
         "tags": [
           "User"
         ],
+        "responses": {
+          "201": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/modules": {
+      "post": {
+        "operationId": "createModule",
+        "summary": "Create module",
+        "tags": [
+          "Module"
+        ],
+        "description": "Create module",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "billingValue": {
+                    "type": "number"
+                  },
+                  "billingType": {
+                    "type": "string",
+                    "enum": [
+                      "FIXED",
+                      "BY_AMBULANCE",
+                      "BY_BASE"
+                    ]
+                  }
+                },
+                "required": [
+                  "name",
+                  "billingValue",
+                  "billingType"
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "operationId": "getModules",
+        "summary": "Get modules",
+        "tags": [
+          "Module"
+        ],
+        "description": "Get modules",
+        "parameters": [
+          {
+            "schema": {
+              "default": 1,
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            },
+            "in": "query",
+            "name": "page",
+            "required": false
+          },
+          {
+            "schema": {
+              "default": 10,
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            },
+            "in": "query",
+            "name": "perPage",
+            "required": false
+          }
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "billingValue": {
+                            "type": "number"
+                          },
+                          "billingType": {
+                            "type": "string",
+                            "enum": [
+                              "FIXED",
+                              "BY_AMBULANCE",
+                              "BY_BASE"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "name",
+                          "billingValue",
+                          "billingType"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "pagination": {
+                      "type": "object",
+                      "properties": {
+                        "total": {
+                          "type": "number"
+                        },
+                        "totalPages": {
+                          "type": "number"
+                        },
+                        "hasNextPage": {
+                          "type": "boolean"
+                        },
+                        "hasPreviousPage": {
+                          "type": "boolean"
+                        },
+                        "currentPage": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "total",
+                        "totalPages",
+                        "hasNextPage",
+                        "hasPreviousPage",
+                        "currentPage"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "pagination"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/modules/{moduleId}": {
+      "put": {
+        "operationId": "updateModule",
+        "summary": "Update module",
+        "tags": [
+          "Module"
+        ],
+        "description": "Update module",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "billingValue": {
+                    "type": "number"
+                  },
+                  "billingType": {
+                    "type": "string",
+                    "enum": [
+                      "FIXED",
+                      "BY_AMBULANCE",
+                      "BY_BASE"
+                    ]
+                  }
+                },
+                "required": [
+                  "name",
+                  "billingValue",
+                  "billingType"
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "moduleId",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "nullable": true,
+                  "enum": [
+                    null
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "deleteModule",
+        "summary": "Delete module",
+        "tags": [
+          "Module"
+        ],
+        "description": "Delete module",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "moduleId",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "nullable": true,
+                  "enum": [
+                    null
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "operationId": "getModule",
+        "summary": "Get Module",
+        "tags": [
+          "Module"
+        ],
+        "description": "Get module",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "moduleId",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "nullable": true,
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "billingValue": {
+                          "type": "number"
+                        },
+                        "billingType": {
+                          "type": "string",
+                          "enum": [
+                            "FIXED",
+                            "BY_AMBULANCE",
+                            "BY_BASE"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name",
+                        "billingValue",
+                        "billingType"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/chats/{id}": {
+      "post": {
+        "operationId": "createChat",
+        "summary": "Create a new chat",
+        "tags": [
+          "Chat"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "baseId": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "baseId"
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "deleteChat",
+        "summary": "Delete a chat",
+        "tags": [
+          "Chat"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "baseId": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "baseId"
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/chats/message/{id}": {
+      "post": {
+        "operationId": "sendMessage",
+        "summary": "Send a message in a chat",
+        "tags": [
+          "Chat"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "content": {
+                    "type": "string"
+                  },
+                  "file": {
+                    "type": "string"
+                  },
+                  "messageType": {
+                    "type": "string",
+                    "enum": [
+                      "TEXT",
+                      "AUDIO",
+                      "IMAGE",
+                      "DOCUMENT",
+                      "VIDEO"
+                    ]
+                  },
+                  "user": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "avatarUrl": {
+                        "nullable": true,
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "name",
+                      "avatarUrl"
+                    ]
+                  },
+                  "platform": {
+                    "type": "string",
+                    "enum": [
+                      "APP",
+                      "WEB"
+                    ]
+                  },
+                  "offlineId": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "content",
+                  "messageType",
+                  "user",
+                  "platform"
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "chatId": {
+                      "type": "string"
+                    },
+                    "content": {
+                      "type": "string"
+                    },
+                    "file": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "messageType": {
+                      "type": "string",
+                      "enum": [
+                        "TEXT",
+                        "AUDIO",
+                        "IMAGE",
+                        "DOCUMENT",
+                        "VIDEO"
+                      ]
+                    },
+                    "user": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "avatarUrl": {
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name",
+                        "avatarUrl"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "platform": {
+                      "type": "string",
+                      "enum": [
+                        "APP",
+                        "WEB"
+                      ]
+                    },
+                    "offlineId": {
+                      "type": "string"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "chatId",
+                    "content",
+                    "messageType",
+                    "user",
+                    "platform",
+                    "createdAt"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/chats": {
+      "get": {
+        "operationId": "getChats",
+        "summary": "Get chats",
+        "tags": [
+          "Chat"
+        ],
+        "description": "Get chats",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "name",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "in": "query",
+            "name": "unitsId",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "in": "query",
+            "name": "companiesId",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "companyGroupId",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "QAP",
+                  "OCP",
+                  "EVT",
+                  "J4",
+                  "J5",
+                  "FA",
+                  "MN"
+                ]
+              }
+            },
+            "in": "query",
+            "name": "status",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "APP",
+                "WEB"
+              ]
+            },
+            "in": "query",
+            "name": "platform",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "readByAppAt": {
+                            "nullable": true,
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "readByWebAt": {
+                            "nullable": true,
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "lastMessageAt": {
+                            "nullable": true,
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "unreadCountApp": {
+                            "type": "number"
+                          },
+                          "unreadCountWeb": {
+                            "type": "number"
+                          },
+                          "ambulance": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "name": {
+                                "type": "string"
+                              },
+                              "status": {
+                                "type": "string",
+                                "enum": [
+                                  "QAP",
+                                  "OCP",
+                                  "EVT",
+                                  "J4",
+                                  "J5",
+                                  "FA",
+                                  "MN"
+                                ]
+                              },
+                              "baseId": {
+                                "type": "string"
+                              },
+                              "unitId": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "name",
+                              "status",
+                              "baseId",
+                              "unitId"
+                            ],
+                            "additionalProperties": false
+                          },
+                          "messages": {
+                            "nullable": true,
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "type": "string"
+                                },
+                                "content": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "messageType": {
+                                  "type": "string",
+                                  "enum": [
+                                    "TEXT",
+                                    "AUDIO",
+                                    "IMAGE",
+                                    "DOCUMENT",
+                                    "VIDEO"
+                                  ]
+                                },
+                                "createdAt": {
+                                  "type": "string",
+                                  "format": "date-time"
+                                }
+                              },
+                              "required": [
+                                "id",
+                                "content",
+                                "messageType",
+                                "createdAt"
+                              ],
+                              "additionalProperties": false
+                            }
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "readByAppAt",
+                          "readByWebAt",
+                          "lastMessageAt",
+                          "unreadCountApp",
+                          "unreadCountWeb",
+                          "ambulance",
+                          "messages"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/chat/messages/{id}": {
+      "get": {
+        "operationId": "getChatMessages",
+        "summary": "Get chat messages paginated (reverse order for infinite scroll)",
+        "tags": [
+          "Chat"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "default": 1,
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            },
+            "in": "query",
+            "name": "page",
+            "required": false
+          },
+          {
+            "schema": {
+              "default": 20,
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            },
+            "in": "query",
+            "name": "perPage",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "chat": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "ambulance": {
+                                "type": "object",
+                                "properties": {
+                                  "unitId": {
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "unitId"
+                                ],
+                                "additionalProperties": false
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "ambulance"
+                            ],
+                            "additionalProperties": false
+                          },
+                          "chatId": {
+                            "type": "string"
+                          },
+                          "content": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "file": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "messageType": {
+                            "type": "string",
+                            "enum": [
+                              "TEXT",
+                              "AUDIO",
+                              "IMAGE",
+                              "DOCUMENT",
+                              "VIDEO"
+                            ]
+                          },
+                          "offlineId": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "createdAt": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "user": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "name": {
+                                "type": "string"
+                              },
+                              "avatarUrl": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "name",
+                              "avatarUrl"
+                            ],
+                            "additionalProperties": false
+                          },
+                          "status": {
+                            "type": "string",
+                            "enum": [
+                              "PENDING",
+                              "SENT"
+                            ]
+                          },
+                          "isNew": {
+                            "type": "boolean"
+                          },
+                          "platform": {
+                            "type": "string",
+                            "enum": [
+                              "APP",
+                              "WEB"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "chat",
+                          "chatId",
+                          "content",
+                          "file",
+                          "messageType",
+                          "createdAt",
+                          "user",
+                          "status",
+                          "platform"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "pagination": {
+                      "type": "object",
+                      "properties": {
+                        "total": {
+                          "type": "number"
+                        },
+                        "totalPages": {
+                          "type": "number"
+                        },
+                        "hasNextPage": {
+                          "type": "boolean"
+                        },
+                        "hasPreviousPage": {
+                          "type": "boolean"
+                        },
+                        "currentPage": {
+                          "type": "number"
+                        },
+                        "perPage": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "total",
+                        "totalPages",
+                        "hasNextPage",
+                        "hasPreviousPage",
+                        "currentPage",
+                        "perPage"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "pagination"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/chats/{id}/read": {
+      "put": {
+        "operationId": "readChat",
+        "summary": "Mark chat as read",
+        "tags": [
+          "Chat"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "platform": {
+                    "type": "string",
+                    "enum": [
+                      "APP",
+                      "WEB"
+                    ]
+                  },
+                  "unitId": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "platform",
+                  "unitId"
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "platform": {
+                      "type": "string"
+                    },
+                    "readAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "platform",
+                    "readAt"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/chat/unread/{id}": {
+      "get": {
+        "operationId": "getUnreadChatMessages",
+        "summary": "Get unread chat messages",
+        "tags": [
+          "Chat"
+        ],
+        "description": "Get unread chat messages",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "unitId",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "nullable": true,
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "lastMessageAt": {
+                          "nullable": true,
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "unreadCountApp": {
+                          "type": "number"
+                        },
+                        "unreadCountWeb": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "lastMessageAt",
+                        "unreadCountApp",
+                        "unreadCountWeb"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/radio/create-meeting": {
+      "post": {
+        "operationId": "createRadioMeeting",
+        "summary": "Create a radio meeting",
+        "tags": [
+          "Radio"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string"
+                  },
+                  "ambulanceId": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "title",
+                  "ambulanceId"
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/radio/add-participant": {
+      "post": {
+        "operationId": "addRadioParticipant",
+        "summary": "Add a participant to a radio meeting",
+        "tags": [
+          "Radio"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "meetingId": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "preset_name": {
+                    "type": "string"
+                  },
+                  "custom_participant_id": {
+                    "type": "string"
+                  },
+                  "ambulanceId": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "meetingId",
+                  "name",
+                  "preset_name",
+                  "custom_participant_id",
+                  "ambulanceId"
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "token": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "token"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/radio/remove-participant": {
+      "delete": {
+        "operationId": "removeRadioParticipant",
+        "summary": "Remove a participant from a radio meeting",
+        "tags": [
+          "Radio"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "meetingId": {
+                    "type": "string"
+                  },
+                  "participantId": {
+                    "type": "string"
+                  },
+                  "ambulanceId": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "meetingId",
+                  "participantId",
+                  "ambulanceId"
+                ]
+              }
+            }
+          },
+          "required": true
+        },
         "responses": {
           "201": {
             "description": "Default Response",

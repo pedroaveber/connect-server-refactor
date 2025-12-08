@@ -31,15 +31,6 @@ export const getCompanyGroups: FastifyPluginCallbackZod = (app) => {
                 companiesCount: z.number(),
                 createdAt: z.date(),
                 updatedAt: z.date(),
-                phones: z.array(
-                  z.object({
-                    id: z.string(),
-                    number: z.string(),
-                    name: z.string().nullable(),
-                    isWhatsapp: z.boolean(),
-                    createdAt: z.date(),
-                  })
-                ),
               })
             ),
             pagination: z.object({
@@ -68,15 +59,6 @@ export const getCompanyGroups: FastifyPluginCallbackZod = (app) => {
             document: true,
             createdAt: true,
             updatedAt: true,
-            phones: {
-              select: {
-                id: true,
-                number: true,
-                name: true,
-                isWhatsapp: true,
-                createdAt: true,
-              },
-            },
             _count: {
               select: {
                 companies: true,
@@ -112,8 +94,6 @@ export const getCompanyGroups: FastifyPluginCallbackZod = (app) => {
       const totalPages = Math.ceil(total / perPage);
       const hasNextPage = page < totalPages;
       const hasPreviousPage = page > 1;
-
-      console.log(companyGroups);
 
       return reply.status(200).send({
         data: companyGroups.map((companyGroup) => ({
